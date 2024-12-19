@@ -4,11 +4,12 @@ import 'package:get/get.dart';
 import 'package:flutter_application_1/models/ubi.dart';
 import 'package:flutter_application_1/services/ubiServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:math';
+
 
 class UbiController extends GetxController {
   final ubiService = UbiService();
   var ubis = <UbiModel>[].obs;
+  var nearbyUbisNames = <String>[].obs; // Lista solo de los nombres de las ubicaciones cercanas
   var isLoading = false.obs;
   var errorMessage = ''.obs;
 
@@ -17,10 +18,12 @@ class UbiController extends GetxController {
   TextEditingController nameController = TextEditingController();
   TextEditingController latitudeController = TextEditingController();
   TextEditingController longitudeController = TextEditingController();
+  TextEditingController distanceController = TextEditingController(); // Para la distancia
   TextEditingController addressController = TextEditingController();
   TextEditingController tipoController = TextEditingController();
   TextEditingController comentariController = TextEditingController();
   TextEditingController horariController = TextEditingController();
+
 
   @override
   void onInit() {
@@ -140,49 +143,24 @@ class UbiController extends GetxController {
     }
   }
 
-// Filtrar ubicacions properes
-  Future<void> filterNearbyLocations(double userLat, double userLon) async {
+  // Buscar ubicaciones cercanas y solo obtener sus nombres
+  Future<void> getNearbyUbis(double lat, double lon, double distance) async {
     isLoading.value = true;
     try {
-      // Obtener todas las ubicaciones desde el servicio
-      final allUbis = await ubiService.getUbis();
+      // Realizamos la consulta de ubicaciones cercanas a través del servicio
+      final nearbyUbis = await ubiService.getNearbyUbis(lat, lon, distance);
+      
+      // Extraemos solo los nombres de las ubicaciones cercanas
+      nearbyUbisNames.value = nearbyUbis.map((ubi) => ubi.name).toList();
 
-      // Filtrar las ubicaciones que estén a menos de 30 km
-      const double radiusKm = 1.0;
-      ubis.value = allUbis.where((ubi) {
-        final lat = ubi.ubication['latitud'];
-        final lon = ubi.ubication['longitud'];
-
-        if (lat == null || lon == null) return false;
-
-        return _calculateDistance(userLat, userLon, lat, lon) <= radiusKm;
-      }).toList();
+      print("Ubicaciones cercanas encontradas: ${nearbyUbisNames.value}");
     } catch (e) {
-      errorMessage.value = 'Error al filtrar les ubicacions.';
+      errorMessage.value = 'Error al obtener las ubicaciones cercanas';
+      print('Error al obtener ubicaciones cercanas: $e');
     } finally {
       isLoading.value = false;
     }
   }
-
-  // Calcular la distancia entre dos coordenadas en kilómetros
-  double _calculateDistance(
-      double lat1, double lon1, double lat2, double lon2) {
-    const double R = 6371; // Radio de la Tierra en kilómetros
-    double dLat = _degToRad(lat2 - lat1);
-    double dLon = _degToRad(lon2 - lon1);
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_degToRad(lat1)) *
-            cos(_degToRad(lat2)) *
-            sin(dLon / 2) *
-            sin(dLon / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return R * c;
-  }
-
-  // Convertir grados a radianes
-  double _degToRad(double deg) => deg * (pi / 180);
-
-
 
   // Netejar els camps del formulari
   void clearForm() {

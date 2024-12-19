@@ -126,4 +126,28 @@ class UbiService {
       return -1;
     }
   }
+
+  // Buscar ubicaciones cercanas
+Future<List<UbiModel>> getNearbyUbis(double lat, double lon, double distance) async {
+  print('getNearbyUbis');
+  try {
+    // Realiza la solicitud GET con los parámetros de latitud, longitud y distancia
+    var res = await dio.get('$baseUrl/api/ubi/nearby/$lon/$lat/$distance');
+
+    // Comprobamos la respuesta
+    print('Response: ${res.data}');
+
+    // Si la respuesta es válida, mapeamos los datos a la lista de UbiModel
+    List<dynamic> responseData = res.data;
+    List<UbiModel> ubis = responseData
+        .map((data) => UbiModel.fromJson(data))
+        .toList();
+
+    return ubis;
+  } catch (e) {
+    print('Error fetching nearby ubications: $e');
+    throw e; // Lanzamos el error para ser manejado más arriba
+  }
+}
+
 }
