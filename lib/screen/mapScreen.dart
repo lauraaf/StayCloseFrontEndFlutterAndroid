@@ -10,6 +10,8 @@ class MapScreen extends StatelessWidget {
   final TextEditingController latitudeController = TextEditingController();
   final TextEditingController longitudeController = TextEditingController();
 
+  RxList<UbiModel> selectedUbications = RxList<UbiModel>([]);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,10 +53,17 @@ class MapScreen extends StatelessWidget {
 
                       return Marker(
                         point: LatLng(latitude, longitude),
-                        builder: (ctx) => Icon(
-                          Icons.place,
-                          color: const Color.fromARGB(255, 133, 160, 160),
-                          size: 35.0,
+                        builder: (ctx) => GestureDetector(
+                          onTap: () {
+                            if (!selectedUbications.contains(ubi)) {
+                              selectedUbications.add(ubi);
+                            }
+                          },
+                          child: Icon(
+                            Icons.place,
+                            color: const Color.fromARGB(255, 133, 160, 160),
+                            size: 35.0,
+                          ),
                         ),
                       );
                     }).toList(),
@@ -141,6 +150,118 @@ class MapScreen extends StatelessWidget {
           ],
         );
       }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showAddUbiDialog(context);
+        },
+        backgroundColor: const Color(0xFF89AFAF),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _showAddUbiDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Center(
+                    child: Text(
+                      'Nova Ubicació',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF89AFAF),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: ubiController.nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nom',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.addressController,
+                    decoration: const InputDecoration(
+                      labelText: 'Adreça',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.horariController,
+                    decoration: const InputDecoration(
+                      labelText: 'Horari',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.tipoController,
+                    decoration: const InputDecoration(
+                      labelText: 'Tipus',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.comentariController,
+                    decoration: const InputDecoration(
+                      labelText: 'Comentari',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.latitudeController,
+                    decoration: const InputDecoration(
+                      labelText: 'Latitud',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.longitudeController,
+                    decoration: const InputDecoration(
+                      labelText: 'Longitud',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await ubiController.createUbi();
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF89AFAF),
+                      ),
+                      child: const Text('Crear Ubicació'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
