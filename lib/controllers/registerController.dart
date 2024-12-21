@@ -99,7 +99,19 @@ class RegisterController extends GetxController {
         final response = await userService.createUser(googleUser);
         if (response == 201){
           Get.snackbar('Éxito', 'Registro con Google exitoso');
-          Get.toNamed('/home');
+          final logIn = (
+            username: googleUser.username,
+            password: googleUser.password,
+          );
+          final response2 = await userService.logIn(logIn);
+          if (response2 == 200) {
+            // Manejo de respuesta exitosa
+            Get.snackbar('Éxito', 'Inicio de sesión exitoso');
+            Text('Bienvenido, ${googleUser.username ?? "Cargando..."}');
+            Get.toNamed('/home');
+          } else {
+          errorMessage.value = 'Usuario o contraseña incorrectos';
+          }  
         } else {
           Get.snackbar('Error', 'No se pudo registrar con Google');
         }
