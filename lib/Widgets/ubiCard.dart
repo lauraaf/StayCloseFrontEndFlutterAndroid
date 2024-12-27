@@ -8,6 +8,7 @@ class UbiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(ubi.name);
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -20,47 +21,12 @@ class UbiCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              ubi.name,
+              
+              ubi.name,  // Solo mostrar el nombre de la ubicación
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              ubi.address,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              ubi.comentari,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Tipo: ${ubi.tipo}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  'Horario: ${ubi.horari}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
             ),
           ],
         ),

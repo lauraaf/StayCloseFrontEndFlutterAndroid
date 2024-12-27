@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter_application_1/controllers/ubiController.dart';
-import 'package:flutter_application_1/models/ubi.dart';
+import 'package:flutter_application_1/controllers/ubiController.dart'; // UbiController para manejar las ubicaciones
+import 'package:flutter_application_1/controllers/ubiListController.dart'; // UbiListController para manejar la lista de ubicaciones seleccionadas
 import 'package:flutter_application_1/widgets/ubiCard.dart'; // Asegúrate de importar UbiCard
 
 class MapScreen extends StatelessWidget {
-  final UbiController ubiController = Get.put(UbiController());
-  RxList<UbiModel> selectedUbications = RxList<UbiModel>([]);
+  final UbiController ubiController = Get.put(UbiController()); // UbiController para manejar las ubicaciones
+  final UbiListController ubiListController = Get.put(UbiListController()); // UbiListController para manejar la lista de ubicaciones seleccionadas
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +18,12 @@ class MapScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF89AFAF),
       ),
       body: Obx(() {
+        // Muestra un cargador mientras se obtienen las ubicaciones
         if (ubiController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
+        // Si no hay ubicaciones, muestra un mensaje
         if (ubiController.ubis.isEmpty) {
           return const Center(child: Text('No hi ha ubicacions disponibles'));
         }
@@ -48,8 +50,9 @@ class MapScreen extends StatelessWidget {
                       point: LatLng(latitude, longitude),
                       builder: (ctx) => GestureDetector(
                         onTap: () {
-                          if (!selectedUbications.contains(ubi)) {
-                            selectedUbications.add(ubi);
+                          // Agrega la ubicación a la lista si no está ya
+                          if (!ubiListController.selectedUbications.contains(ubi)) {
+                            ubiListController.selectedUbications.add(ubi);
                           }
                         },
                         child: const Icon(
@@ -74,8 +77,8 @@ class MapScreen extends StatelessWidget {
                   color: const Color.fromARGB(121, 178, 213, 213),
                   borderRadius: BorderRadius.circular(12.0),
                   border: Border.all(
-                    color: const Color.fromARGB(255, 92, 165, 165), // El color del borde
-                    width: 2.0, // El grosor del borde
+                    color: const Color.fromARGB(255, 92, 165, 165),
+                    width: 2.0,
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -133,7 +136,7 @@ class MapScreen extends StatelessWidget {
                           double distance = double.parse(ubiController.distanceController.text);
 
                           // Llamamos a la función para obtener las ubicaciones cercanas
-                          await ubiController.getNearbyUbis(latitude, longitude, distance);
+                          await ubiListController.getNearbyUbis(latitude, longitude, distance);
                         } catch (e) {
                           Get.snackbar("Error", "Por favor, ingresa valores válidos.");
                         }
@@ -153,10 +156,12 @@ class MapScreen extends StatelessWidget {
               top: 250,
               left: 16,
               right: 16,
-              child: Column(
-                children: selectedUbications.map((ubi) {
-                  return UbiCard(ubi: ubi); // Usamos el widget UbiCard aquí
-                }).toList(),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: ubiListController.selectedUbications.map((ubi) {
+                    return UbiCard(ubi: ubi); // Usamos el widget UbiCard aquí
+                  }).toList(),
+                ),
               ),
             ),
           ],

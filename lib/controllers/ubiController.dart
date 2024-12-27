@@ -139,7 +139,7 @@ class UbiController extends GetxController {
   }
 
   // Buscar ubicaciones cercanas y solo obtener sus nombres
-  Future<void> getNearbyUbis(double lat, double lon, double distance) async {
+  /*Future<void> getNearbyUbis(double lat, double lon, double distance) async {
     isLoading.value = true;
     try {
       final nearbyUbis = await ubiService.getNearbyUbis(lat, lon, distance);
@@ -151,7 +151,7 @@ class UbiController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
+  }*/
 
   // Limpiar los campos del formulario
   void clearForm() {

@@ -1,23 +1,77 @@
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/ubi.dart';
-import 'package:flutter_application_1/services/ubiServices.dart'; // Asegúrate de importar el servicio
+import 'package:flutter_application_1/services/ubiServices.dart';
 
 class UbiListController extends GetxController {
+  var isLoading = true.obs;
   var ubis = <UbiModel>[].obs; // Lista reactiva de ubicaciones
-  var isLoading = false.obs;
-
   final UbiService _ubiService = UbiService(); // Instancia del servicio
+  var selectedUbications = RxList<UbiModel>([]); // Lista de ubicaciones seleccionadas
+
+  @override
+  void onInit() {
+    super.onInit();
+  }
 
   // Función para obtener ubicaciones cercanas
   Future<void> getNearbyUbis(double lat, double lon, double distance) async {
     try {
+      // Validación de parámetros
+      if (lat == null || lon == null || distance == null) {
+        Get.snackbar('Error', 'Por favor, introduce valores válidos para latitud, longitud y distancia.');
+        return;
+      }
+
       isLoading(true); // Activamos el indicador de carga
-      List<UbiModel> fetchedUbis = await _ubiService.getNearbyUbis(lat, lon, distance);
-      ubis.assignAll(fetchedUbis); // Asignamos las ubicaciones obtenidas
+
+      // Llamar al servicio para obtener ubicaciones cercanas
+      var fetchedUbis = await _ubiService.getNearbyUbis(lat, lon, distance);
+
+      if (fetchedUbis != null && fetchedUbis.isNotEmpty) {
+        ubis.assignAll(fetchedUbis); // Asignamos las ubicaciones obtenidas
+        // Añadimos todas las ubicaciones a selectedUbications
+        // Aquí puedes agregar una condición si solo quieres agregar algunas
+        for (var ubi in fetchedUbis) {
+          addSelectedUbi(ubi); // Añadir la ubicación seleccionada
+        }
+      } else {
+        Get.snackbar('Error', 'No se encontraron ubicaciones cercanas.');
+      }
     } catch (e) {
       print("Error obteniendo ubicaciones cercanas: $e");
+      Get.snackbar('Error', 'Error al obtener ubicaciones cercanas.');
     } finally {
       isLoading(false); // Desactivamos el indicador de carga
     }
   }
+
+  // Función para añadir una ubicación a las seleccionadas
+  void addSelectedUbi(UbiModel ubi) {
+    if (!selectedUbications.contains(ubi)) {
+      selectedUbications.add(ubi); // Añadir ubicación a la lista de seleccionadas
+    }
+  }
 }
+
+
+
+  // Método para eliminar una ubicación utilizando el id
+  /*Future<void> deleteUbi(String ubiId) async {
+    try {
+      isLoading(true); // Establecemos el estado de carga a true
+      var statusCode = await _ubiService.deleteUbiById(ubiId);
+      if (statusCode == 200) {
+        Get.snackbar('Éxito', 'Ubicación eliminada correctamente');
+        getNearbyUbis(); // Actualiza la lista después de eliminar
+      } else {
+        Get.snackbar('Error', 'No se pudo eliminar la ubicación');
+      }
+    } catch (e) {
+      print("Error deleting ubi: $e");
+      Get.snackbar('Error', 'Hubo un error al eliminar la ubicación');
+    } finally {
+      isLoading(false);
+    }
+  }*/
+
