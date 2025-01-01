@@ -15,36 +15,43 @@ class UbiListController extends GetxController {
   }
 
   // Función para obtener ubicaciones cercanas
-  Future<void> getNearbyUbis(double lat, double lon, double distance) async {
-    try {
-      // Validación de parámetros
-      if (lat == null || lon == null || distance == null) {
-        Get.snackbar('Error', 'Por favor, introduce valores válidos para latitud, longitud y distancia.');
-        return;
-      }
-
-      isLoading(true); // Activamos el indicador de carga
-
-      // Llamar al servicio para obtener ubicaciones cercanas
-      var fetchedUbis = await _ubiService.getNearbyUbis(lat, lon, distance);
-
-      if (fetchedUbis != null && fetchedUbis.isNotEmpty) {
-        ubis.assignAll(fetchedUbis); // Asignamos las ubicaciones obtenidas
-        // Añadimos todas las ubicaciones a selectedUbications
-        // Aquí puedes agregar una condición si solo quieres agregar algunas
-        for (var ubi in fetchedUbis) {
-          addSelectedUbi(ubi); // Añadir la ubicación seleccionada
-        }
-      } else {
-        Get.snackbar('Error', 'No se encontraron ubicaciones cercanas.');
-      }
-    } catch (e) {
-      print("Error obteniendo ubicaciones cercanas: $e");
-      Get.snackbar('Error', 'Error al obtener ubicaciones cercanas.');
-    } finally {
-      isLoading(false); // Desactivamos el indicador de carga
+ // Función para obtener ubicaciones cercanas
+Future<void> getNearbyUbis(double lat, double lon, double distance) async {
+  try {
+    // Validación de parámetros
+    if (lat == null || lon == null || distance == null) {
+      Get.snackbar('Error', 'Por favor, introduce valores válidos para latitud, longitud y distancia.');
+      return;
     }
+
+    isLoading(true); // Activamos el indicador de carga
+
+    // Limpiamos la lista de ubicaciones anteriores
+    ubis.clear(); // Limpia la lista de ubicaciones actuales
+    
+    // Limpiamos las ubicaciones seleccionadas
+    selectedUbications.clear(); // Limpia la lista de ubicaciones seleccionadas
+
+    // Llamar al servicio para obtener ubicaciones cercanas
+    var fetchedUbis = await _ubiService.getNearbyUbis(lat, lon, distance);
+
+    if (fetchedUbis != null && fetchedUbis.isNotEmpty) {
+      ubis.assignAll(fetchedUbis); // Asignamos las ubicaciones obtenidas
+      // Añadimos todas las ubicaciones a selectedUbications
+      for (var ubi in fetchedUbis) {
+        addSelectedUbi(ubi); // Añadir la ubicación seleccionada
+      }
+    } else {
+      Get.snackbar('Error', 'No se encontraron ubicaciones cercanas.');
+    }
+  } catch (e) {
+    print("Error obteniendo ubicaciones cercanas: $e");
+    Get.snackbar('Error', 'Error al obtener ubicaciones cercanas.');
+  } finally {
+    isLoading(false); // Desactivamos el indicador de carga
   }
+}
+
 
   // Función para añadir una ubicación a las seleccionadas
   void addSelectedUbi(UbiModel ubi) {

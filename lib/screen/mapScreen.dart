@@ -120,7 +120,7 @@ class MapScreen extends StatelessWidget {
                     TextField(
                       controller: ubiController.distanceController,
                       decoration: const InputDecoration(
-                        labelText: 'Distància (en metres)',
+                        labelText: 'Distància (en km)',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
@@ -145,6 +145,19 @@ class MapScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+
+            // Mostrar tarjetas debajo del buscador
+            Positioned(
+              top: 310,
+              right: 20,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: ubiListController.selectedUbications.map((ubi) {
+                    return UbiCard(ubi: ubi); // Usamos el widget UbiCard aquí
+                  }).toList(),
                 ),
               ),
             ),
@@ -194,19 +207,6 @@ class MapScreen extends StatelessWidget {
               }
               return Container(); // Si no hay ubicación seleccionada, no mostramos la tarjeta
             }),
-            // Mostrar tarjetas debajo del buscador
-            Positioned(
-              top: 250,
-              left: 16,
-              right: 16,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: ubiListController.selectedUbications.map((ubi) {
-                    return UbiCard(ubi: ubi); // Usamos el widget UbiCard aquí
-                  }).toList(),
-                ),
-              ),
-            ),
           ],
         );
       }),
