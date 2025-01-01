@@ -153,12 +153,29 @@ class MapScreen extends StatelessWidget {
             Positioned(
               top: 310,
               right: 20,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: ubiListController.selectedUbications.map((ubi) {
-                    return UbiCard(ubi: ubi); // Usamos el widget UbiCard aquí
-                  }).toList(),
-                ),
+              child: Container(
+                width: 300, // Ajusta el ancho según lo necesites
+                height: 400, // Ajusta la altura según lo necesites
+                child: Obx(() {
+                  return ListView.builder(
+                    controller: ubiListController.scrollController, // Asociamos el ScrollController
+                    itemCount: ubiListController.ubis.length + 1, // Añadimos uno para mostrar el indicador de carga
+                    itemBuilder: (context, index) {
+                      if (index == ubiListController.ubis.length) {
+                        // Si hemos llegado al final, mostramos un indicador de carga
+                        return ubiListController.isLoading.value
+                            ? const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16.0),
+                                child: Center(child: CircularProgressIndicator()),
+                              )
+                            : const SizedBox.shrink();
+                      } else {
+                        var ubi = ubiListController.ubis[index];
+                        return UbiCard(ubi: ubi); // Mostrar las ubicaciones
+                      }
+                    },
+                  );
+                }),
               ),
             ),
 
@@ -220,7 +237,6 @@ class MapScreen extends StatelessWidget {
     );
   }
 
-  
   void _showAddUbiDialog(BuildContext context) {
     showDialog(
       context: context,
