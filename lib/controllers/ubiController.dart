@@ -20,6 +20,8 @@ class UbiController extends GetxController {
   TextEditingController tipoController = TextEditingController();
   TextEditingController comentariController = TextEditingController();
   TextEditingController horariController = TextEditingController();
+    var selectedUbi = Rx<UbiModel?>(null); // Ubicación seleccionada (reactiva)
+
 
   @override
   void onInit() {
@@ -162,5 +164,15 @@ class UbiController extends GetxController {
     comentariController.clear();
     tipoController.clear();
     horariController.clear();
+  }
+
+  // Método para seleccionar una ubicación y actualizar selectedUbi
+  void selectUbi(UbiModel ubi) {
+    selectedUbi.value = ubi; // Actualiza la ubicación seleccionada
+  }
+
+  // Limpiar la ubicación seleccionada
+  void clearSelectedUbi() {
+    selectedUbi.value = null;
   }
 }

@@ -50,15 +50,13 @@ class MapScreen extends StatelessWidget {
                       point: LatLng(latitude, longitude),
                       builder: (ctx) => GestureDetector(
                         onTap: () {
-                          // Agrega la ubicación a la lista si no está ya
-                          if (!ubiListController.selectedUbications.contains(ubi)) {
-                            ubiListController.selectedUbications.add(ubi);
-                          }
+                          // Actualiza la ubicación seleccionada en el UbiController
+                          ubiController.selectUbi(ubi);
                         },
                         child: const Icon(
                           Icons.place,
-                          color: Color.fromARGB(255, 133, 160, 160),
-                          size: 35.0,
+                          color: Color.fromARGB(255, 84, 91, 111),
+                          size: 38.0,
                         ),
                       ),
                     );
@@ -151,6 +149,51 @@ class MapScreen extends StatelessWidget {
               ),
             ),
 
+            // Mostrar tarjeta de la ubicación seleccionada en la parte superior derecha
+            Obx(() {
+              final selectedUbi = ubiController.selectedUbi.value;
+              if (selectedUbi != null) {
+                return Positioned(
+                  top: 16,
+                  right: 323,
+                  child: Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      width: 250,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('${selectedUbi.name}', style: TextStyle(fontWeight: FontWeight.bold)),
+                              IconButton(
+                                icon: const Icon(Icons.close, color: Colors.red),
+                                iconSize: 20, // Tamaño más pequeño para el ícono
+                                onPressed: () {
+                                  ubiController.selectedUbi.value = null; // Desmarcar la ubicación
+                                },
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Text('· Dirección: ${selectedUbi.address}'),
+                          SizedBox(height: 5),
+                          Text('· Tipo: ${selectedUbi.tipo}'),
+                          SizedBox(height: 5),
+                          Text('· Comentario: ${selectedUbi.comentari}'),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return Container(); // Si no hay ubicación seleccionada, no mostramos la tarjeta
+            }),
             // Mostrar tarjetas debajo del buscador
             Positioned(
               top: 250,
@@ -177,6 +220,7 @@ class MapScreen extends StatelessWidget {
     );
   }
 
+  
   void _showAddUbiDialog(BuildContext context) {
     showDialog(
       context: context,
