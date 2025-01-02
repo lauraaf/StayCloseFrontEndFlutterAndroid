@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter_application_1/controllers/ubiController.dart';
-import 'package:flutter_application_1/models/ubi.dart';
+import 'package:flutter_application_1/controllers/ubiController.dart'; // UbiController para manejar las ubicaciones
+import 'package:flutter_application_1/controllers/ubiListController.dart'; // UbiListController para manejar la lista de ubicaciones seleccionadas
+import 'package:flutter_application_1/widgets/ubiCard.dart'; // Asegúrate de importar UbiCard
 
 class MapScreen extends StatelessWidget {
-  final UbiController ubiController = Get.put(UbiController());
-  RxList<UbiModel> selectedUbications = RxList<UbiModel>([]);
+  final UbiController ubiController = Get.put(UbiController()); // UbiController para manejar las ubicaciones
+  final UbiListController ubiListController = Get.put(UbiListController()); // UbiListController para manejar la lista de ubicaciones seleccionadas
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +18,12 @@ class MapScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF89AFAF),
       ),
       body: Obx(() {
+        // Muestra un cargador mientras se obtienen las ubicaciones
         if (ubiController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
+        // Si no hay ubicaciones, muestra un mensaje
         if (ubiController.ubis.isEmpty) {
           return const Center(child: Text('No hi ha ubicacions disponibles'));
         }
@@ -35,29 +38,25 @@ class MapScreen extends StatelessWidget {
               ),
               children: [
                 TileLayer(
-                  urlTemplate:
-                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                   subdomains: ['a', 'b', 'c'],
                 ),
                 MarkerLayer(
                   markers: ubiController.ubis.map((ubi) {
-                    final latitude =
-                        ubi.ubication['latitud'] ?? 41.382395521312176;
-                    final longitude =
-                        ubi.ubication['longitud'] ?? 2.1567611541534366;
+                    final latitude = ubi.ubication.latitud ?? 41.382395521312176;
+                    final longitude = ubi.ubication.longitud ?? 2.1567611541534366;
 
                     return Marker(
                       point: LatLng(latitude, longitude),
                       builder: (ctx) => GestureDetector(
                         onTap: () {
-                          if (!selectedUbications.contains(ubi)) {
-                            selectedUbications.add(ubi);
-                          }
+                          // Actualiza la ubicación seleccionada en el UbiController
+                          ubiController.selectUbi(ubi);
                         },
-                        child: Icon(
+                        child: const Icon(
                           Icons.place,
-                          color: const Color.fromARGB(255, 133, 160, 160),
-                          size: 35.0,
+                          color: Color.fromARGB(255, 84, 91, 111),
+                          size: 38.0,
                         ),
                       ),
                     );
@@ -66,86 +65,165 @@ class MapScreen extends StatelessWidget {
               ],
             ),
 
-            // Mostra les caixes per a les ubicacions seleccionades
-            ...selectedUbications.map((ubi) {
-              int index = selectedUbications.indexOf(ubi);
-              return Positioned(
-                right: 16.0,
-                top: 16.0 + index * 160.0,
-                child: Container(
-                  width: 220.0,
-                  padding: const EdgeInsets.all(12.0),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFB2D5D5),
-                    borderRadius: BorderRadius.circular(12.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 6.0,
-                        offset: const Offset(3, 3),
-                      ),
-                    ],
+            // Cuadro de búsqueda en la esquina superior derecha
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(121, 178, 213, 213),
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: Border.all(
+                    color: const Color.fromARGB(255, 92, 165, 165),
+                    width: 2.0,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 6.0,
+                      offset: const Offset(3, 3),
+                    ),
+                  ],
+                ),
+                width: 300,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Buscar ubicacions per distància',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: ubiController.latitudeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Latitud',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: ubiController.longitudeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Longitud',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: ubiController.distanceController,
+                      decoration: const InputDecoration(
+                        labelText: 'Distància (en km)',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        try {
+                          double latitude = double.parse(ubiController.latitudeController.text);
+                          double longitude = double.parse(ubiController.longitudeController.text);
+                          double distance = double.parse(ubiController.distanceController.text);
+
+                          // Llamamos a la función para obtener las ubicaciones cercanas
+                          await ubiListController.getNearbyUbis(latitude, longitude, distance);
+                        } catch (e) {
+                          Get.snackbar("Error", "Por favor, ingresa valores válidos.");
+                        }
+                      },
+                      child: const Text('Buscar'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF89AFAF),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Mostrar tarjetas debajo del buscador
+            Positioned(
+              top: 310,
+              right: 20,
+              child: Container(
+                width: 300, // Ajusta el ancho según lo necesites
+                height: 400, // Ajusta la altura según lo necesites
+                child: Obx(() {
+                  return ListView.builder(
+                    controller: ubiListController.scrollController, // Asociamos el ScrollController
+                    itemCount: ubiListController.ubis.length + 1, // Añadimos uno para mostrar el indicador de carga
+                    itemBuilder: (context, index) {
+                      if (index == ubiListController.ubis.length) {
+                        // Si hemos llegado al final, mostramos un indicador de carga
+                        return ubiListController.isLoading.value
+                            ? const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16.0),
+                                child: Center(child: CircularProgressIndicator()),
+                              )
+                            : const SizedBox.shrink();
+                      } else {
+                        var ubi = ubiListController.ubis[index];
+                        return UbiCard(ubi: ubi); // Mostrar las ubicaciones
+                      }
+                    },
+                  );
+                }),
+              ),
+            ),
+
+            // Mostrar tarjeta de la ubicación seleccionada en la parte superior derecha
+            Obx(() {
+              final selectedUbi = ubiController.selectedUbi.value;
+              if (selectedUbi != null) {
+                return Positioned(
+                  top: 16,
+                  right: 323,
+                  child: Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      width: 250,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Detalls',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('${selectedUbi.name}', style: TextStyle(fontWeight: FontWeight.bold)),
+                              IconButton(
+                                icon: const Icon(Icons.close, color: Colors.red),
+                                iconSize: 20, // Tamaño más pequeño para el ícono
+                                onPressed: () {
+                                  ubiController.selectedUbi.value = null; // Desmarcar la ubicación
+                                },
+                              ),
+                            ],
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              selectedUbications.remove(ubi);
-                            },
-                            child: const Icon(
-                              Icons.close,
-                              size: 20.0,
-                              color: Colors.black,
-                            ),
-                          ),
+                          SizedBox(height: 5),
+                          Text('· Dirección: ${selectedUbi.address}'),
+                          SizedBox(height: 5),
+                          Text('· Tipo: ${selectedUbi.tipo}'),
+                          SizedBox(height: 5),
+                          Text('· Comentario: ${selectedUbi.comentari}'),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Nom: ${ubi.name}',
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.black),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Tipus: ${ubi.tipo}',
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.black),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Horari: ${ubi.horari}',
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.black),
-                      ),
-                      Text(
-                        'Adreça: ${ubi.address}',
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.black),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Comentari: ${ubi.comentari}',
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.black),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              );
-            }).toList(),
+                );
+              }
+              return Container(); // Si no hay ubicación seleccionada, no mostramos la tarjeta
+            }),
           ],
         );
       }),
