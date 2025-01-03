@@ -46,16 +46,16 @@ class PostService {
     }
   }
 
-  // Función para obtener la lista de experiencias
+  // Función para obtener la lista de posts
   Future<List<PostModel>> getPosts() async {
     print('getPosts');
     try {
-      // Enviar solicitud GET para obtener las experiencias
+      // Enviar solicitud GET para obtener los posts
       var res = await dio.get('$baseUrl/api/posts');
       print(res);
       List<dynamic> responseData = res.data;
       print(responseData);
-      // Convertir la respuesta en una lista de ExperienceModel
+      // Convertir la respuesta en una lista de postModel
       List<PostModel> posts = responseData
           .map((data) => PostModel.fromJson(data))
           .toList();
@@ -103,7 +103,7 @@ class PostService {
     }
   }
 
-  // Función para eliminar una experiencia por descripción
+  // Función para eliminar un post por id
 Future<int> deletePostById(String id) async {
   print('deletePostById');
   try {
@@ -135,5 +135,22 @@ Future<int> deletePostById(String id) async {
     return -1;  // En caso de un error durante la solicitud
   }
 }
+
+// Función para obtener los posts de un autor específico
+Future<List<PostModel>> getPostsByAuthor(String id) async {
+  try {
+    // Enviar solicitud GET con el autor como parámetro de consulta
+    var res = await dio.get('$baseUrl/api/posts/authorPosts/$id');
+    
+    List<dynamic> responseData = res.data;
+
+    // Convertir la respuesta en una lista de PostModel
+    return responseData.map((data) => PostModel.fromJson(data)).toList();
+  } catch (e) {
+    print('Error fetching posts by author: $e');
+    throw e;
+  }
+}
+
 
 }

@@ -138,4 +138,22 @@ class PostController extends GetxController {
     }
 
   }
+
+  // Método para obtener los posts del usuario actual
+Future<List<PostModel>> fetchMyPosts() async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+
+    if (username.isEmpty) {
+      throw Exception('No se pudo recuperar el nombre de usuario.');
+    }
+
+    final myPosts = await postService.getPostsByAuthor(username);
+    return myPosts;
+  } catch (e) {
+    throw Exception('Error al obtener los posts: $e');
+  }
+}
+
 }
