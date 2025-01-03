@@ -237,107 +237,89 @@ class MapScreen extends StatelessWidget {
     );
   }
 
-  void _showAddUbiDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Center(
-                    child: Text(
-                      'Nova Ubicació',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF89AFAF),
-                      ),
+ void _showAddUbiDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Text(
+                    'Nova Ubicació',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF89AFAF),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: ubiController.nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nom',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: ubiController.nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nom',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.addressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Adreça',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: ubiController.addressController,
+                  decoration: const InputDecoration(
+                    labelText: 'Adreça',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.horariController,
-                    decoration: const InputDecoration(
-                      labelText: 'Horari',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: ubiController.horariController,
+                  decoration: const InputDecoration(
+                    labelText: 'Horari',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.tipoController,
-                    decoration: const InputDecoration(
-                      labelText: 'Tipus',
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: ubiController.tipoController,
+                  decoration: const InputDecoration(
+                    labelText: 'Tipus',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.comentariController,
-                    decoration: const InputDecoration(
-                      labelText: 'Comentari',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: ubiController.comentariController,
+                  decoration: const InputDecoration(
+                    labelText: 'Comentari',
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.latitudeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Latitud',
-                      border: OutlineInputBorder(),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await ubiController.createUbi();
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF89AFAF),
                     ),
-                    keyboardType: TextInputType.number,
+                    child: const Text('Crear Ubicació'),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.longitudeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Longitud',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        await ubiController.createUbi();
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF89AFAF),
-                      ),
-                      child: const Text('Crear Ubicació'),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        );
+        ),
+      );
       },
     );
   }
