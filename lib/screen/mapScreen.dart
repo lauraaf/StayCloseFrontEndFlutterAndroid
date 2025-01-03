@@ -5,10 +5,87 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_application_1/controllers/ubiController.dart'; // UbiController para manejar las ubicaciones
 import 'package:flutter_application_1/controllers/ubiListController.dart'; // UbiListController para manejar la lista de ubicaciones seleccionadas
 import 'package:flutter_application_1/widgets/ubiCard.dart'; // Asegúrate de importar UbiCard
+import 'package:geolocator/geolocator.dart'; // Paquete para geolocalización
 
-class MapScreen extends StatelessWidget {
-  final UbiController ubiController = Get.put(UbiController()); // UbiController para manejar las ubicaciones
-  final UbiListController ubiListController = Get.put(UbiListController()); // UbiListController para manejar la lista de ubicaciones seleccionadas
+class MapScreen extends StatefulWidget {
+  @override
+  _MapScreenState createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+  final UbiController ubiController = Get.put(UbiController());
+  final UbiListController ubiListController = Get.put(UbiListController());
+
+  double? userLatitude;
+  double? userLongitude;
+
+  @override
+  void initState() {
+    super.initState();
+    print("Vamos a obtener la ubicacion del usuario");
+    _getUserLocation(); // Obtener la ubicación del usuario al entrar al mapa
+  }
+
+  // Función para obtener la ubicación del usuario
+Future<void> _getUserLocation() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // Verificar si los servicios de ubicación están habilitados
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    print("Los servicios de ubicación no están habilitados.");
+    return;
+  } else {
+    print("Servicios de ubicación habilitados.");
+  }
+
+  // Verificar si se tiene permiso para acceder a la ubicación
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      print("Permiso de ubicación denegado.");
+      return;
+    } else {
+      print("Permiso de ubicación concedido.");
+    }
+  } else {
+    print("Permiso de ubicación ya concedido.");
+  }
+
+  // Obtener la ubicación actual del usuario
+  try {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    print("Ubicación obtenida: Lat: ${position.latitude}, Lon: ${position.longitude}");
+
+    // Actualizar el estado con las coordenadas obtenidas
+    setState(() {
+      userLatitude = position.latitude;
+      userLongitude = position.longitude;
+    });
+
+    // Añadir el marcador en el mapa
+    if (userLatitude != null && userLongitude != null) {
+      final userMarker = Marker(
+        point: LatLng(userLatitude!, userLongitude!),
+        builder: (ctx) => const Icon(
+          Icons.location_on,
+          color: Colors.red, // Color rojo para la ubicación del usuario
+          size: 38.0,
+        ),
+      );
+
+      print("Marcador añadido en la ubicación del usuario.");
+    }
+  } catch (e) {
+    print("Error al obtener la ubicación: $e");
+  }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -42,25 +119,37 @@ class MapScreen extends StatelessWidget {
                   subdomains: ['a', 'b', 'c'],
                 ),
                 MarkerLayer(
-                  markers: ubiController.ubis.map((ubi) {
-                    final latitude = ubi.ubication.latitud ?? 41.382395521312176;
-                    final longitude = ubi.ubication.longitud ?? 2.1567611541534366;
-
-                    return Marker(
-                      point: LatLng(latitude, longitude),
-                      builder: (ctx) => GestureDetector(
-                        onTap: () {
-                          // Actualiza la ubicación seleccionada en el UbiController
-                          ubiController.selectUbi(ubi);
-                        },
-                        child: const Icon(
-                          Icons.place,
-                          color: Color.fromARGB(255, 84, 91, 111),
+                  markers: [
+                    // Marcador de la ubicación del usuario (en rojo)
+                    if (userLatitude != null && userLongitude != null)
+                      Marker(
+                        point: LatLng(userLatitude!, userLongitude!),
+                        builder: (ctx) => const Icon(
+                          Icons.location_on,
+                          color: Colors.red, // Color rojo para indicar la ubicación del usuario
                           size: 38.0,
                         ),
                       ),
-                    );
-                  }).toList(),
+                    // Otros marcadores para las ubicaciones
+                    ...ubiController.ubis.map((ubi) {
+                      final latitude = ubi.ubication.latitud ?? 41.382395521312176;
+                      final longitude = ubi.ubication.longitud ?? 2.1567611541534366;
+
+                      return Marker(
+                        point: LatLng(latitude, longitude),
+                        builder: (ctx) => GestureDetector(
+                          onTap: () {
+                            ubiController.selectUbi(ubi);
+                          },
+                          child: const Icon(
+                            Icons.place,
+                            color: Color.fromARGB(255, 84, 91, 111),
+                            size: 38.0,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
                 ),
               ],
             ),
