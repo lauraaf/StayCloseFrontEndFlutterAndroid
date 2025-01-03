@@ -41,7 +41,7 @@ class UbiListController extends GetxController {
       selectedUbications.clear(); // Limpiamos las ubicaciones seleccionadas
 
       // Llamar al servicio para obtener ubicaciones cercanas
-      var fetchedUbis = await _ubiService.getNearbyUbis(lat, lon, distance);
+      var fetchedUbis = await _ubiService.getNearbyUbis(lat, lon, 2);
 
       if (fetchedUbis != null && fetchedUbis.isNotEmpty) {
         ubis.assignAll(fetchedUbis); // Asignamos las ubicaciones obtenidas
@@ -98,9 +98,6 @@ class UbiListController extends GetxController {
     }
   }
 }
-
-
-
 
   // Método para eliminar una ubicación utilizando el id
   /*Future<void> deleteUbi(String ubiId) async {

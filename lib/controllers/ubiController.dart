@@ -20,7 +20,7 @@ class UbiController extends GetxController {
   TextEditingController tipoController = TextEditingController();
   TextEditingController comentariController = TextEditingController();
   TextEditingController horariController = TextEditingController();
-    var selectedUbi = Rx<UbiModel?>(null); // Ubicación seleccionada (reactiva)
+  var selectedUbi = Rx<UbiModel?>(null); // Ubicación seleccionada (reactiva)
 
 
   @override
@@ -87,7 +87,6 @@ class UbiController extends GetxController {
   }
 }
 
-
   // Editar una ubicación existente
   Future<void> editUbi(String id) async {
     final name = nameController.text.trim();
@@ -143,21 +142,6 @@ class UbiController extends GetxController {
       isLoading.value = false;
     }
   }
-
-  // Buscar ubicaciones cercanas y solo obtener sus nombres
-  /*Future<void> getNearbyUbis(double lat, double lon, double distance) async {
-    isLoading.value = true;
-    try {
-      final nearbyUbis = await ubiService.getNearbyUbis(lat, lon, distance);
-      nearbyUbisNames.value = nearbyUbis.map((ubi) => ubi.name).toList();
-      print("Ubicaciones cercanas encontradas: ${nearbyUbisNames.value}");
-    } catch (e) {
-      errorMessage.value = 'Error al obtener las ubicaciones cercanas';
-      print('Error al obtener ubicaciones cercanas: $e');
-    } finally {
-      isLoading.value = false;
-    }
-  }*/
 
   // Limpiar los campos del formulario
   void clearForm() {

@@ -27,65 +27,68 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   // Función para obtener la ubicación del usuario
-Future<void> _getUserLocation() async {
-  bool serviceEnabled;
-  LocationPermission permission;
+  Future<void> _getUserLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
 
-  // Verificar si los servicios de ubicación están habilitados
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    print("Los servicios de ubicación no están habilitados.");
-    return;
-  } else {
-    print("Servicios de ubicación habilitados.");
-  }
-
-  // Verificar si se tiene permiso para acceder a la ubicación
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      print("Permiso de ubicación denegado.");
+    // Verificar si los servicios de ubicación están habilitados
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print("Los servicios de ubicación no están habilitados.");
       return;
     } else {
-      print("Permiso de ubicación concedido.");
+      print("Servicios de ubicación habilitados.");
     }
-  } else {
-    print("Permiso de ubicación ya concedido.");
-  }
 
-  // Obtener la ubicación actual del usuario
-  try {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    print("Ubicación obtenida: Lat: ${position.latitude}, Lon: ${position.longitude}");
+    // Verificar si se tiene permiso para acceder a la ubicación
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print("Permiso de ubicación denegado.");
+        return;
+      } else {
+        print("Permiso de ubicación concedido.");
+      }
+    } else {
+      print("Permiso de ubicación ya concedido.");
+    }
 
-    // Actualizar el estado con las coordenadas obtenidas
-    setState(() {
-      userLatitude = position.latitude;
-      userLongitude = position.longitude;
-    });
-
-    // Añadir el marcador en el mapa
-    if (userLatitude != null && userLongitude != null) {
-      final userMarker = Marker(
-        point: LatLng(userLatitude!, userLongitude!),
-        builder: (ctx) => const Icon(
-          Icons.location_on,
-          color: Colors.red, // Color rojo para la ubicación del usuario
-          size: 38.0,
-        ),
+    // Obtener la ubicación actual del usuario
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
       );
+      print("Ubicación obtenida: Lat: ${position.latitude}, Lon: ${position.longitude}");
 
-      print("Marcador añadido en la ubicación del usuario.");
+      // Actualizar el estado con las coordenadas obtenidas
+      setState(() {
+        userLatitude = position.latitude;
+        userLongitude = position.longitude;
+      });
+
+      // Llamamos a la función para obtener las ubicaciones cercanas
+      if (userLatitude != null && userLongitude != null) {
+        await ubiListController.getNearbyUbis(userLatitude!, userLongitude!, 10); // Buscar ubicaciones cercanas a 10 km de distancia
+      }
+
+      // Añadir el marcador en el mapa
+      if (userLatitude != null && userLongitude != null) {
+        final userMarker = Marker(
+          point: LatLng(userLatitude!, userLongitude!),
+          builder: (ctx) => const Icon(
+            Icons.location_on,
+            color: Colors.red, // Color rojo para la ubicación del usuario
+            size: 38.0,
+          ),
+        );
+
+        print("Marcador añadido en la ubicación del usuario.");
+      }
+    } catch (e) {
+      print("Error al obtener la ubicación: $e");
     }
-  } catch (e) {
-    print("Error al obtener la ubicación: $e");
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -154,91 +157,7 @@ Future<void> _getUserLocation() async {
               ],
             ),
 
-            // Cuadro de búsqueda en la esquina superior derecha
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(121, 178, 213, 213),
-                  borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(
-                    color: const Color.fromARGB(255, 92, 165, 165),
-                    width: 2.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 6.0,
-                      offset: const Offset(3, 3),
-                    ),
-                  ],
-                ),
-                width: 300,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Buscar ubicacions per distància',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: ubiController.latitudeController,
-                      decoration: const InputDecoration(
-                        labelText: 'Latitud',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: ubiController.longitudeController,
-                      decoration: const InputDecoration(
-                        labelText: 'Longitud',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: ubiController.distanceController,
-                      decoration: const InputDecoration(
-                        labelText: 'Distància (en km)',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          double latitude = double.parse(ubiController.latitudeController.text);
-                          double longitude = double.parse(ubiController.longitudeController.text);
-                          double distance = double.parse(ubiController.distanceController.text);
-
-                          // Llamamos a la función para obtener las ubicaciones cercanas
-                          await ubiListController.getNearbyUbis(latitude, longitude, distance);
-                        } catch (e) {
-                          Get.snackbar("Error", "Por favor, ingresa valores válidos.");
-                        }
-                      },
-                      child: const Text('Buscar'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF89AFAF),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Mostrar tarjetas debajo del buscador
+            // Mostrar tarjetas debajo del mapa con las ubicaciones cercanas
             Positioned(
               top: 310,
               right: 20,
@@ -325,7 +244,7 @@ Future<void> _getUserLocation() async {
       ),
     );
   }
-
+  
  void _showAddUbiDialog(BuildContext context) {
   showDialog(
     context: context,
