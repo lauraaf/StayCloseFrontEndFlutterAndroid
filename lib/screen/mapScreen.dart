@@ -157,33 +157,64 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
 
+            Positioned(
+                  top: 8, // Ajusta la distancia desde la parte superior
+                  right: 27, // Centra el texto horizontalmente
+                  child: Container(
+                    width: 290, // Cambia este valor para ajustar el ancho del recuadro
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(191, 255, 255, 255), // Color de fondo del recuadro
+                      borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
+                      border: Border.all(color: Color.fromARGB(255, 84, 91, 111), width: 1.5), // Borde con el color deseado
+                    ),
+                    child: Center(  // Usamos Center para centrar el texto en ambos ejes
+                      child: Text(
+                        'Punts propers a tú',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 84, 91, 111), // Cambia el color si lo deseas
+                        ),
+                    ),
+                  ),
+                ),
+            ),
             // Mostrar tarjetas debajo del mapa con las ubicaciones cercanas
             Positioned(
-              top: 310,
-              right: 20,
+              top: 58,
+              right: 10,
               child: Container(
-                width: 300, // Ajusta el ancho según lo necesites
-                height: 400, // Ajusta la altura según lo necesites
-                child: Obx(() {
-                  return ListView.builder(
-                    controller: ubiListController.scrollController, // Asociamos el ScrollController
-                    itemCount: ubiListController.ubis.length + 1, // Añadimos uno para mostrar el indicador de carga
-                    itemBuilder: (context, index) {
-                      if (index == ubiListController.ubis.length) {
-                        // Si hemos llegado al final, mostramos un indicador de carga
-                        return ubiListController.isLoading.value
-                            ? const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 16.0),
-                                child: Center(child: CircularProgressIndicator()),
-                              )
-                            : const SizedBox.shrink();
-                      } else {
-                        var ubi = ubiListController.ubis[index];
-                        return UbiCard(ubi: ubi); // Mostrar las ubicaciones
-                      }
-                    },
-                  );
-                }),
+                width: 320, // Ajusta el ancho según lo necesites
+                height: 450, // Ajusta la altura para que haya espacio para el título y la lista
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Lista de ubicaciones
+                    Expanded(
+                      child: Obx(() {
+                       return ListView.builder(
+                         controller: ubiListController.scrollController, // Asociamos el ScrollController
+                          itemCount: ubiListController.ubis.length + 1, // Añadimos uno para mostrar el indicador de carga
+                          itemBuilder: (context, index) {
+                            if (index == ubiListController.ubis.length) {
+                              // Si hemos llegado al final, mostramos un indicador de carga
+                              return ubiListController.isLoading.value
+                                  ? const Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                                      child: Center(child: CircularProgressIndicator()),
+                                      )
+                                  : const SizedBox.shrink();
+                            } else {
+                              var ubi = ubiListController.ubis[index];
+                              return UbiCard(ubi: ubi); // Mostrar las ubicaciones
+                            }
+                          },
+                        );
+                      }),
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -192,7 +223,7 @@ class _MapScreenState extends State<MapScreen> {
               final selectedUbi = ubiController.selectedUbi.value;
               if (selectedUbi != null) {
                 return Positioned(
-                  top: 16,
+                  top: 7,
                   right: 323,
                   child: Card(
                     elevation: 5,
@@ -244,7 +275,7 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
-  
+
  void _showAddUbiDialog(BuildContext context) {
   showDialog(
     context: context,
@@ -281,7 +312,7 @@ class _MapScreenState extends State<MapScreen> {
                 TextField(
                   controller: ubiController.addressController,
                   decoration: const InputDecoration(
-                    labelText: 'Adreça',
+                    labelText: 'Adreça (carrer, localitat)',
                     border: OutlineInputBorder(),
                   ),
                 ),

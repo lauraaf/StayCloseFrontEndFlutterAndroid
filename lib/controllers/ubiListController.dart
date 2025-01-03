@@ -41,7 +41,7 @@ class UbiListController extends GetxController {
       selectedUbications.clear(); // Limpiamos las ubicaciones seleccionadas
 
       // Llamar al servicio para obtener ubicaciones cercanas
-      var fetchedUbis = await _ubiService.getNearbyUbis(lat, lon, 2);
+      var fetchedUbis = await _ubiService.getNearbyUbis(lat, lon, 3);
 
       if (fetchedUbis != null && fetchedUbis.isNotEmpty) {
         ubis.assignAll(fetchedUbis); // Asignamos las ubicaciones obtenidas
