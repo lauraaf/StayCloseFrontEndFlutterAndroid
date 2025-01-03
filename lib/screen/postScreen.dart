@@ -29,13 +29,24 @@ class _PostsScreenState extends State<PostsScreen> {
         ),
         backgroundColor: const Color(0xFF89AFAF),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.account_circle),
-            tooltip: "Els Meus Posts",
-            onPressed: () {
-              _fetchMyPosts();
-            },
-          ),
+          Container(
+              margin: const EdgeInsets.only(right: 16.0), // Añade espacio a la derecha
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  _fetchMyPosts();
+                },
+                icon: const Icon(Icons.account_circle),
+                label: const Text("Els meus posts"),
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12), // Bordes redondeados
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  backgroundColor: const Color.fromARGB(187, 255, 255, 255), // Color de fondo
+                  foregroundColor: Color.fromARGB(255, 84, 91, 111), // Color del texto y del ícono
+                ),
+              ),
+            ),
         ],
       ),
       body: Center(
@@ -173,7 +184,6 @@ class _PostsScreenState extends State<PostsScreen> {
   );
 }
 
-
   void _showAddPostDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -271,6 +281,8 @@ class _PostsScreenState extends State<PostsScreen> {
                           onPressed: () async {
                             postController.createPost();
                             postsListController.fetchPosts();
+                                Get.find<PostController>().clearFields();
+
                             Navigator.of(context).pop();
                           },
                           style: ElevatedButton.styleFrom(
@@ -289,4 +301,5 @@ class _PostsScreenState extends State<PostsScreen> {
       },
     );
   }
+  
 }

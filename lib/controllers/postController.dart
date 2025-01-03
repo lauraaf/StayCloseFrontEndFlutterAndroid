@@ -139,6 +139,13 @@ class PostController extends GetxController {
 
   }
 
+  void clearFields() {
+    descriptionController.clear();
+    postType.value = ''; // Limpiar el tipo de post
+    uploadedImageUrl.value = ''; // Limpiar la URL de la imagen
+    selectedImage = null; // Limpiar la imagen seleccionada
+  }
+
   // Método para obtener los posts del usuario actual
 Future<List<PostModel>> fetchMyPosts() async {
   try {
