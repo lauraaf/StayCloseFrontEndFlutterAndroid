@@ -2,35 +2,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter_application_1/controllers/ubiController.dart'; // UbiController para manejar las ubicaciones
-import 'package:flutter_application_1/controllers/ubiListController.dart'; // UbiListController para manejar la lista de ubicaciones seleccionadas
-import 'package:flutter_application_1/widgets/ubiCard.dart'; // Asegúrate de importar UbiCard
+import 'package:flutter_application_1/controllers/ubiController.dart';
+import 'package:flutter_application_1/controllers/ubiListController.dart';
+import 'package:flutter_application_1/widgets/ubiCard.dart';
 
 class MapScreen extends StatelessWidget {
-  final UbiController ubiController = Get.put(UbiController()); // UbiController para manejar las ubicaciones
-  final UbiListController ubiListController = Get.put(UbiListController()); // UbiListController para manejar la lista de ubicaciones seleccionadas
+  final UbiController ubiController = Get.put(UbiController());
+  final UbiListController ubiListController = Get.put(UbiListController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mapa'),
-        backgroundColor: const Color(0xFF89AFAF),
+        title: Text('Mapa'.tr), // Traducción dinámica
+        backgroundColor: Color(0xFF89AFAF),
+        actions: [
+          // Botón para cambio de idioma
+          PopupMenuButton<String>(
+            onSelected: (String languageCode) {
+              if (languageCode == 'ca') {
+                Get.updateLocale(Locale('ca', 'ES'));
+              } else if (languageCode == 'es') {
+                Get.updateLocale(Locale('es', 'ES'));
+              } else if (languageCode == 'en') {
+                Get.updateLocale(Locale('en', 'US'));
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(value: 'ca', child: Text('Català')),
+                PopupMenuItem(value: 'es', child: Text('Español')),
+                PopupMenuItem(value: 'en', child: Text('English')),
+              ];
+            },
+          ),
+        ],
       ),
       body: Obx(() {
-        // Muestra un cargador mientras se obtienen las ubicaciones
         if (ubiController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
 
-        // Si no hay ubicaciones, muestra un mensaje
         if (ubiController.ubis.isEmpty) {
-          return const Center(child: Text('No hi ha ubicacions disponibles'));
+          return Center(child: Text('No hay ubicaciones disponibles'.tr));
         }
 
         return Stack(
           children: [
-            // Mapa
             FlutterMap(
               options: MapOptions(
                 center: LatLng(41.382395521312176, 2.1567611541534366),
@@ -44,16 +62,16 @@ class MapScreen extends StatelessWidget {
                 MarkerLayer(
                   markers: ubiController.ubis.map((ubi) {
                     final latitude = ubi.ubication.latitud ?? 41.382395521312176;
-                    final longitude = ubi.ubication.longitud ?? 2.1567611541534366;
+                    final longitude = ubi.ubication.longitud ?? 2.1567611541534366; // Corregido a 'longitud'
 
                     return Marker(
                       point: LatLng(latitude, longitude),
                       builder: (ctx) => GestureDetector(
                         onTap: () {
-                          // Actualiza la ubicación seleccionada en el UbiController
+                          // Actualiza la ubicacion seleccionada en el UbiController
                           ubiController.selectUbi(ubi);
                         },
-                        child: const Icon(
+                        child: Icon(
                           Icons.place,
                           color: Color.fromARGB(255, 84, 91, 111),
                           size: 38.0,
@@ -64,25 +82,23 @@ class MapScreen extends StatelessWidget {
                 ),
               ],
             ),
-
-            // Cuadro de búsqueda en la esquina superior derecha
             Positioned(
               top: 16,
               right: 16,
               child: Container(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(121, 178, 213, 213),
+                  color: Color.fromARGB(121, 178, 213, 213),
                   borderRadius: BorderRadius.circular(12.0),
                   border: Border.all(
-                    color: const Color.fromARGB(255, 92, 165, 165),
+                    color: Color.fromARGB(255, 92, 165, 165),
                     width: 2.0,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
                       blurRadius: 6.0,
-                      offset: const Offset(3, 3),
+                      offset: Offset(3, 3),
                     ),
                   ],
                 ),
@@ -90,8 +106,8 @@ class MapScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Buscar ubicacions per distància',
+                    Text(
+                      'Buscar ubicaciones por distancia'.tr,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -101,8 +117,8 @@ class MapScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     TextField(
                       controller: ubiController.latitudeController,
-                      decoration: const InputDecoration(
-                        labelText: 'Latitud',
+                      decoration: InputDecoration(
+                        labelText: 'Latitud'.tr,
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
@@ -110,8 +126,8 @@ class MapScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     TextField(
                       controller: ubiController.longitudeController,
-                      decoration: const InputDecoration(
-                        labelText: 'Longitud',
+                      decoration: InputDecoration(
+                        labelText: 'Longitud'.tr,
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
@@ -119,8 +135,8 @@ class MapScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     TextField(
                       controller: ubiController.distanceController,
-                      decoration: const InputDecoration(
-                        labelText: 'Distància (en km)',
+                      decoration: InputDecoration(
+                        labelText: 'Distancia (en km)'.tr,
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
@@ -136,50 +152,46 @@ class MapScreen extends StatelessWidget {
                           // Llamamos a la función para obtener las ubicaciones cercanas
                           await ubiListController.getNearbyUbis(latitude, longitude, distance);
                         } catch (e) {
-                          Get.snackbar("Error", "Por favor, ingresa valores válidos.");
+                          Get.snackbar("Error", "Por favor, ingresa valores válidos.".tr);
                         }
                       },
-                      child: const Text('Buscar'),
+                      child: Text('Buscar'.tr),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF89AFAF),
+                        backgroundColor: Color(0xFF89AFAF),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-
-            // Mostrar tarjetas debajo del buscador
             Positioned(
               top: 310,
               right: 20,
               child: Container(
-                width: 300, // Ajusta el ancho según lo necesites
-                height: 400, // Ajusta la altura según lo necesites
+                width: 300,
+                height: 400,
                 child: Obx(() {
                   return ListView.builder(
-                    controller: ubiListController.scrollController, // Asociamos el ScrollController
+                    controller: ubiListController.scrollController,
                     itemCount: ubiListController.ubis.length + 1, // Añadimos uno para mostrar el indicador de carga
                     itemBuilder: (context, index) {
                       if (index == ubiListController.ubis.length) {
                         // Si hemos llegado al final, mostramos un indicador de carga
                         return ubiListController.isLoading.value
-                            ? const Padding(
+                            ? Padding(
                                 padding: EdgeInsets.symmetric(vertical: 16.0),
                                 child: Center(child: CircularProgressIndicator()),
                               )
-                            : const SizedBox.shrink();
+                            : SizedBox.shrink();
                       } else {
                         var ubi = ubiListController.ubis[index];
-                        return UbiCard(ubi: ubi); // Mostrar las ubicaciones
+                        return UbiCard(ubi: ubi);
                       }
                     },
                   );
                 }),
               ),
             ),
-
-            // Mostrar tarjeta de la ubicación seleccionada en la parte superior derecha
             Obx(() {
               final selectedUbi = ubiController.selectedUbi.value;
               if (selectedUbi != null) {
@@ -202,27 +214,27 @@ class MapScreen extends StatelessWidget {
                             children: [
                               Text('${selectedUbi.name}', style: TextStyle(fontWeight: FontWeight.bold)),
                               IconButton(
-                                icon: const Icon(Icons.close, color: Colors.red),
-                                iconSize: 20, // Tamaño más pequeño para el ícono
+                                icon: Icon(Icons.close, color: Colors.red),
+                                iconSize: 20,
                                 onPressed: () {
-                                  ubiController.selectedUbi.value = null; // Desmarcar la ubicación
+                                  ubiController.selectedUbi.value = null;
                                 },
                               ),
                             ],
                           ),
                           SizedBox(height: 5),
-                          Text('· Dirección: ${selectedUbi.address}'),
+                          Text('· Dirección: ${selectedUbi.address}'.tr),
                           SizedBox(height: 5),
-                          Text('· Tipo: ${selectedUbi.tipo}'),
+                          Text('· Tipo: ${selectedUbi.tipo}'.tr),
                           SizedBox(height: 5),
-                          Text('· Comentario: ${selectedUbi.comentari}'),
+                          Text('· Comentario: ${selectedUbi.comentari}'.tr),
                         ],
                       ),
                     ),
                   ),
                 );
               }
-              return Container(); // Si no hay ubicación seleccionada, no mostramos la tarjeta
+              return Container();
             }),
           ],
         );
@@ -231,8 +243,8 @@ class MapScreen extends StatelessWidget {
         onPressed: () {
           _showAddUbiDialog(context);
         },
-        backgroundColor: const Color(0xFF89AFAF),
-        child: const Icon(Icons.add),
+        backgroundColor: Color(0xFF89AFAF),
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -247,13 +259,13 @@ class MapScreen extends StatelessWidget {
           ),
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Center(
+                                children: [
+                  Center(
                     child: Text(
-                      'Nova Ubicació',
+                      'Nueva Ubicación'.tr,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -264,40 +276,40 @@ class MapScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   TextField(
                     controller: ubiController.nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nom',
+                    decoration: InputDecoration(
+                      labelText: 'Nombre'.tr,
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.addressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Adreça',
+                    decoration: InputDecoration(
+                      labelText: 'Dirección'.tr,
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.horariController,
-                    decoration: const InputDecoration(
-                      labelText: 'Horari',
+                    decoration: InputDecoration(
+                      labelText: 'Horario'.tr,
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.tipoController,
-                    decoration: const InputDecoration(
-                      labelText: 'Tipus',
+                    decoration: InputDecoration(
+                      labelText: 'Tipo'.tr,
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.comentariController,
-                    decoration: const InputDecoration(
-                      labelText: 'Comentari',
+                    decoration: InputDecoration(
+                      labelText: 'Comentario'.tr,
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 3,
@@ -305,8 +317,8 @@ class MapScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.latitudeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Latitud',
+                    decoration: InputDecoration(
+                      labelText: 'Latitud'.tr,
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -314,8 +326,8 @@ class MapScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.longitudeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Longitud',
+                    decoration: InputDecoration(
+                      labelText: 'Longitud'.tr,
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -328,9 +340,9 @@ class MapScreen extends StatelessWidget {
                         Navigator.of(context).pop();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF89AFAF),
+                        backgroundColor: Color(0xFF89AFAF),
                       ),
-                      child: const Text('Crear Ubicació'),
+                      child: Text('Crear Ubicación'.tr),
                     ),
                   ),
                 ],

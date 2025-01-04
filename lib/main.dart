@@ -4,17 +4,16 @@ import 'package:get/get.dart';
 import 'package:flutter_application_1/controllers/userController.dart';
 import 'package:flutter_application_1/Widgets/bottomNavigationBar.dart';
 import 'package:flutter_application_1/screen/postScreen.dart';
-import 'package:flutter_application_1/screen/logIn.dart';
-import 'package:flutter_application_1/screen/register.dart';
-//import 'package:flutter_application_1/screen/user.dart';
+import 'package:flutter_application_1/screen/logIn.dart'; // Importa LogInPage una sola vez
+import 'package:flutter_application_1/screen/register.dart'; // Importa RegisterPage una sola vez
 import 'package:flutter_application_1/screen/home.dart';
 import 'package:flutter_application_1/screen/perfilScreen.dart';
 import 'package:flutter_application_1/screen/mapScreen.dart';
 import 'package:cloudinary_flutter/cloudinary_context.dart';
-//import 'package:cloudinary_flutter/image/cld_image.dart';
 import 'package:cloudinary_url_gen/cloudinary.dart';
-import 'package:flutter_application_1/screen/calendarScreen.dart'; 
-
+import 'package:flutter_application_1/screen/calendarScreen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_application_1/translation_service.dart'; // Asegúrate de que el archivo esté en la ruta correcta
 
 void main() {
   CloudinaryContext.cloudinary = Cloudinary.fromCloudName(cloudName: "djen7vqby");
@@ -27,21 +26,31 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-   
-
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
+      locale: Locale('es', 'ES'), // Idioma predeterminado
+      translations: TranslationService(), // Usa la nueva clase de traducción
+      fallbackLocale: Locale('en', 'US'), // Idioma de respaldo
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', 'US'),
+        const Locale('es', 'ES'),
+        const Locale('ca', 'ES'),
+      ],
       initialRoute: '/login',
       getPages: [
         // Ruta de inicio de sesión
         GetPage(
           name: '/login',
-          page: () => LogInPage(),
+          page: () => LogInPage(), 
         ),
-        // Ruta de registro
+         // Ruta de registro
         GetPage(
           name: '/register',
-          page: () => RegisterPage(),
+          page: () => RegisterPage(), 
         ),
         // Ruta de la pantalla principal con BottomNavScaffold
         GetPage(
@@ -59,7 +68,8 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/calendario',
           page: () => BottomNavScaffold(child: CalendarScreen()),
-        ),/*
+        ),
+        /*
         GetPage(
           name: '/chat',
           page: () => BottomNavScaffold(child: PerfilScreen()),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/controllers/userController.dart';
-import 'package:flutter_application_1/controllers/eventController.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_application_1/screen/calendarScreen.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_application_1/controllers/userController.dart';
+import 'package:flutter_application_1/controllers/eventController.dart';
+import 'package:flutter_application_1/screen/calendarScreen.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -51,19 +51,40 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     Get.put(UserController());
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
-        backgroundColor: const Color(0xFF89AFAF),
+        title: Text('Inicio'.tr), // Traducción dinámica
+        backgroundColor: Color(0xFF89AFAF),
+        actions: [
+          // Botón para cambio de idioma
+          PopupMenuButton<String>(
+            onSelected: (String languageCode) {
+              if (languageCode == 'ca') {
+                Get.updateLocale(Locale('ca', 'ES'));
+              } else if (languageCode == 'es') {
+                Get.updateLocale(Locale('es', 'ES'));
+              } else if (languageCode == 'en') {
+                Get.updateLocale(Locale('en', 'US'));
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(value: 'ca', child: Text('Català')),
+                PopupMenuItem(value: 'es', child: Text('Español')),
+                PopupMenuItem(value: 'en', child: Text('English')),
+              ];
+            },
+          ),
+        ],
       ),
       body: Container(
-        color: const Color(0xFFE0F7FA),
+        color: Color(0xFFE0F7FA),
         child: Center(
           child: Container(
-            padding: const EdgeInsets.all(20),
-            margin: const EdgeInsets.symmetric(horizontal: 300),
+            padding: EdgeInsets.all(20),
+            margin: EdgeInsets.symmetric(horizontal: 300),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(194, 162, 204, 204),
+              color: Color.fromARGB(194, 162, 204, 204),
               borderRadius: BorderRadius.circular(15),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: Colors.black26,
                   blurRadius: 10,
@@ -74,8 +95,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Benvinguda a STAYCLOSE',
+                Text(
+                  'Benvinguda a STAYCLOSE'.tr,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -83,16 +104,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Ens alegra tenir-te aquí. Gaudeix d\'aquesta aplicació i mantén la teva comunitat segura.',
+                SizedBox(height: 10),
+                Text(
+                  'Ens alegra tenir-te aquí. Gaudeix d\'aquesta aplicació i mantén la teva comunitat segura.'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 AnimatedBuilder(
                   animation: _animation,
                   builder: (context, child) {
@@ -106,38 +127,38 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     );
                   },
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Próximos Eventos',
+                SizedBox(height: 20),
+                Text(
+                  'Próximos Eventos'.tr,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 255, 255, 255),
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 // Desplegable dinámico para eventos
                 Obx(() {
                   if (eventController.isLoading.value) {
-                    return const CircularProgressIndicator();
+                    return CircularProgressIndicator();
                   } else if (eventController.events.isEmpty) {
-                    return const Text('No hay eventos próximos');
+                    return Text('No hay eventos próximos'.tr);
                   } else {
                     return ExpansionTile(
-                      title: const Text(
-                        'Ver eventos próximos',
+                      title: Text(
+                        'Ver eventos próximos'.tr,
                         style: TextStyle(fontSize: 16, color: Colors.black),
                       ),
                       children: eventController.events.map((event) {
                         return Card(
                           color: Colors.white,
-                          margin: const EdgeInsets.symmetric(vertical: 2),
+                          margin: EdgeInsets.symmetric(vertical: 2),
                           child: ListTile(
                             title: Text(event.name),
                             subtitle: Text(
                               DateFormat('yyyy-MM-dd').format(event.eventDate),
                             ),
-                            trailing: const Icon(Icons.event),
+                            trailing: Icon(Icons.event),
                             onTap: () {
                               // Navegar a la pantalla de calendario
                               Get.to(() => CalendarScreen(), arguments: {
@@ -150,15 +171,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     );
                   }
                 }),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _contactEmergency,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(214, 255, 67, 67),
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(20),
+                    backgroundColor: Color.fromARGB(214, 255, 67, 67),
+                    shape: CircleBorder(),
+                    padding: EdgeInsets.all(20),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.sos,
                     color: Colors.white,
                     size: 40,

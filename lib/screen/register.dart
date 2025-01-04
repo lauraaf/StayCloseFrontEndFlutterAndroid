@@ -9,16 +9,34 @@ class RegisterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registrarse'),
+        title: Text('Registrarse'.tr),
         backgroundColor: Color(0xFF89AFAF),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (String languageCode) {
+              if (languageCode == 'ca') {
+                Get.updateLocale(Locale('ca', 'ES'));
+              } else if (languageCode == 'es') {
+                Get.updateLocale(Locale('es', 'ES'));
+              } else if (languageCode == 'en') {
+                Get.updateLocale(Locale('en', 'US'));
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(value: 'ca', child: Text('Català')),
+                PopupMenuItem(value: 'es', child: Text('Español')),
+                PopupMenuItem(value: 'en', child: Text('English')),
+              ];
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Container(
           padding: const EdgeInsets.all(16.0),
           margin: const EdgeInsets.symmetric(horizontal: 40.0),
-          constraints: BoxConstraints(
-            maxWidth: 500,
-          ),
+          constraints: BoxConstraints(maxWidth: 500),
           decoration: BoxDecoration(
             color: Color.fromARGB(194, 162, 204, 204),
             borderRadius: BorderRadius.circular(10),
@@ -35,7 +53,7 @@ class RegisterPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Crear una cuenta",
+                  "Crear una cuenta".tr,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -47,7 +65,7 @@ class RegisterPage extends StatelessWidget {
                   controller: registerController.usernameController,
                   cursorColor: Colors.white,
                   decoration: InputDecoration(
-                    labelText: 'Username',
+                    labelText: 'Nombre de usuario'.tr,
                     labelStyle: TextStyle(color: Colors.white),
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white),
@@ -60,7 +78,7 @@ class RegisterPage extends StatelessWidget {
                   controller: registerController.nameController,
                   cursorColor: Colors.white,
                   decoration: InputDecoration(
-                    labelText: 'Nom',
+                    labelText: 'Nombre'.tr,
                     labelStyle: TextStyle(color: Colors.white),
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white),
@@ -73,7 +91,7 @@ class RegisterPage extends StatelessWidget {
                   controller: registerController.emailController,
                   cursorColor: Colors.white,
                   decoration: InputDecoration(
-                    labelText: 'Correo Electrónico',
+                    labelText: 'Correo Electrónico'.tr,
                     labelStyle: TextStyle(color: Colors.white),
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white),
@@ -90,7 +108,7 @@ class RegisterPage extends StatelessWidget {
                     cursorColor: Colors.white,
                     obscureText: !registerController.isPasswordVisible.value,
                     decoration: InputDecoration(
-                      labelText: 'Contraseña',
+                      labelText: 'Contraseña'.tr,
                       labelStyle: TextStyle(color: Colors.white),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
@@ -114,30 +132,32 @@ class RegisterPage extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 // Confirm Password Field
-                TextField(
-                  controller: registerController.confirmPasswordController,
-                  cursorColor: Colors.white,
-                  obscureText: !registerController.isConfirmPasswordVisible.value,
-                  decoration: InputDecoration(
-                    labelText: 'Confirmar Contraseña',
-                    labelStyle: TextStyle(color: Colors.white),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    border: OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        registerController.isConfirmPasswordVisible.value
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                        color: Colors.white,
+                Obx(() {
+                  return TextField(
+                    controller: registerController.confirmPasswordController,
+                    cursorColor: Colors.white,
+                    obscureText: !registerController.isConfirmPasswordVisible.value,
+                    decoration: InputDecoration(
+                      labelText: 'Confirmar Contraseña'.tr,
+                      labelStyle: TextStyle(color: Colors.white),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
                       ),
-                      onPressed: () {
-                        registerController.toggleConfirmPasswordVisibility();
-                      },
+                      border: OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          registerController.isConfirmPasswordVisible.value
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          registerController.toggleConfirmPasswordVisibility();
+                        },
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                }),
 
                 const SizedBox(height: 20),
                 Obx(() {
@@ -150,7 +170,7 @@ class RegisterPage extends StatelessWidget {
                         backgroundColor: Color(0xFF89AFAF),
                         foregroundColor: Colors.white,
                       ),
-                      child: Text('Registrarse'),
+                      child: Text('Registrarse'.tr),
                     );
                   }
                 }),

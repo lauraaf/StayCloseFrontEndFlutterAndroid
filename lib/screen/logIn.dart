@@ -13,8 +13,29 @@ class LogInPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Iniciar Sesión'),
+        title: Text('Iniciar Sesión'.tr), // Traducción dinámica
         backgroundColor: Color(0xFF89AFAF),
+        actions: [
+          // Botón para cambio de idioma
+          PopupMenuButton<String>(
+            onSelected: (String languageCode) {
+              if (languageCode == 'ca') {
+                Get.updateLocale(Locale('ca', 'ES'));
+              } else if (languageCode == 'es') {
+                Get.updateLocale(Locale('es', 'ES'));
+              } else if (languageCode == 'en') {
+                Get.updateLocale(Locale('en', 'US'));
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(value: 'ca', child: Text('Català')),
+                PopupMenuItem(value: 'es', child: Text('Español')),
+                PopupMenuItem(value: 'en', child: Text('English')),
+              ];
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Container(
@@ -39,7 +60,7 @@ class LogInPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Iniciar Sesión",
+                  'Iniciar Sesión'.tr,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -47,7 +68,7 @@ class LogInPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                //Imatge cloudinary
+                //Imagen de Cloudinary
                 CldImageWidget(
                   publicId: 'logo_ounbww',
                 ),
@@ -56,7 +77,7 @@ class LogInPage extends StatelessWidget {
                   controller: userController.usernameController,
                   cursorColor: Colors.white,
                   decoration: InputDecoration(
-                    labelText: 'Username',
+                    labelText: 'Usuario'.tr,
                     labelStyle: TextStyle(color: Colors.white),
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white),
@@ -65,15 +86,15 @@ class LogInPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                
-                // Password Field with Visibility Toggle
+
+                // Campo de contraseña con conmutador de visibilidad
                 Obx(() {
                   return TextField(
                     controller: userController.passwordController,
                     cursorColor: Colors.white,
                     obscureText: !userController.isPasswordVisible.value,
                     decoration: InputDecoration(
-                      labelText: 'Contraseña',
+                      labelText: 'Contraseña'.tr,
                       labelStyle: TextStyle(color: Colors.white),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
@@ -105,7 +126,7 @@ class LogInPage extends StatelessWidget {
                         backgroundColor: Color(0xFF89AFAF),
                         foregroundColor: Colors.white,
                       ),
-                      child: Text('Iniciar Sesión'),
+                      child: Text('Iniciar Sesión'.tr),
                     );
                   }
                 }),
@@ -125,7 +146,7 @@ class LogInPage extends StatelessWidget {
                 }),
                 const SizedBox(height: 10),
                 Text(
-                  "Aun no tienes una cuenta, Registrate",
+                  '¿Aún no tienes una cuenta? Regístrate'.tr,
                   style: TextStyle(
                     fontSize: 14,
                     color: Color.fromARGB(255, 255, 255, 255),
@@ -138,7 +159,7 @@ class LogInPage extends StatelessWidget {
                     backgroundColor: Color(0xFF89AFAF),
                     foregroundColor: Colors.white,
                   ),
-                  child: Text('Registrarse'),
+                  child: Text('Registrarse'.tr),
                 ),
               ],
             ),

@@ -33,89 +33,99 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text(
-        'Perfil',
-        style: TextStyle(color: Colors.white),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Perfil'.tr, style: TextStyle(color: Colors.white)), // Traducción dinámica
+        backgroundColor: Color(0xFF89AFAF),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (String languageCode) {
+              if (languageCode == 'ca') {
+                Get.updateLocale(Locale('ca', 'ES'));
+              } else if (languageCode == 'es') {
+                Get.updateLocale(Locale('es', 'ES'));
+              } else if (languageCode == 'en') {
+                Get.updateLocale(Locale('en', 'US'));
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(value: 'ca', child: Text('Català')),
+                PopupMenuItem(value: 'es', child: Text('Español')),
+                PopupMenuItem(value: 'en', child: Text('English')),
+              ];
+            },
+          ),
+        ],
       ),
-      backgroundColor: const Color(0xFF89AFAF), // El mismo color que hemos usado
-    ),
-    body: Center( // Centra el contenido en la pantalla
-      child: SingleChildScrollView( // Asegura que el contenido sea desplazable si es necesario
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Centra los elementos verticalmente
-            crossAxisAlignment: CrossAxisAlignment.center, // Centra los elementos horizontalmente
-            children: [
-              CircleAvatar(
-                radius: 80, // Tamaño del avatar
-                backgroundColor: Colors.grey[300], // Color de fondo del avatar
-                child: Icon(
-                  Icons.person, // El ícono de Flutter que representa un perfil
-                  size: 80, // Tamaño del ícono
-                  color: Colors.white, // Color del ícono
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 80,
+                  backgroundColor: Colors.grey[300],
+                  child: Icon(
+                    Icons.person,
+                    size: 80,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              // Nombre del usuario, si está disponible
-              Text(
-                _username ?? 'Nombre del Usuario', // Usa el nombre del usuario desde SharedPreferences
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF89AFAF), // El mismo color que hemos usado
+                const SizedBox(height: 20),
+                Text(
+                  _username ?? 'Nombre del Usuario'.tr,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF89AFAF),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              
-              // Correo electrónico, si está disponible
-              Text(
-                _email ?? 'usuario@example.com', // Usa el correo desde SharedPreferences
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
+                const SizedBox(height: 10),
+                Text(
+                  _email ?? 'usuario@example.com'.tr,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              
-              // Botones debajo de la foto de perfil
-              SizedBox(
-                width: 200, // Ancho del botón Configuración
-                child: _buildProfileButton(context, 'Configuración'),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: 200, // Ancho del botón Cerrar Sesión
-                child: _buildProfileButton(context, 'Cerrar Sesión'),
-              ),
-            ],
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: 200,
+                  child: _buildProfileButton(context, 'Configuración'.tr), // Traducción dinámica
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: 200,
+                  child: _buildProfileButton(context, 'Cerrar Sesión'.tr), // Traducción dinámica
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-
-  // Widget para construir los botones con un estilo consistente
   Widget _buildProfileButton(BuildContext context, String text) {
     return ElevatedButton(
       onPressed: () => _onButtonPressed(context, text),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF89AFAF),
+        backgroundColor: Color(0xFF89AFAF),
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
         padding: const EdgeInsets.symmetric(vertical: 14),
-        minimumSize: Size(double.infinity, 50), // Hacer el botón más grande
+        minimumSize: Size(double.infinity, 50),
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
@@ -123,73 +133,60 @@ Widget build(BuildContext context) {
     );
   }
 
-  // Ruta para cada botón de la pantalla de perfil
   void _onButtonPressed(BuildContext context, String route) {
-    if (route == 'Cerrar Sesión') {
+    if (route == 'Cerrar Sesión'.tr) {
       _logOut(context);
-    } else if (route == 'Configuración') {
-      // Mostrar la pantalla de configuración como un diálogo emergente
+    } else if (route == 'Configuración'.tr) {
       _showConfiguracionDialog(context);
     } else {
-      print('Navegando a $route');
+      print('Navegando a $route'.tr);
     }
   }
 
-  // Método para mostrar el diálogo emergente de configuración
   void _showConfiguracionDialog(BuildContext context) async {
-  final result = await showDialog<Map<String, String>>(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20), // Borde redondeado
-        ),
-        elevation: 10, // Sombra para darle profundidad
-        backgroundColor: Colors.white, // Fondo blanco para el diálogo
-        child: Container(
-          padding: const EdgeInsets.all(16), // Padding alrededor de la pantalla de configuración
-          width: 500, // Ancho del diálogo
-          height: 500,
-          constraints: BoxConstraints(
-            //maxWidth: 500, // Ancho máximo para el diálogo
-            //minHeight: 100, // Alto mínimo
+    final result = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          child: ConfiguracionScreen(), // Pantalla de configuración
-        ),
-      );
-    },
-  );
+          elevation: 10,
+          backgroundColor: Colors.white,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            width: 500,
+            height: 500,
+            child: ConfiguracionScreen(),
+          ),
+        );
+      },
+    );
 
-  if (result != null) {
-    // Actualizar SharedPreferences con los nuevos valores
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('username', result['username'] ?? '');
-    await prefs.setString('email', result['email'] ?? '');
+    if (result != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('username'.tr, result['username'.tr] ?? '');
+      await prefs.setString('email'.tr, result['email'.tr] ?? '');
 
-    // Refrescar los valores en pantalla
-    setState(() {
-      _username = result['username'];
-      _email = result['email'];
-    });
+      setState(() {
+        _username = result['username'.tr];
+        _email = result['email'.tr];
+      });
+    }
   }
-}
 
+  void closeWithResult(BuildContext context, String newUsername, String newEmail) {
+    Navigator.of(context).pop({'username'.tr: newUsername, 'email'.tr: newEmail});
+  }
 
-void closeWithResult(BuildContext context, String newUsername, String newEmail) {
-  Navigator.of(context).pop({'username': newUsername, 'email': newEmail});
-}
-
-  // Método para cerrar sesión
   void _logOut(BuildContext context) async {
     try {
-      // Llamar al método de logOut desde UserService
       await userService.logOut();
-      Get.snackbar('Éxito', 'Has cerrado sesión correctamente');
+      Get.snackbar('Éxito'.tr, 'Has cerrado sesión correctamente'.tr);
 
-      // Redirigir al usuario a la pantalla de inicio de sesión
       Get.offAllNamed('/login');
     } catch (e) {
-      Get.snackbar('Error', 'Hubo un problema al cerrar sesión');
+      Get.snackbar('Error'.tr, 'Hubo un problema al cerrar sesión'.tr);
     }
   }
 }

@@ -11,38 +11,58 @@ class CalendarScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFDCE6E6),
       appBar: AppBar(
-        title: const Text("Calendari"),
-        backgroundColor: const Color(0xFF89AFAF),
+        title: Text("Calendario".tr),
+        backgroundColor: Color(0xFF89AFAF),
+        actions: [
+          // Botón para cambio de idioma
+          PopupMenuButton<String>(
+            onSelected: (String languageCode) {
+              if (languageCode == 'ca') {
+                Get.updateLocale(Locale('ca', 'ES'));
+              } else if (languageCode == 'es') {
+                Get.updateLocale(Locale('es', 'ES'));
+              } else if (languageCode == 'en') {
+                Get.updateLocale(Locale('en', 'US'));
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(value: 'ca', child: Text('Català')),
+                PopupMenuItem(value: 'es', child: Text('Español')),
+                PopupMenuItem(value: 'en', child: Text('English')),
+              ];
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              //Calendari
+              // Calendario
               Obx(() => Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFFB2D5D5),
+                      color: Color(0xFFB2D5D5),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: TableCalendar(
                       firstDay: DateTime.utc(2020, 01, 01),
                       lastDay: DateTime.utc(2030, 12, 31),
                       focusedDay: eventController.focusedDay.value,
-                      startingDayOfWeek: StartingDayOfWeek.monday, // Setmana comença dilluns
-                      selectedDayPredicate: (day) =>
-                          isSameDay(eventController.selectedDay.value, day),
+                      startingDayOfWeek: StartingDayOfWeek.monday,
+                      selectedDayPredicate: (day) => isSameDay(eventController.selectedDay.value, day),
                       onDaySelected: eventController.onDaySelected,
                       onPageChanged: (focusedDay) {
                         eventController.focusedDay.value = focusedDay;
                       },
                       calendarStyle: CalendarStyle(
                         selectedDecoration: BoxDecoration(
-                          color: Color(0xFF89AFAF), // Color del dia seleccionat
+                          color: Color(0xFF89AFAF),
                           shape: BoxShape.circle,
                         ),
                         todayDecoration: BoxDecoration(
-                          color: Color(0xFF89AFAF), // Color del dia d'avui
+                          color: Color(0xFF89AFAF),
                           shape: BoxShape.circle,
                         ),
                         defaultDecoration: BoxDecoration(
@@ -52,33 +72,30 @@ class CalendarScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         markerDecoration: BoxDecoration(
-                          color: Colors.purpleAccent, // Color per als dies amb esdeveniments
+                          color: Colors.purpleAccent,
                           shape: BoxShape.circle,
                         ),
                       ),
                       headerStyle: HeaderStyle(
                         formatButtonVisible: false,
                         titleCentered: true,
-                        leftChevronIcon:
-                            Icon(Icons.chevron_left, color: Colors.black),
-                        rightChevronIcon:
-                            Icon(Icons.chevron_right, color: Colors.black),
+                        leftChevronIcon: Icon(Icons.chevron_left, color: Colors.black),
+                        rightChevronIcon: Icon(Icons.chevron_right, color: Colors.black),
                       ),
                       daysOfWeekStyle: DaysOfWeekStyle(
                         weekdayStyle: TextStyle(color: Colors.black),
                         weekendStyle: TextStyle(color: Colors.black),
                       ),
-                      eventLoader: (day) =>
-                          eventController.getEventsForDay(day), // Marca els dies amb esdeveniments
+                      eventLoader: (day) => eventController.getEventsForDay(day),
                     ),
                   )),
               SizedBox(height: 16),
-              // Llista d'esdeveniments per al dia seleccionat
+              // Lista de eventos para el día seleccionado
               Obx(() {
                 final selectedEvents = eventController.getEventsForDay(eventController.selectedDay.value);
                 return Container(
                   decoration: BoxDecoration(
-                    color: Color(0xFFB2D5D5), // Color del fons
+                    color: Color(0xFFB2D5D5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: EdgeInsets.all(16),
@@ -86,7 +103,7 @@ class CalendarScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Esdeveniments del dia seleccionat",
+                        "Eventos del día seleccionado".tr,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -97,24 +114,23 @@ class CalendarScreen extends StatelessWidget {
                       selectedEvents.isEmpty
                           ? Center(
                               child: Text(
-                                "No hi ha esdeveniments per a aquest dia.",
+                                "No hay eventos para este día.".tr,
                                 style: TextStyle(color: Colors.black54),
                               ),
                             )
                           : ListView.builder(
-                              shrinkWrap: true, // Impedeix que ocupi tot l'espai disponible
-                              physics: NeverScrollableScrollPhysics(), // Evita conflictes amb el scroll principal
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
                               itemCount: selectedEvents.length,
                               itemBuilder: (context, index) {
                                 final event = selectedEvents[index];
                                 return ListTile(
                                   contentPadding: EdgeInsets.zero,
                                   title: Text(
-                                    event.name,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    event.name.tr,
+                                    style: TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  subtitle: Text(event.description),
+                                  subtitle: Text(event.description.tr),
                                   trailing: Text(
                                     "${event.eventDate.hour}:${event.eventDate.minute.toString().padLeft(2, '0')}",
                                     style: TextStyle(color: Colors.black54),
@@ -126,8 +142,6 @@ class CalendarScreen extends StatelessWidget {
                   ),
                 );
               }),
-
-
             ],
           ),
         ),
@@ -136,8 +150,8 @@ class CalendarScreen extends StatelessWidget {
         onPressed: () {
           _showAddEventDialog(context);
         },
-        backgroundColor: const Color(0xFF89AFAF),
-        child: const Icon(Icons.add),
+        backgroundColor: Color(0xFF89AFAF),
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -158,9 +172,9 @@ class CalendarScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Center(
+                      Center(
                         child: Text(
-                          'Nou Esdeveniment',
+                          'Nuevo Evento'.tr,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -171,16 +185,16 @@ class CalendarScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       TextField(
                         controller: eventController.nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nom',
+                        decoration: InputDecoration(
+                          labelText: 'Nombre'.tr,
                           border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 16),
                       TextField(
                         controller: eventController.descriptionController,
-                        decoration: const InputDecoration(
-                          labelText: 'Descripció',
+                        decoration: InputDecoration(
+                          labelText: 'Descripción'.tr,
                           border: OutlineInputBorder(),
                         ),
                         maxLines: 3,
@@ -188,16 +202,16 @@ class CalendarScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       TextField(
                         controller: eventController.dateController,
-                        decoration: const InputDecoration(
-                          labelText: 'Data (YYYY-MM-DD)',
+                        decoration: InputDecoration(
+                          labelText: 'Fecha (YYYY-MM-DD)'.tr,
                           border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 16),
                       TextField(
                         controller: eventController.creatorController,
-                        decoration: const InputDecoration(
-                          labelText: 'Creador',
+                        decoration: InputDecoration(
+                          labelText: 'Creador'.tr,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -209,9 +223,9 @@ class CalendarScreen extends StatelessWidget {
                             Navigator.of(context).pop();
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF89AFAF),
+                            backgroundColor: Color(0xFF89AFAF),
                           ),
-                          child: const Text('Crear Esdeveniment'),
+                          child: Text('Crear Evento'.tr),
                         ),
                       ),
                     ],
