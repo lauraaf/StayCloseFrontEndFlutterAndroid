@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     if (await canLaunch(emergencyPhoneNumber)) {
       await launch(emergencyPhoneNumber);
     } else {
-      throw 'No se puede realizar la llamada';
+      throw 'No se puede realizar la llamada'.tr;
     }
   }
 

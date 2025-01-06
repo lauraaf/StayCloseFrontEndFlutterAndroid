@@ -10,42 +10,49 @@ class BottomNavScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Variables de tipo String asignadas en tiempo de ejecución
+    final homeLabel = 'Home'.tr;
+    final foroLabel = 'Foro'.tr;
+    final mapLabel = 'Mapa'.tr;
+    final calendarLabel = 'Calendario'.tr;
+    final chatLabel = 'Chat'.tr;
+    final profileLabel = 'Perfil'.tr;
+
     return Scaffold(
       body: child,
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
           currentIndex: navController.selectedIndex.value,
           onTap: navController.navigateTo,
-          selectedItemColor: const Color(0xFF89AFAF), // Verde claro (estética del Home)
-          unselectedItemColor: const Color(0xFF4D6F6F), // Verde oscuro/gris para elementos no seleccionados
-          backgroundColor: const Color(0xFFE0F7FA), // Fondo azul claro (coherente con Home)
+          selectedItemColor: Color(0xFF89AFAF), // Verde claro (estética del Home)
+          unselectedItemColor: Color(0xFF4D6F6F), // Verde oscuro/gris para elementos no seleccionados
+          backgroundColor: Color(0xFFE0F7FA), // Fondo azul claro (coherente con Home)
           elevation: 5, // Sombra suave para el diseño
           type: BottomNavigationBarType.fixed, // Fija para mantener los elementos en su lugar
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Home',
+              label: homeLabel, // Usamos la variable en lugar de .tr en una constante
             ),
-            
             BottomNavigationBarItem(
               icon: Icon(Icons.app_registration_sharp),
-              label: 'Posts',
+              label: foroLabel, // Usamos la variable en lugar de .tr en una constante
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.location_on_outlined),
-              label: 'Mapa',
+              label: mapLabel, // Usamos la variable en lugar de .tr en una constante
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month_outlined),
-              label: 'Calendari',
+              label: calendarLabel, // Usamos la variable en lugar de .tr en una constante
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.forum_outlined),
-              label: 'Chat',
+              label: chatLabel, // Usamos la variable en lugar de .tr en una constante
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
-              label: 'Perfil',
+              label: profileLabel, // Usamos la variable en lugar de .tr en una constante
             ),
           ],
         ),
@@ -53,4 +60,3 @@ class BottomNavScaffold extends StatelessWidget {
     );
   }
 }
-

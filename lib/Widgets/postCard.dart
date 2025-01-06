@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // Añadido para traducción
 import '../models/post.dart'; // Ajusta la ruta según la ubicación de tu modelo
 
 class PostCard extends StatelessWidget {
@@ -12,7 +13,7 @@ class PostCard extends StatelessWidget {
   // Método para determinar el color del círculo según el tipo de publicación
   Color _getPostTypeColor(String postType) {
     switch (postType) {
-      case 'Pelicula':
+      case 'Pelicula': // <== Eliminado `.tr`
         return const Color(0xFF002F49); // Rojo suave
       case 'Libro':
         return const Color(0xFF002F49); // Naranja suave
@@ -90,7 +91,7 @@ class PostCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        post.postType,
+                        post.postType.tr, // Traducción dinámica
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -102,8 +103,8 @@ class PostCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Add space between the text and the image
-            const SizedBox(width: 12), // Adds space between the content and image
+            // Añadir espacio entre el texto y la imagen
+            const SizedBox(width: 12), // Añade espacio entre el contenido y la imagen
             // Imagen alineada a la derecha
             if (post.image != null)
               ClipRRect(

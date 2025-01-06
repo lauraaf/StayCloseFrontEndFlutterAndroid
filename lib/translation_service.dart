@@ -69,7 +69,11 @@ class TranslationService extends Translations {
       '¿Estas Seguro?': 'Are you sure?', 
       '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.': 'Are you sure you want to delete your account? This action is irreversible.', 
       'Cancelar': 'Cancel', 
-      'Eliminar': 'Delete'
+      'Eliminar': 'Delete',
+      'No se puede realizar la llamada': 'The call cannot be made',
+      'Home':'Home',
+      'Foro':'Forum',
+      'Chat':'Chat'
     },
     'es_ES': {
       'Registrarse': 'Registrarse',
@@ -136,7 +140,13 @@ class TranslationService extends Translations {
       'Eliminar Cuenta': 'Eliminar Cuenta', 
       '¿Estas Seguro?': '¿Estas Seguro?', 
       '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.': '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.', 
-      'Cancelar': 'Cancelar', 'Eliminar': 'Eliminar'
+      'Cancelar': 'Cancelar', 
+      'Eliminar': 'Eliminar',
+      'No se puede realizar la llamada':'No se puede realizar la llamada',
+      'Home':'Inicio',
+      'Foro':'Foro',
+      'Chat':'Chat'
+
     },
     'ca_ES': {
       'Registrarse': 'Registrar-se',
@@ -204,7 +214,13 @@ class TranslationService extends Translations {
       '¿Estas Seguro?': 'Estàs Segur?', 
       '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.': 'Estàs segur que vols eliminar el teu compte? Aquesta acció és irreversible.',
       'Cancelar': 'Cancel·lar', 
-      'Eliminar': 'Eliminar'
+      'Eliminar': 'Eliminar',
+      'No se puede realizar la llamada':'No es pot realitzar la trucada',
+      'Home': 'Inici',
+      'Foro':'Fòrum',
+      'Chat':'Xat'
+
+      
     },
   };
 }

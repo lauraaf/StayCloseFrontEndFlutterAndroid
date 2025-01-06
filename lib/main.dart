@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
           page: () => BottomNavScaffold(child: PostsScreen()),
         ),
         GetPage(
-          name: '/mapa',
+          name: '/mapa'.tr,
           page: () => BottomNavScaffold(child: MapScreen()),
         ),
         GetPage(
