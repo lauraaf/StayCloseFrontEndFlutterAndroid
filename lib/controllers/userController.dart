@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_application_1/services/userServices.dart';
 import 'package:flutter_application_1/models/user.dart';
+import 'dart:typed_data';
+import 'package:image_picker_web/image_picker_web.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 
 class UserController extends GetxController {
   final UserService userService = Get.put(UserService());
@@ -113,4 +118,64 @@ class UserController extends GetxController {
       Get.snackbar('Error', 'Hubo un problema al cerrar sesión');
     }
   }
+
+  // Método para crear una nueva experiencia
+  Rxn<Uint8List> selectedImage = Rxn<Uint8List>(); // Bytes de la imagen seleccionada
+  var uploadedImageUrl = ''.obs; // URL de la imagen subida a Cloudinary
+
+  // Seleccionar imagen desde el dispositivo
+ Future<void> pickImage() async {
+    try {
+      Uint8List? imageBytes = await ImagePickerWeb.getImageAsBytes();
+      if (imageBytes != null) {
+        selectedImage.value = imageBytes; // Guarda la imagen en selectedImage
+        uploadedImageUrl.value = ''; // Si usas Cloudinary o alguna URL, resetea
+        update(); // Actualiza la UI
+        Get.snackbar('Éxito', 'Imagen seleccionada correctamente');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'No se pudo seleccionar la imagen: $e', snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  // Subir imagen a Cloudinary
+  Future<void> uploadImageToCloudinary() async {
+    if (selectedImage == null) {
+      Get.snackbar('Error', 'Selecciona una imagen primero',
+          snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://api.cloudinary.com/v1_1/djen7vqby/image/upload'),
+      );
+      request.fields['upload_preset'] = 'nm1eu9ik';
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          selectedImage.value!,
+          filename: 'image_${DateTime.now().millisecondsSinceEpoch}.png',
+        ),
+      );
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var data = jsonDecode(responseData);
+        uploadedImageUrl.value = data['secure_url'];
+        Get.snackbar('Éxito', 'Imagen subida correctamente');
+      } else {
+        Get.snackbar('Error', 'Falló la subida de la imagen',
+            snackPosition: SnackPosition.BOTTOM);
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Error al subir la imagen: $e',
+          snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
 }

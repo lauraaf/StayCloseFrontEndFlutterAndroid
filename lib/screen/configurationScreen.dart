@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Para acceder a SharedPreferences
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
-import 'package:flutter_application_1/controllers/userController.dart'; // Importa el controlador
-import 'package:flutter_application_1/models/user.dart'; // Asegúrate de importar el modelo
-import 'package:flutter_application_1/services/userServices.dart'; // Importar el servicio
+import 'package:flutter_application_1/controllers/userController.dart';
+import 'package:flutter_application_1/models/user.dart';
+import 'package:flutter_application_1/services/userServices.dart';
 
 class ConfiguracionScreen extends StatefulWidget {
   @override
@@ -28,7 +28,6 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
     _loadUserData();
   }
 
-  // Cargar la ID del usuario desde SharedPreferences
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -40,7 +39,6 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
     }
   }
 
-  // Obtener los datos completos del usuario con su ID
   Future<void> _fetchUserData() async {
     await userController.fetchUser(_userId!);
     if (userController.user.value != null) {
@@ -55,7 +53,6 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
     }
   }
 
-  // Función para guardar la configuración
   void _saveConfiguration() async {
     String newUsername = _usernameController.text.trim();
     String newName = _nameController.text.trim();
@@ -67,7 +64,15 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
     } else if (_userId == null) {
       Get.snackbar('Error'.tr, 'No se pudo obtener la ID del usuario'.tr);
     } else {
-      // Crear un nuevo objeto UserModel con los datos actualizados
+      // Subir la imagen a Cloudinary si es necesario
+      if (userController.selectedImage.value != null) {
+        await userController.uploadImageToCloudinary();
+      }
+
+      // Obtener la URL de la imagen subida
+      String avatarUrl = userController.uploadedImageUrl.value;
+
+      // Actualizar los datos del usuario con la nueva imagen, si hay
       UserModel updatedUser = UserModel(
         username: newUsername.isNotEmpty ? newUsername : userController.user.value!.username,
         name: newName.isNotEmpty ? newName : userController.user.value!.name,
@@ -77,42 +82,36 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         inHome: userController.user.value!.inHome,
         admin: userController.user.value!.admin,
         disabled: userController.user.value!.disabled,
+        avatar: avatarUrl.isNotEmpty ? avatarUrl : userController.user.value!.avatar, // Usar la URL de la imagen
       );
 
-      // Llamar al método editUser para actualizar el usuario
+      // Guardar los cambios
       userController.editUser(updatedUser, _userId!);
 
-      // Guardar los valores en SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('username', newUsername);
       await prefs.setString('email', newEmail);
 
-      // Actualizar la pantalla principal
       setState(() {
         _username = newUsername;
         _email = newEmail;
       });
 
-      // Mostrar confirmación y cerrar el diálogo
       Get.snackbar('Éxito'.tr, 'Configuración guardada correctamente'.tr);
       Navigator.pop(context);
     }
   }
 
-  // Método para eliminar el usuario
   Future<void> _deleteUser() async {
     if (_userId != null) {
       int success = await userService.deleteUser(_userId!);
       if (success == 200) {
         Get.snackbar('Éxito'.tr, 'Usuario eliminado correctamente'.tr);
-
-        // Eliminar los datos locales almacenados en SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.remove('user_id');
         await prefs.remove('user_data');
         await userService.logOut();
 
-        // Redirigir a la pantalla de inicio de sesión después de la eliminación
         Get.offAllNamed('/login');
       } else {
         Get.snackbar('Error'.tr, 'No se pudo eliminar el usuario'.tr);
@@ -122,7 +121,6 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
     }
   }
 
-  // Método para mostrar el diálogo de confirmación
   void _showDeleteConfirmationDialog() {
     showDialog(
       context: context,
@@ -137,6 +135,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
               },
               child: Text('Cancelar'.tr),
             ),
+            
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
@@ -150,6 +149,10 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
     );
   }
 
+  void _onAvatarPressed() {
+    userController.pickImage();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,9 +161,8 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Contenedor superior con esquinas redondeadas
             Container(
-              width: 500,
+              width: 600,
               decoration: BoxDecoration(
                 color: Color(0xFF89AFAF),
                 borderRadius: BorderRadius.circular(20.0),
@@ -186,21 +188,19 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                 ),
               ),
             ),
-
-                      const SizedBox(height: 16), // Separación entre el contenedor superior y el formulario
-            // Contenedor principal con el formulario
+            const SizedBox(height: 16),
             Container(
-              width: 500,
+              width: 700,
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20.0), // Redondear solo las esquinas del formulario
+                borderRadius: BorderRadius.circular(20.0),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
                     spreadRadius: 5,
                     blurRadius: 10,
-                    offset: const Offset(0, 3), // Sombra suave
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -208,6 +208,33 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Avatar centrado y con función al presionarlo
+                    GestureDetector(
+                      onTap: _onAvatarPressed,
+                      child: Center(
+                        child: CircleAvatar(
+                          radius: 80,
+                          backgroundColor: Colors.grey[300],
+                          child: Obx(() {
+                            return userController.selectedImage.value != null
+                                ? ClipOval(
+                                    child: Image.memory(
+                                      userController.selectedImage.value!, // Accede al valor de selectedImage
+                                      fit: BoxFit.cover,
+                                      width: 160,
+                                      height: 160,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.person,
+                                    size: 80,
+                                    color: Colors.white,
+                                  );
+                          }),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     TextField(
                       controller: _usernameController,
                       decoration: InputDecoration(
@@ -238,25 +265,25 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                         labelText: 'Contraseña'.tr,
                         border: OutlineInputBorder(),
                       ),
-                      obscureText: true, // Para ocultar la contraseña
+                      obscureText: true,
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: _saveConfiguration, // Guardar configuración
+                      onPressed: _saveConfiguration,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF89AFAF),
-                        foregroundColor: Colors.white, // Color del texto
-                        minimumSize: const Size(double.infinity, 50), // Botón ancho
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 50),
                       ),
                       child: Text('Guardar'.tr),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: _showDeleteConfirmationDialog, // Mostrar diálogo de confirmación
+                      onPressed: _showDeleteConfirmationDialog,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
-                        foregroundColor: Colors.white, // Color del texto
-                        minimumSize: const Size(double.infinity, 50), // Botón ancho
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 50),
                       ),
                       child: Text('Eliminar Cuenta'.tr),
                     ),
@@ -268,6 +295,5 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         ),
       ),
     );
-
-}
+  }
 }

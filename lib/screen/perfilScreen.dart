@@ -13,30 +13,52 @@ class PerfilScreen extends StatefulWidget {
 class _PerfilScreenState extends State<PerfilScreen> {
   String? _username;
   String? _email;
+  String? _avatarUrl; // Variable per guardar l'URL de l'avatar
+  String? _userId; // Guardem l'ID del usuari per fer la petició
 
   final UserService userService = Get.put(UserService());
-  final UserController userController = Get.put(UserController());  // Controlador para crear post
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadUserId(); // Carrega l'ID del usuari
   }
 
-  // Cargar los datos del usuario desde SharedPreferences
-  Future<void> _loadUserData() async {
+  // Càrrega l'ID del usuari des de SharedPreferences
+  Future<void> _loadUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _username = prefs.getString('username');
-      _email = prefs.getString('email');
-    });
+    String? userId = prefs.getString('user_id');
+    if (userId != null) {
+      setState(() {
+        _userId = userId;
+      });
+      await _loadUserData(userId); // Crida a carregar les dades de l'usuari
+    }
+  }
+
+  // Càrrega les dades del usuari des del servei
+  Future<void> _loadUserData(String userId) async {
+    try {
+      var user = await userService.getUser(userId); // Obtenim el model d'usuari
+      if (user != null) {
+        setState(() {
+          _username = user.username;
+          _email = user.email;
+          _avatarUrl = user.avatar; // Agafem l'URL de l'avatar
+        });
+      } else {
+        print('No s\'han pogut carregar les dades de l\'usuari.');
+      }
+    } catch (e) {
+      print('Error carregant les dades de l\'usuari: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perfil'.tr, style: TextStyle(color: Colors.white)), // Traducción dinámica
+        title: Text('Perfil'.tr, style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF89AFAF),
         actions: [
           PopupMenuButton<String>(
@@ -69,12 +91,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
               children: [
                 CircleAvatar(
                   radius: 80,
+                  backgroundImage: _avatarUrl != null
+                      ? NetworkImage(_avatarUrl!) // Si hi ha URL, carrega l'avatar
+                      : null,
                   backgroundColor: Colors.grey[300],
-                  child: Icon(
-                    Icons.person,
-                    size: 80,
-                    color: Colors.white,
-                  ),
+                  child: _avatarUrl == null
+                      ? Icon(
+                          Icons.person,
+                          size: 80,
+                          color: Colors.white,
+                        )
+                      : null,
                 ),
                 const SizedBox(height: 20),
                 Text(
@@ -96,12 +123,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 const SizedBox(height: 30),
                 SizedBox(
                   width: 200,
-                  child: _buildProfileButton(context, 'Configuración'.tr), // Traducción dinámica
+                  child: _buildProfileButton(context, 'Configuración'.tr),
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
                   width: 200,
-                  child: _buildProfileButton(context, 'Cerrar Sesión'.tr), // Traducción dinámica
+                  child: _buildProfileButton(context, 'Cerrar Sesión'.tr),
                 ),
               ],
             ),
@@ -155,8 +182,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
           backgroundColor: Colors.white,
           child: Container(
             padding: const EdgeInsets.all(16),
-            width: 500,
-            height: 500,
+            width: 700,
+            height: 700,
             child: ConfiguracionScreen(),
           ),
         );

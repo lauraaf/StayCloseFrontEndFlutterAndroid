@@ -110,7 +110,8 @@ class RegisterController extends GetxController {
         password: passwordController.text,
         email: emailController.text,
         actualUbication: List.empty(),
-        admin: true
+        admin: true,
+        avatar: 'hey'
       );
 
       final response = await userService.createUser(newUser);
