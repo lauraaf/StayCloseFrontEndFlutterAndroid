@@ -31,26 +31,6 @@ class _PostsScreenState extends State<PostsScreen> {
         ),
         backgroundColor: Color.fromRGBO(137, 175, 175, 1),
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16.0),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                _fetchMyPosts();
-              },
-              icon: const Icon(Icons.account_circle),
-              label: const Text("Els meus posts"),
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                backgroundColor: const Color.fromARGB(187, 255, 255, 255),
-                foregroundColor: const Color.fromARGB(255, 84, 91, 111),
-              ),
-            ),
-          ),
-        ],
-        actions: [
           // Botón para cambio de idioma
           PopupMenuButton<String>(
             onSelected: (String languageCode) {
@@ -69,6 +49,24 @@ class _PostsScreenState extends State<PostsScreen> {
                 PopupMenuItem(value: 'en', child: Text('English')),
               ];
             },
+          ),
+          Container(
+            margin: const EdgeInsets.only(right: 16.0),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                _fetchMyPosts();
+              },
+              icon: const Icon(Icons.account_circle),
+              label: const Text("Els meus posts"),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                backgroundColor: const Color.fromARGB(187, 255, 255, 255),
+                foregroundColor: const Color.fromARGB(255, 84, 91, 111),
+              ),
+            ),
           ),
         ],
       ),
