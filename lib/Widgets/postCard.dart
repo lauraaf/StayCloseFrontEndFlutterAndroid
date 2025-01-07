@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/post.dart'; // Ajusta la ruta según la ubicación de tu modelo
+import '../models/post.dart'; 
 
 class PostCard extends StatelessWidget {
   final PostModel post;
@@ -13,15 +13,15 @@ class PostCard extends StatelessWidget {
   Color _getPostTypeColor(String postType) {
     switch (postType) {
       case 'Pelicula':
-        return const Color(0xFF002F49); // Rojo suave
+        return const Color(0xFF002F49); // Azul
       case 'Libro':
         return const Color(0xFF002F49); // Naranja suave
       case 'Evento':
-        return const Color(0xFF002F49); // Azul suave
-      case 'Música':
         return const Color(0xFF002F49); // Verde suave
-      default:
+      case 'Música':
         return const Color(0xFF002F49); // Gris
+      default:
+        return const Color(0xFF002F49); // Gris por defecto
     }
   }
 
@@ -34,85 +34,63 @@ class PostCard extends StatelessWidget {
       ),
       color: const Color(0xFF89AFAF), // Fondo verde claro
       elevation: 5, // Sombra suave
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Columna para el texto (autor, descripción, fecha)
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Autor
-                  Text(
-                    post.author,
-                    style: const TextStyle(
-                      fontSize: 20,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  post.author, // Primer el nombre del usuario
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: _getPostTypeColor(post.postType),
+                      width: 2,
+                    ),
+                  ),
+                  child: Text(
+                    post.postType, // Tipo de post debajo del nombre
+                    style: TextStyle(
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: _getPostTypeColor(post.postType),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  // Contenido
-                  Text(
-                    post.content,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                    ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  post.content, // Contenido debajo del tipo de post
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
                   ),
-                  const SizedBox(height: 8),
-                  // Fecha
-                  if (post.postDate != null)
-                    Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Text(
-                        '${post.postDate!.toLocal()}'.split(' ')[0],
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white54,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 16),
-                  // Tipo de Publicación en un "círculo" (con bordes)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20), // Bordes redondeados
-                        border: Border.all(
-                          color: _getPostTypeColor(post.postType), // Color de borde
-                          width: 2,
-                        ),
-                      ),
-                      child: Text(
-                        post.postType,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: _getPostTypeColor(post.postType),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            // Add space between the text and the image
-            const SizedBox(width: 12), // Adds space between the content and image
-            // Imagen alineada a la derecha
-            if (post.image != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+          ),
+          // Imagen al final
+          if (post.image != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 200, right: 200), // Margen alrededor de la imagen
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8), // Esquinas redondeadas
                 child: Image.network(
                   post.image!,
                   fit: BoxFit.cover,
-                  height: 200,
-                  width: 250,
+                  width: double.infinity,
+                  height: 300,
                   errorBuilder: (context, error, stackTrace) => const Icon(
                     Icons.broken_image,
                     size: 100,
@@ -120,8 +98,8 @@ class PostCard extends StatelessWidget {
                   ),
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
