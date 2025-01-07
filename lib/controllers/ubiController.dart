@@ -20,7 +20,7 @@ class UbiController extends GetxController {
   TextEditingController tipoController = TextEditingController();
   TextEditingController comentariController = TextEditingController();
   TextEditingController horariController = TextEditingController();
-    var selectedUbi = Rx<UbiModel?>(null); // Ubicación seleccionada (reactiva)
+  var selectedUbi = Rx<UbiModel?>(null); // Ubicación seleccionada (reactiva)
 
 
   @override
@@ -44,45 +44,48 @@ class UbiController extends GetxController {
 
   // Crear una nueva ubicación
   Future<void> createUbi() async {
-    final name = nameController.text.trim();
-    final latitude = latitudeController.text.trim();
-    final longitude = longitudeController.text.trim();
-    final address = addressController.text.trim();
-    final comentari = comentariController.text.trim();
-    final tipo = tipoController.text.trim();
-    final horari = horariController.text.trim();
+  final name = nameController.text.trim();
+  final latitude = latitudeController.text.trim();
+  final longitude = longitudeController.text.trim();
+  final address = addressController.text.trim();
+  final comentari = comentariController.text.trim();
+  final tipo = tipoController.text.trim();
+  final horari = horariController.text.trim();
 
-    if (name.isEmpty || latitude.isEmpty || longitude.isEmpty || address.isEmpty || comentari.isEmpty || tipo.isEmpty || horari.isEmpty) {
-      Get.snackbar("Error", "Tots els camps són obligatoris");
-      return;
-    }
-
-    try {
-      isLoading.value = true;
-
-      final ubication = Ubication(
-        type: "Point",
-        coordinates: [double.parse(longitude), double.parse(latitude)],
-      );
-
-      await ubiService.createUbi(UbiModel(
-        name: name,
-        horari: horari,
-        tipo: tipo,
-        ubication: ubication,
-        address: address,
-        comentari: comentari,
-      ));
-
-      fetchUbis(); // Refresca la lista de ubicaciones
-      clearForm();
-      Get.snackbar("Èxit", "Ubicació creada correctament");
-    } catch (e) {
-      Get.snackbar("Error", "No s'ha pogut crear la ubicació");
-    } finally {
-      isLoading.value = false;
-    }
+  if (name.isEmpty || address.isEmpty || comentari.isEmpty || tipo.isEmpty || horari.isEmpty) {
+    Get.snackbar("Error", "Tots els camps són obligatoris");
+    return;
   }
+
+  try {
+    isLoading.value = true;
+
+    // Si no se tiene latitud y longitud, ubication se deja vacío
+    Ubication? ubication = (latitude.isNotEmpty && longitude.isNotEmpty)
+        ? Ubication(
+            type: "Point",
+            coordinates: [double.parse(longitude), double.parse(latitude)],
+          )
+        : null;
+
+    await ubiService.createUbi(UbiModel(
+      name: name,
+      horari: horari,
+      tipo: tipo,
+      ubication: ubication ?? Ubication(type: "Point", coordinates: []), // Enviar un objeto vacío si ubication es null
+      address: address,
+      comentari: comentari,
+    ));
+
+    fetchUbis(); // Refresca la lista de ubicaciones
+    clearForm();
+    Get.snackbar("Èxit", "Ubicació creada correctament");
+  } catch (e) {
+    Get.snackbar("Error", "No s'ha pogut crear la ubicació");
+  } finally {
+    isLoading.value = false;
+  }
+}
 
   // Editar una ubicación existente
   Future<void> editUbi(String id) async {
@@ -139,21 +142,6 @@ class UbiController extends GetxController {
       isLoading.value = false;
     }
   }
-
-  // Buscar ubicaciones cercanas y solo obtener sus nombres
-  /*Future<void> getNearbyUbis(double lat, double lon, double distance) async {
-    isLoading.value = true;
-    try {
-      final nearbyUbis = await ubiService.getNearbyUbis(lat, lon, distance);
-      nearbyUbisNames.value = nearbyUbis.map((ubi) => ubi.name).toList();
-      print("Ubicaciones cercanas encontradas: ${nearbyUbisNames.value}");
-    } catch (e) {
-      errorMessage.value = 'Error al obtener las ubicaciones cercanas';
-      print('Error al obtener ubicaciones cercanas: $e');
-    } finally {
-      isLoading.value = false;
-    }
-  }*/
 
   // Limpiar los campos del formulario
   void clearForm() {
