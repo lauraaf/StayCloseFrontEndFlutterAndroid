@@ -183,7 +183,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
           child: Container(
             padding: const EdgeInsets.all(16),
             width: 700,
-            height: 700,
+            height: 800,
             child: ConfiguracionScreen(),
           ),
         );

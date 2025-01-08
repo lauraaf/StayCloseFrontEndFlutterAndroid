@@ -11,6 +11,7 @@ class UserModel with ChangeNotifier {
   bool _admin;
   bool _disabled;
   String _avatar;
+  String _home;
 
   // Constructor
   UserModel(
@@ -22,7 +23,8 @@ class UserModel with ChangeNotifier {
       bool inHome = false,
       bool admin = true,
       bool disabled = false, 
-      required String avatar
+      required String avatar,
+      required String home
       })
       : _username = username,
       _name = name,
@@ -32,7 +34,8 @@ class UserModel with ChangeNotifier {
         _inHome = inHome,
         _admin = admin,
         _disabled = disabled,
-        _avatar = avatar;
+        _avatar = avatar,
+        _home = home;
 
   // Getters
   String get username => _username;
@@ -44,6 +47,7 @@ class UserModel with ChangeNotifier {
   bool get admin => _admin;
   bool get disabled => _disabled;
   String get avatar => _avatar;
+  String get home => _home;
 
   // Método para actualizar el usuario
   void setUser(String username, String name, String email, String password, List<dynamic> actualUbication, bool inHome, bool admin, bool disabled, String avatar ) {
@@ -55,6 +59,7 @@ class UserModel with ChangeNotifier {
     _inHome = inHome;
     _disabled = disabled;
     _avatar = avatar;
+    _home = home;
     notifyListeners();
   }
 
@@ -70,6 +75,7 @@ class UserModel with ChangeNotifier {
       admin: json['admin'],
       disabled: json['disabled'],
       avatar: json['avatar'],
+      home: json['home'],
     );
   }
 
@@ -85,6 +91,7 @@ class UserModel with ChangeNotifier {
       'admin': _admin,
       'disabled': _disabled,
       'avatar': _avatar,
+      'home': _home,
     };
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/controllers/postsListController.dart';
-import 'package:flutter_application_1/controllers/postController.dart';
+import 'package:flutter_application_1/controllers/postsListController.dart';  // Controlador para la lista de posts
+import 'package:flutter_application_1/controllers/postController.dart';  // Controlador para crear el post
 import 'package:flutter_application_1/Widgets/postCard.dart';
 import 'package:get/get.dart';
+import 'dart:io';
 
 class PostsScreen extends StatefulWidget {
   @override
@@ -10,15 +11,16 @@ class PostsScreen extends StatefulWidget {
 }
 
 class _PostsScreenState extends State<PostsScreen> {
-  final PostsListController postsListController = Get.put(PostsListController());
-  final PostController postController = Get.put(PostController());
+  final PostsListController postsListController = Get.put(PostsListController());  // Controlador para lista de posts
+  final PostController postController = Get.put(PostController());  // Controlador para crear post
 
-  String selectedType = 'Todos';
+    String selectedType = 'Todos';
+
 
   @override
   void initState() {
     super.initState();
-    postsListController.fetchPosts();
+    postsListController.fetchPosts();  // Cargar los posts al inicio
   }
 
   @override
@@ -29,7 +31,7 @@ class _PostsScreenState extends State<PostsScreen> {
           'Foro de Posts'.tr,  // Traducción dinámica
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Color.fromRGBO(137, 175, 175, 1),
+        backgroundColor: Color(0xFF89AFAF),
         actions: [
           // Botón para cambio de idioma
           PopupMenuButton<String>(
@@ -57,7 +59,7 @@ class _PostsScreenState extends State<PostsScreen> {
                 _fetchMyPosts();
               },
               icon: const Icon(Icons.account_circle),
-              label: const Text("Els meus posts"),
+              label:  Text('Mis Posts'.tr),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -68,17 +70,18 @@ class _PostsScreenState extends State<PostsScreen> {
               ),
             ),
           ),
+
         ],
       ),
       body: Center(
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.6,
+          width: MediaQuery.of(context).size.width * 0.6, // Ancho del contenedor
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            children: [
+          children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: ['Todos', 'Pelicula', 'Serie', 'Libro', 'Podcast', 'Música']
+                children: ['Todos'.tr, 'Película'.tr, 'Serie'.tr, 'Libro'.tr, 'Podcast', 'Música'.tr]
                     .map((type) {
                   return ElevatedButton(
                     onPressed: () {
@@ -94,7 +97,7 @@ class _PostsScreenState extends State<PostsScreen> {
                       foregroundColor: Colors.white,  // Cambia el color del texto a blanco
                       textStyle: const TextStyle(
                       color: Colors.white,  // Asegura que el color del texto sea blanco
-        ),
+                      ),
                     ),
                   );
                 }).toList(),
@@ -135,10 +138,10 @@ class _PostsScreenState extends State<PostsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddPostDialog(context);
+          _showAddPostDialog(context);  // Mostrar el cuadro de diálogo para agregar un post
         },
-        backgroundColor: const Color(0xFF89AFAF),
-        child: const Icon(Icons.add),
+        backgroundColor: Color(0xFF89AFAF),  // Color del botón flotante
+        child: Icon(Icons.add),  // Icono de suma
       ),
     );
   }
@@ -167,7 +170,7 @@ class _PostsScreenState extends State<PostsScreen> {
                       padding: const EdgeInsets.all(20.0),
                       child: Center(
                         child: Text(
-                          'Error al cargar los posts: ${snapshot.error}',
+                          'Error al cargar los posts: ${snapshot.error}'.tr,
                           style: const TextStyle(fontSize: 16, color: Colors.red),
                         ),
                       ),
@@ -181,8 +184,8 @@ class _PostsScreenState extends State<PostsScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Mis Posts',
+                          Text(
+                            'Mis Posts'.tr,
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -191,9 +194,9 @@ class _PostsScreenState extends State<PostsScreen> {
                           ),
                           const SizedBox(height: 20),
                           if (myPosts.isEmpty)
-                            const Center(
+                            Center(
                               child: Text(
-                                "No tienes posts todavía.",
+                                "No tienes posts todavía.".tr,
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFF89AFAF),
@@ -222,7 +225,7 @@ class _PostsScreenState extends State<PostsScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF89AFAF),
                               ),
-                              child: const Text('Cerrar'),
+                              child: Text('Cerrar'.tr),
                             ),
                           ),
                         ],
@@ -238,6 +241,8 @@ class _PostsScreenState extends State<PostsScreen> {
     );
   }
 
+
+  // Mostrar el cuadro de diálogo para crear un nuevo post
   void _showAddPostDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -255,9 +260,9 @@ class _PostsScreenState extends State<PostsScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Center(
+                      Center(
                         child: Text(
-                          'Nuevo Post',
+                          'Nuevo Post'.tr,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -266,60 +271,58 @@ class _PostsScreenState extends State<PostsScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      // Campo para el autor (owner)
                       TextField(
                         controller: postController.ownerController,
-                        decoration: const InputDecoration(
-                          labelText: 'Autor',
+                        decoration: InputDecoration(
+                          labelText: 'Autor'.tr,
                           border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 16),
+                      // Campo para la descripción
                       TextField(
                         controller: postController.descriptionController,
-                        decoration: const InputDecoration(
-                          labelText: 'Descripción',
+                        decoration: InputDecoration(
+                          labelText: 'Descripción'.tr,
                           border: OutlineInputBorder(),
                         ),
                         maxLines: 3,
                       ),
                       const SizedBox(height: 16),
+                      // Campo para el tipo de post (Dropdown)
+                      // Dropdown para seleccionar el tipo de post
                       Obx(() {
                         return DropdownButton<String>(
-                          value: postController.postType.value.isEmpty
-                              ? null
-                              : postController.postType.value,
-                          hint: const Text(
-                            'Selecciona el tipo de post',
+                          value: postController.postType.value.isEmpty ? null : postController.postType.value,
+                          hint: Text(
+                            'Selecciona el tipo de post'.tr,
                             style: TextStyle(color: Color(0xFF89AFAF)),
                           ),
                           onChanged: (String? newValue) {
                             postController.postType.value = newValue ?? '';
                           },
-                          items: <String>[
-                            'Libro',
-                            'Película',
-                            'Podcast',
-                            'Música',
-                            'Serie',
-                            'Otro'
-                          ].map<DropdownMenuItem<String>>((String value) {
+                          items: <String>['', 'Libro'.tr, 'Película'.tr, 'Música'.tr, 'Serie'.tr, 'Otro'.tr]
+                              .map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
-                              child: Text(value),
+                              child: Text(value.tr),
                             );
                           }).toList(),
-                          dropdownColor: Colors.white,
-                          underline: Container(),
+                          dropdownColor: Colors.white,  // Fondo blanco para el dropdown
+                          underline: Container(),  // Eliminar línea de subrayado
                         );
                       }),
                       const SizedBox(height: 16),
+                      // Botón para seleccionar imagen
                       ElevatedButton(
                         onPressed: () async {
                           await postController.pickImage();
                         },
-                        child: const Text('Seleccionar Imagen'),
+                        child: Text('Seleccionar Imagen'.tr),
                       ),
                       const SizedBox(height: 16),
+                      // Vista previa de la imagen seleccionada
                       if (postController.selectedImage != null)
                         Center(
                           child: Image.memory(
@@ -330,19 +333,19 @@ class _PostsScreenState extends State<PostsScreen> {
                           ),
                         ),
                       const SizedBox(height: 20),
+                      // Botón para guardar el post
                       Center(
                         child: ElevatedButton(
                           onPressed: () async {
+                            // Llamar al método para crear el post
                             postController.createPost();
-                            postsListController.fetchPosts();
-                                Get.find<PostController>().clearFields();
-
-                            Navigator.of(context).pop();
+                            postsListController.fetchPosts(); 
+                            Navigator.of(context).pop();  // Cerrar el cuadro de diálogo después de crear el post
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF89AFAF),
+                            backgroundColor: Color(0xFF89AFAF),
                           ),
-                          child: const Text('Crear Post'),
+                          child: Text('Crear Post'.tr),
                         ),
                       ),
                     ],
@@ -355,5 +358,4 @@ class _PostsScreenState extends State<PostsScreen> {
       },
     );
   }
-  
 }

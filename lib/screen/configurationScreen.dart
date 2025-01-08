@@ -21,6 +21,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
+  final _homeController = TextEditingController();
 
   @override
   void initState() {
@@ -47,6 +48,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         _nameController.text = userController.user.value!.name;
         _emailController.text = userController.user.value!.email;
         _passController.text = userController.user.value!.password;
+        _homeController.text = userController.user.value!.home;
       });
     } else {
       Get.snackbar('Error'.tr, 'No se pudo obtener los datos del usuario'.tr);
@@ -58,6 +60,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
     String newName = _nameController.text.trim();
     String newEmail = _emailController.text.trim();
     String newPassword = _passController.text.trim();
+    String newHomeAddress = _homeController.text.trim();
 
     if (newUsername.isEmpty || newEmail.isEmpty || newPassword.isEmpty) {
       Get.snackbar('Error'.tr, 'Los campos no pueden estar vacíos'.tr);
@@ -83,6 +86,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         admin: userController.user.value!.admin,
         disabled: userController.user.value!.disabled,
         avatar: avatarUrl.isNotEmpty ? avatarUrl : userController.user.value!.avatar, // Usar la URL de la imagen
+        home: newHomeAddress.isNotEmpty ? newHomeAddress : userController.user.value!.home,
       );
 
       // Guardar los cambios
@@ -247,6 +251,13 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                       controller: _nameController,
                       decoration: InputDecoration(
                         labelText: 'Nombre Completo'.tr,
+                        border: OutlineInputBorder(),
+                      ),
+                    ),const SizedBox(height: 16),
+                    TextField(
+                      controller: _homeController,
+                      decoration: InputDecoration(
+                        labelText: 'Dirección de tu casa'.tr,
                         border: OutlineInputBorder(),
                       ),
                     ),

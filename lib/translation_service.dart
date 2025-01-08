@@ -73,7 +73,10 @@ class TranslationService extends Translations {
       'No se puede realizar la llamada': 'The call cannot be made',
       'Home':'Home',
       'Foro':'Forum',
-      'Chat':'Chat'
+      'Chat':'Chat',
+      'Dirección de tu casa':'Your home address',
+      'Cerrar':'Close',
+      'Mis Posts':'My Posts'
     },
     'es_ES': {
       'Registrarse': 'Registrarse',
@@ -145,7 +148,10 @@ class TranslationService extends Translations {
       'No se puede realizar la llamada':'No se puede realizar la llamada',
       'Home':'Inicio',
       'Foro':'Foro',
-      'Chat':'Chat'
+      'Chat':'Chat',
+      'Dirección de tu casa':'Dirección de tu casa',
+      'Cerrar':'Cerrar',
+      'Mis Posts':'Mis Posts'
 
     },
     'ca_ES': {
@@ -218,9 +224,10 @@ class TranslationService extends Translations {
       'No se puede realizar la llamada':'No es pot realitzar la trucada',
       'Home': 'Inici',
       'Foro':'Fòrum',
-      'Chat':'Xat'
-
-      
+      'Chat':'Xat',
+      'Dirección de tu casa':'Direcció de casa teva',
+      'Cerrar':'Tanca',
+      'Mis Posts':'Els meus Posts'
     },
   };
 }

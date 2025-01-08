@@ -62,7 +62,7 @@ class PostCard extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    post.postType, // Tipo de post debajo del nombre
+                    post.postType.tr, // Tipo de post debajo del nombre
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
