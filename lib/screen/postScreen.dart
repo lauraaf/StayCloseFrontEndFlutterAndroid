@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/controllers/postsListController.dart';  // Controlador para la lista de posts
-import 'package:flutter_application_1/controllers/postController.dart';  // Controlador para crear el post
+import 'package:flutter_application_1/controllers/postsListController.dart';
+import 'package:flutter_application_1/controllers/postController.dart';
 import 'package:flutter_application_1/Widgets/postCard.dart';
 import 'package:get/get.dart';
-import 'dart:io';
 
 class PostsScreen extends StatefulWidget {
   @override
@@ -11,16 +10,26 @@ class PostsScreen extends StatefulWidget {
 }
 
 class _PostsScreenState extends State<PostsScreen> {
-  final PostsListController postsListController = Get.put(PostsListController());  // Controlador para lista de posts
-  final PostController postController = Get.put(PostController());  // Controlador para crear post
+  final PostController postController = Get.put(PostController());
+  final PostsListController postsListController = Get.put(PostsListController());
 
-    String selectedType = 'Todos';
-
+  String selectedType = 'Todos';
 
   @override
   void initState() {
     super.initState();
-    postsListController.fetchPosts();  // Cargar los posts al inicio
+    postsListController.fetchPosts();
+  }
+
+  void _filterPostsByType(String type) {
+    setState(() {
+      selectedType = type;
+    });
+    if (type == 'Todos') {
+      postsListController.fetchPosts();
+    } else {
+      postController.fetchPostsByType(type);
+    }
   }
 
   @override
@@ -28,12 +37,11 @@ class _PostsScreenState extends State<PostsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Foro de Posts'.tr,  // Traducción dinámica
+          'Foro de Posts'.tr,
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Color(0xFF89AFAF),
         actions: [
-          // Botón para cambio de idioma
           PopupMenuButton<String>(
             onSelected: (String languageCode) {
               if (languageCode == 'ca') {
@@ -59,7 +67,7 @@ class _PostsScreenState extends State<PostsScreen> {
                 _fetchMyPosts();
               },
               icon: const Icon(Icons.account_circle),
-              label:  Text('Mis Posts'.tr),
+              label: Text('Mis Posts'.tr),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -70,33 +78,30 @@ class _PostsScreenState extends State<PostsScreen> {
               ),
             ),
           ),
-
         ],
       ),
       body: Center(
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.6, // Ancho del contenedor
+          width: MediaQuery.of(context).size.width * 0.6,
           padding: const EdgeInsets.all(16.0),
           child: Column(
-          children: [
+            children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: ['Todos'.tr, 'Película'.tr, 'Serie'.tr, 'Libro'.tr, 'Podcast', 'Música'.tr]
+                children: ['Todos', 'Película', 'Serie', 'Libro', 'Podcast', 'Música']
                     .map((type) {
                   return ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        selectedType = type;
-                      });
+                      _filterPostsByType(type);
                     },
-                    child: Text(type),
+                    child: Text(type.tr),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: selectedType == type
                           ? const Color.fromRGBO(137, 175, 175, 1)
                           : const Color.fromARGB(255, 178, 178, 178),
-                      foregroundColor: Colors.white,  // Cambia el color del texto a blanco
+                      foregroundColor: Colors.white,
                       textStyle: const TextStyle(
-                      color: Colors.white,  // Asegura que el color del texto sea blanco
+                        color: Colors.white,
                       ),
                     ),
                   );
@@ -104,9 +109,16 @@ class _PostsScreenState extends State<PostsScreen> {
               ),
               const SizedBox(height: 16),
               Obx(() {
-                if (postsListController.isLoading.value) {
+                if (postController.isLoading.value) {
                   return Center(child: CircularProgressIndicator());
-                } else if (postsListController.postList.isEmpty) {
+                } else if (selectedType != 'Todos' && postController.postsByType.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No hay posts disponibles para esta categoría".tr,
+                      style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF)),
+                    ),
+                  );
+                } else if (selectedType == 'Todos' && postsListController.postList.isEmpty) {
                   return Center(
                     child: Text(
                       "No hay posts disponibles".tr,
@@ -114,15 +126,14 @@ class _PostsScreenState extends State<PostsScreen> {
                     ),
                   );
                 } else {
-                  List filteredPosts = postsListController.postList.where((post) {
-                    return selectedType == 'Todos'.tr || post.postType == selectedType; //Hem de poder traduir el selectedType, per que el filtre funcioni amb la traducció
-                  }).toList();
-
+                  var postsToDisplay = selectedType == 'Todos'
+                      ? postsListController.postList
+                      : postController.postsByType;
                   return Expanded(
                     child: ListView.builder(
-                      itemCount: filteredPosts.length,
+                      itemCount: postsToDisplay.length,
                       itemBuilder: (context, index) {
-                        final post = filteredPosts[index];
+                        final post = postsToDisplay[index];
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: PostCard(post: post),
@@ -138,10 +149,10 @@ class _PostsScreenState extends State<PostsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddPostDialog(context);  // Mostrar el cuadro de diálogo para agregar un post
+          _showAddPostDialog(context);
         },
-        backgroundColor: Color(0xFF89AFAF),  // Color del botón flotante
-        child: Icon(Icons.add),  // Icono de suma
+        backgroundColor: Color(0xFF89AFAF),
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -240,7 +251,6 @@ class _PostsScreenState extends State<PostsScreen> {
       },
     );
   }
-
 
   // Mostrar el cuadro de diálogo para crear un nuevo post
   void _showAddPostDialog(BuildContext context) {

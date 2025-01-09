@@ -5,21 +5,38 @@ import '../models/post.dart';
 class PostCard extends StatelessWidget {
   final PostModel post;
 
-  const PostCard({
+  PostCard({
     Key? key,
     required this.post,
   }) : super(key: key);
 
+  // Mapa de traducció de categories
+  final Map<String, String> categoryTranslations = {
+    'P': 'Película',
+    'L': 'Libro',
+    'S': 'Serie',
+    'M': 'Música',
+    'Pod': 'Podcast',
+    'O': 'Otro',
+  };
+
+  // Métode per obtenir la descripció completa de la categoria
+  String getCategoryDescription(String code) {
+    return categoryTranslations[code] ?? 'Otro'; // Per defecte "Otro"
+  }
+
   // Método para determinar el color del círculo según el tipo de publicación
   Color _getPostTypeColor(String postType) {
     switch (postType) {
-      case 'Pelicula':
+      case 'P':
         return const Color(0xFF002F49); // Azul
-      case 'Libro':
+      case 'L':
         return const Color(0xFF002F49); // Naranja suave
-      case 'Evento':
+      case 'S':
         return const Color(0xFF002F49); // Verde suave
-      case 'Música':
+      case 'M':
+        return const Color(0xFF002F49); // Gris
+      case 'Pod':
         return const Color(0xFF002F49); // Gris
       default:
         return const Color(0xFF002F49); // Gris por defecto
@@ -62,7 +79,7 @@ class PostCard extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    post.postType.tr, // Tipo de post debajo del nombre
+                    getCategoryDescription(post.postType).tr, // Traduir i mostrar el tipus de post
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

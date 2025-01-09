@@ -77,7 +77,8 @@ class TranslationService extends Translations {
       'Dirección de tu casa':'Your home address',
       'Cerrar':'Close',
       'Mis Posts':'My Posts',
-      'Todos':'All'
+      'Todos':'All',
+      'No hay posts disponibles para esta categoría':'No posts available for this category'
     },
     'es_ES': {
       'Registrarse': 'Registrarse',
@@ -153,7 +154,8 @@ class TranslationService extends Translations {
       'Dirección de tu casa':'Dirección de tu casa',
       'Cerrar':'Cerrar',
       'Mis Posts':'Mis Posts',
-      'Todos':'Todos'
+      'Todos':'Todos',
+      'No hay posts disponibles para esta categoría':'No hay posts disponibles para esta categoría'
 
     },
     'ca_ES': {
@@ -230,7 +232,8 @@ class TranslationService extends Translations {
       'Dirección de tu casa':'Direcció de casa teva',
       'Cerrar':'Tanca',
       'Mis Posts':'Els meus Posts',
-      'Todos':'Tots'
+      'Todos':'Tots',
+      'No hay posts disponibles para esta categoría':'No hi ha posts disponibles per aquesta categoria'
     },
   };
 }
