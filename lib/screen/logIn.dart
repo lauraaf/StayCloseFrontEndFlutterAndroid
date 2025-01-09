@@ -68,10 +68,12 @@ class LogInPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
+                /*
                 //Imagen de Cloudinary
                 CldImageWidget(
                   publicId: 'logo_ounbww',
                 ),
+                */
                 const SizedBox(height: 20),
                 TextField(
                   controller: userController.usernameController,

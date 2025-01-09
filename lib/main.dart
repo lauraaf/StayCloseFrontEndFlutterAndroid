@@ -14,10 +14,13 @@ import 'package:cloudinary_url_gen/cloudinary.dart';
 import 'package:flutter_application_1/screen/calendarScreen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_application_1/translation_service.dart'; // Asegúrate de que el archivo esté en la ruta correcta
+import 'package:flutter_application_1/screen/chatScreen.dart';
 
 void main() {
-  CloudinaryContext.cloudinary = Cloudinary.fromCloudName(cloudName: "djen7vqby");
-  Get.put(UserController());  // Esto asegura que el controlador se ponga en el GetX 'depósito'
+  CloudinaryContext.cloudinary =
+      Cloudinary.fromCloudName(cloudName: "djen7vqby");
+  Get.put(
+      UserController()); // Esto asegura que el controlador se ponga en el GetX 'depósito'
   runApp(
     MyApp(),
   );
@@ -45,12 +48,12 @@ class MyApp extends StatelessWidget {
         // Ruta de inicio de sesión
         GetPage(
           name: '/login',
-          page: () => LogInPage(), 
+          page: () => LogInPage(),
         ),
-         // Ruta de registro
+        // Ruta de registro
         GetPage(
           name: '/register',
-          page: () => RegisterPage(), 
+          page: () => RegisterPage(),
         ),
         // Ruta de la pantalla principal con BottomNavScaffold
         GetPage(
@@ -69,11 +72,11 @@ class MyApp extends StatelessWidget {
           name: '/calendario',
           page: () => BottomNavScaffold(child: CalendarScreen()),
         ),
-        /*
+
         GetPage(
           name: '/chat',
-          page: () => BottomNavScaffold(child: PerfilScreen()),
-        ),*/
+          page: () => BottomNavScaffold(child: ChatScreen()),
+        ),
         GetPage(
           name: '/perfil',
           page: () => BottomNavScaffold(child: PerfilScreen()),
