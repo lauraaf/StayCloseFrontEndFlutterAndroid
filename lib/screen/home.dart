@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _animation = Tween<double>(begin: 1.0, end: 1.1).animate(_controller);
 
     // Cargar eventos al iniciar
-    eventController.fetchEvents();
+    eventController.fetchIncomingEvents();
   }
 
   @override

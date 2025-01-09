@@ -49,6 +49,26 @@ class EventController extends GetxController {
     }
   }
 
+  Future<void> fetchIncomingEvents() async {
+  isLoading.value = true;
+  try {
+    final fetchedEvents = await eventService.getEvents();
+    final now = DateTime.now();
+    
+    // Filtrar només els esdeveniments futurs
+    final futureEvents = fetchedEvents.where((event) => event.eventDate.isAfter(now)).toList();
+    
+    // Ordenar per data d'esdeveniment
+    futureEvents.sort((a, b) => a.eventDate.compareTo(b.eventDate));
+    
+    events.value = futureEvents;
+  } catch (e) {
+    errorMessage.value = 'Error al carregar els esdeveniments.';
+  } finally {
+    isLoading.value = false;
+  }
+}
+
   Future<void> createEvent() async {
     final name = nameController.text.trim();
     final description = descriptionController.text.trim();
