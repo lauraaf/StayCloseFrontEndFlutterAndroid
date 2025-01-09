@@ -76,7 +76,8 @@ class TranslationService extends Translations {
       'Chat':'Chat',
       'Dirección de tu casa':'Your home address',
       'Cerrar':'Close',
-      'Mis Posts':'My Posts'
+      'Mis Posts':'My Posts',
+      'Todos':'All'
     },
     'es_ES': {
       'Registrarse': 'Registrarse',
@@ -151,7 +152,8 @@ class TranslationService extends Translations {
       'Chat':'Chat',
       'Dirección de tu casa':'Dirección de tu casa',
       'Cerrar':'Cerrar',
-      'Mis Posts':'Mis Posts'
+      'Mis Posts':'Mis Posts',
+      'Todos':'Todos'
 
     },
     'ca_ES': {
@@ -227,7 +229,8 @@ class TranslationService extends Translations {
       'Chat':'Xat',
       'Dirección de tu casa':'Direcció de casa teva',
       'Cerrar':'Tanca',
-      'Mis Posts':'Els meus Posts'
+      'Mis Posts':'Els meus Posts',
+      'Todos':'Tots'
     },
   };
 }

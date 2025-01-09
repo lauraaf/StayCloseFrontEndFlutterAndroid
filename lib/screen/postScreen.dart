@@ -115,7 +115,7 @@ class _PostsScreenState extends State<PostsScreen> {
                   );
                 } else {
                   List filteredPosts = postsListController.postList.where((post) {
-                    return selectedType == 'Todos' || post.postType == selectedType;
+                    return selectedType == 'Todos'.tr || post.postType == selectedType; //Hem de poder traduir el selectedType, per que el filtre funcioni amb la traducció
                   }).toList();
 
                   return Expanded(
