@@ -1,5 +1,6 @@
 import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/screen/UserListScreen';
 import 'package:get/get.dart';
 import 'package:flutter_application_1/controllers/userController.dart';
 import 'package:flutter_application_1/Widgets/bottomNavigationBar.dart';
@@ -75,7 +76,9 @@ class MyApp extends StatelessWidget {
 
         GetPage(
           name: '/chat',
-          page: () => BottomNavScaffold(child: ChatScreen()),
+          page: () => BottomNavScaffold(
+            child: UserListScreen(),
+          ),
         ),
         GetPage(
           name: '/perfil',
