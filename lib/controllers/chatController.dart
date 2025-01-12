@@ -231,6 +231,145 @@ class ChatController extends GetxController {
 }
 */
 
+//funciona
+
+/*
+import 'package:get/get.dart';
+import '../models/message.dart';
+import '../services/chatService.dart';
+
+class ChatController extends GetxController {
+  final ChatService _chatService = ChatService();
+  final RxList<Message> messages = <Message>[].obs;
+
+  void connectToChat(
+      String chatId, String senderUsername, String receiverUsername) {
+    _chatService.connect(senderUsername);
+    _chatService.joinChat(chatId);
+
+    _chatService.onReceiveMessage((data) {
+      // Manejo de datos recibidos
+      if (data is Map<String, dynamic>) {
+        try {
+          final Message message = Message.fromJson(data);
+          messages.add(message);
+          print("Mensaje recibido: $data");
+        } catch (e) {
+          print("Error al procesar el mensaje único: $e");
+        }
+      } else if (data is List) {
+        for (var item in data) {
+          if (item is Map<String, dynamic>) {
+            try {
+              final Message message = Message.fromJson(item);
+              messages.add(message);
+            } catch (e) {
+              print("Error al procesar un mensaje de la lista: $e");
+            }
+          } else {
+            print("Formato inesperado en la lista de mensajes: $item");
+          }
+        }
+      } else {
+        print("Formato de datos inesperado: $data");
+      }
+    });
+  }
+
+  void loadChatMessages(String senderEmail, String receiverEmail) {
+    _chatService.loadUserChats(senderEmail, receiverEmail);
+
+    _chatService.onLoadUniqueChat((data) {
+      // Manejo de datos recibidos
+      if (data is Map<String, dynamic>) {
+        try {
+          final Message message = Message.fromJson(data);
+          messages.add(message);
+        } catch (e) {
+          print("Error al procesar el mensaje único en loadChatMessages: $e");
+        }
+      } else if (data is List) {
+        for (var item in data) {
+          if (item is Map<String, dynamic>) {
+            try {
+              final Message message = Message.fromJson(item);
+              messages.add(message);
+            } catch (e) {
+              print(
+                  "Error al procesar un mensaje de la lista en loadChatMessages: $e");
+            }
+          } else {
+            print("Formato inesperado en la lista de mensajes: $item");
+          }
+        }
+      } else {
+        print("Formato de datos inesperado en loadChatMessages: $data");
+      }
+    });
+  }
+
+  void sendMessage(String chatId, String senderId, String content) {
+    _chatService.sendMessage(chatId, senderId, content);
+    messages.add(Message(
+        senderId: senderId, content: content, timestamp: DateTime.now()));
+  }
+
+  @override
+  void onClose() {
+    _chatService.disconnect();
+    super.onClose();
+  }
+}
+
+*/
+
+/*
+import 'package:get/get.dart';
+import '../models/message.dart';
+import '../services/chatService.dart';
+
+class ChatController extends GetxController {
+  final ChatService _chatService = ChatService();
+  final RxList<Message> messages = <Message>[].obs;
+
+  void connectToServer(String username) {
+    _chatService.connect(username);
+  }
+
+  void onConnectedUsers(Function(List<dynamic>) callback) {
+    _chatService.onConnectedUsers(callback);
+  }
+
+  void startChat(String receiverUsername) {
+    final roomId = 'room-${DateTime.now().millisecondsSinceEpoch}';
+    _chatService.startChat(roomId, receiverUsername);
+
+    _chatService.onRoomCreated((roomData) {
+      Get.toNamed('/chatRoom', arguments: {
+        'roomId': roomData['roomId'],
+        'receiver': receiverUsername,
+      });
+    });
+  }
+
+  void sendMessage(String roomId, String sender, String content) {
+    _chatService.sendMessage(roomId, sender, content);
+    messages.add(
+        Message(senderId: sender, content: content, timestamp: DateTime.now()));
+  }
+
+  void onReceiveMessage(Function(dynamic) callback) {
+    _chatService.onReceiveMessage(callback);
+  }
+
+  @override
+  void onClose() {
+    _chatService.disconnect();
+    super.onClose();
+  }
+}
+*/
+
 import 'package:get/get.dart';
 import '../models/message.dart';
 import '../services/chatService.dart';

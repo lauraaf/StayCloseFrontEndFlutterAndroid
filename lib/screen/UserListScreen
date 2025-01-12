@@ -449,19 +449,24 @@ class _UserListScreenState extends State<UserListScreen> {
 
 */
 
+//funciona 
+/*
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/connectedUser.dart';
-import '../services/chatService.dart';
+import '../services/chatService.dart'; 
 import '../controllers/userController.dart';
+import '../controllers/chatController.dart';
 
 class UserListScreen extends StatefulWidget {
   @override
   _UserListScreenState createState() => _UserListScreenState();
+
 }
 
 class _UserListScreenState extends State<UserListScreen> {
-  final ChatService _chatService = ChatService();
+  final ChatController _chatController = Get.put(ChatController());
+  final ChatService _chatService = ChatService(); //
   final UserController _userController = Get.find<UserController>(); // Obtener el controlador
   List<ConnectedUser> connectedUsers = [];
   bool isLoading = true;
@@ -528,6 +533,245 @@ class _UserListScreenState extends State<UserListScreen> {
                           context,
                           '/chatRoom',
                           arguments: {'username': user.username},
+                        );
+                      },
+                    );
+                  },
+                ),
+    );
+  }
+}
+
+*/
+
+////funciona ////
+/*
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../models/connectedUser.dart';
+import '../controllers/chatController.dart';
+import '../controllers/userController.dart';
+
+class UserListScreen extends StatefulWidget {
+   final String currentUser;
+  @override
+  _UserListScreenState createState() => _UserListScreenState();
+}
+
+class _UserListScreenState extends State<UserListScreen> {
+  final ChatController _chatController = Get.put(ChatController());
+  final UserController _userController = Get.find<UserController>();
+  List<ConnectedUser> connectedUsers = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Obtener el username del usuario logueado
+    final String loggedInUsername = _userController.currentUserName.value;
+
+    // Conectar al servidor de chat
+    _chatController.connectToServer(loggedInUsername);
+
+    // Escuchar usuarios conectados
+    _chatController.onConnectedUsers((users) {
+      if (!mounted) return;
+      setState(() {
+        connectedUsers = users.map((u) => ConnectedUser.fromJson(u)).toList();
+        isLoading = false;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Usuarios Conectados')),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: connectedUsers.length,
+              itemBuilder: (context, index) {
+                final user = connectedUsers[index];
+                return ListTile(
+                  title: Text(user.username),
+                  onTap: () {
+                    _chatController.startChat(user.username);
+                  },
+                );
+              },
+            ),
+    );
+  }
+}
+*/
+
+/*
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../models/connectedUser.dart';
+import '../services/chatService.dart';
+import '../controllers/userController.dart';
+import '../screen/chatScreen.dart';
+
+class UserListScreen extends StatefulWidget {
+  @override
+  _UserListScreenState createState() => _UserListScreenState();
+}
+
+class _UserListScreenState extends State<UserListScreen> {
+  final ChatService _chatService = ChatService();
+  final UserController _userController = Get.find<UserController>();
+  List<ConnectedUser> connectedUsers = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    String loggedInUsername = _userController.currentUserName.value;
+
+    // Conectar al servidor de chat
+    try {
+      _chatService.connect(loggedInUsername);
+    } catch (e) {
+      print('Error al conectar al servidor de chat: $e');
+    }
+
+    // Escuchar usuarios conectados
+    _chatService.onConnectedUsers((data) {
+      if (!mounted) return;
+      setState(() {
+        connectedUsers = data
+            .map<ConnectedUser>((user) => ConnectedUser.fromJson(user))
+            .toSet()
+            .toList(); // Elimina duplicados
+      });
+    });
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Usuarios Conectados'),
+      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : connectedUsers.isEmpty
+              ? Center(child: Text('No hay usuarios conectados'))
+              : ListView.builder(
+                  itemCount: connectedUsers.length,
+                  itemBuilder: (context, index) {
+                    final user = connectedUsers[index];
+                    return ListTile(
+                      title: Text(user.username),
+                      onTap: () {
+                        String senderId = _userController.currentUserName.value;
+                        String receiverId = user.username;
+                        String chatId = '${senderId}_$receiverId';
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              chatId: chatId,
+                              senderId: senderId,
+                              receiverId: receiverId,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+    );
+  }
+}
+
+*/
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../models/connectedUser.dart';
+import '../services/chatService.dart';
+import '../controllers/userController.dart';
+import '../screen/chatScreen.dart';
+
+class UserListScreen extends StatefulWidget {
+  @override
+  _UserListScreenState createState() => _UserListScreenState();
+}
+
+class _UserListScreenState extends State<UserListScreen> {
+  final ChatService _chatService = ChatService();
+  final UserController _userController = Get.find<UserController>();
+  List<ConnectedUser> connectedUsers = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    String loggedInUsername = _userController.currentUserName.value;
+    _chatService.connect(loggedInUsername);
+
+    // Escuchar usuarios conectados
+    _chatService.onConnectedUsers((data) {
+      if (!mounted) return;
+      setState(() {
+        connectedUsers = data
+            .map<ConnectedUser>((user) => ConnectedUser.fromJson(user))
+            .toSet()
+            .toList(); // Evitar duplicados
+      });
+    });
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _chatService.disconnect();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Usuarios Conectados'),
+      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : connectedUsers.isEmpty
+              ? Center(child: Text('No hay usuarios conectados'))
+              : ListView.builder(
+                  itemCount: connectedUsers.length,
+                  itemBuilder: (context, index) {
+                    final user = connectedUsers[index];
+                    return ListTile(
+                      title: Text(user.username),
+                      onTap: () {
+                        String senderId = _userController.currentUserName.value;
+                        String receiverId = user.username;
+                        String chatId = '${senderId}_$receiverId';
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              chatId: chatId,
+                              senderId: senderId,
+                              receiverId: receiverId,
+                            ),
+                          ),
                         );
                       },
                     );
