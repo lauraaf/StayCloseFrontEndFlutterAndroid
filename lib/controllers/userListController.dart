@@ -19,7 +19,8 @@ class UserListController extends GetxController {
   Future fetchUsers() async {
     try {
       isLoading(true);
-      var users = await userService.getUsers(currentPage.value, limit.value); // Passar pàgina i límit
+      var users = await userService.getUsers(
+          currentPage.value, limit.value); // Passar pàgina i límit
       if (users != null) {
         userList.assignAll(users);
       }
