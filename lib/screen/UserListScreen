@@ -5,6 +5,7 @@ import '../models/connectedUser.dart';
 import '../services/chatService.dart';
 import '../controllers/userController.dart';
 import '../screen/chatScreen.dart';
+import 'package:flutter_application_1/controllers/userController.dart';
 
 class UserListScreen extends StatefulWidget {
   @override
@@ -22,6 +23,7 @@ class _UserListScreenState extends State<UserListScreen> {
     super.initState();
 
     String loggedInUsername = _userController.currentUserName.value;
+   
     _chatService.connect(loggedInUsername);
 
     // Escuchar usuarios conectados
@@ -32,6 +34,8 @@ class _UserListScreenState extends State<UserListScreen> {
             .map<ConnectedUser>((user) => ConnectedUser.fromJson(user))
             .toSet()
             .toList(); // Evitar duplicados
+            print('Usuarios conectados recibidos: $data');
+
       });
     });
 
@@ -73,6 +77,7 @@ class _UserListScreenState extends State<UserListScreen> {
                               chatId: chatId,
                               senderId: senderId,
                               receiverId: receiverId,
+                              
                             ),
                           ),
                         );

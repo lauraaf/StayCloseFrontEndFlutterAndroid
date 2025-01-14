@@ -7,4 +7,10 @@ class ConnectedUser {
   factory ConnectedUser.fromJson(Map<String, dynamic> json) {
     return ConnectedUser(username: json['username'] ?? 'username');
   }
+  // Convertir una instancia a JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'username': username,
+    };
+  }
 }
