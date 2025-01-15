@@ -1,5 +1,6 @@
 import 'package:flutter_application_1/models/user.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:math';
 
 class Googleauthservices {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -8,6 +9,13 @@ class Googleauthservices {
       'email'
     ],
   );
+
+  // Funció per generar la contrasenya aleatòria
+  String generateRandomPassword({int length = 12}) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#\$%^&*()_+-=[]{}|;:,.<>?';
+    Random random = Random();
+    return List.generate(length, (index) => characters[random.nextInt(characters.length)]).join();
+  }
 
   Future<GoogleSignInAccount?> signIn() async {
     try {
@@ -23,22 +31,24 @@ class Googleauthservices {
   }
 
   Future<UserModel?> signInWithGooggle() async {
-    try{
+    try {
       final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null; // Usuario cancela
 
-      // Obtenims les dades pel model del usuari
+      // Generar una contrasenya aleatòria
+      final randomPassword = generateRandomPassword();
+
+      // Obtenim les dades pel model del usuari
       final user = UserModel(
         username: googleUser.email.split('@')[0],
         name: googleUser.displayName ?? 'Usuario Google',
         email: googleUser.email,
-        password: '1234567', // La contraseña no se usa en este caso
+        password: randomPassword, // La contrasenya aleatòria generada
         actualUbication: [],
         admin: true,
       );
       return user;
-    }
-    catch(error) {
+    } catch (error) {
       print("Error al registrar-te amb Google: $error");
       return null;
     }
