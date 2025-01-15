@@ -8,7 +8,13 @@ class UserService {
   final String baseUrl = "http://127.0.0.1:3000/api"; // URL de tu backend Web
   //final String baseUrl = "http://147.83.7.155:3000/api"; // URL del teu backenda producció
   //final String baseUrl = "http://10.0.2.2:3000"; // URL de tu backend Android
-  final Dio dio = Dio(); // Usa el prefijo 'Dio' para referenciar la clase Dio
+ final Dio dio = Dio(BaseOptions(
+    validateStatus: (status) {
+      return status! < 500; // Permite respuestas con códigos de estado 2xx y 3xx
+    },
+    followRedirects: true, // Habilitar seguir redirecciones
+    maxRedirects: 5, // Limitar la cantidad de redirecciones
+  ));
   var statusCode;
   var data;
 
@@ -78,47 +84,39 @@ class UserService {
     'password': logIn.password};
   }
   
-  //Función createUser
-  Future<int> createUser(UserModel newUser) async {
-    print('createUser');
-    print('try');
-    //Aquí llamamos a la función request
-    print('request');
-    // Utilizar Dio para enviar la solicitud POST a http://127.0.0.1:3000/user
-    Response response =
-        await dio.post('$baseUrl/user/', data: newUser.toJson());
-    print('response');
-    //En response guardamos lo que recibimos como respuesta
-    //Printeamos los datos recibidos
+ Future<int> createUser(UserModel newUser) async {
+  print('createUser');
 
-    data = response.data.toString();
-    print('Data: $data');
-    //Printeamos el status code recibido por el backend
+  try {
+    Response response = await dio.post('$baseUrl/user/', data: newUser.toJson());
 
-    statusCode = response.statusCode;
-    print('Status code: $statusCode');
+    print('Respuesta completa del servidor: ${response.data}');
+    print('Respuesta del servidor: ${response.statusCode}');
 
-    if (statusCode == 200) {
-      // Si el usuario se crea correctamente, retornamos el código 201
+    if (response.statusCode == 200) {
       print('200: usuario creado');
       return 201;
-    } else if (statusCode == 400) {
-      // Si hay campos faltantes, retornamos el código 400
-      print('400');
-
+    } else if (response.statusCode == 301) {
+      print('301: El nombre de usuario ya está en uso');
+      return 301;
+    } else if (response.statusCode == 302) {
+      print('302: El correo electrónico ya está en uso');
+      return 302;
+    } else if (response.statusCode == 400) {
+      print('400: Campos faltantes');
       return 400;
-    } else if (statusCode == 500) {
-      // Si hay un error interno del servidor, retornamos el código 500
-      print('500');
-
+    } else if (response.statusCode == 500) {
+      print('500: Error interno del servidor');
       return 500;
     } else {
-      // Otro caso no manejado
-      print('-1');
-
+      print('-1: Código de error desconocido');
       return -1;
     }
+  } catch (e) {
+    print('Error al hacer la solicitud: $e');
+    return -1;
   }
+}
 
   Future<List<UserModel>> getUsers(int page, int limit) async {
     print('getUsers');

@@ -88,6 +88,8 @@ class UserController extends GetxController {
       // Llamada al servicio para iniciar sesión
       final responseData = await userService.logIn(logIn);
 
+      
+
       print('el response data es:${ responseData}');
 
       if (responseData == 200) {

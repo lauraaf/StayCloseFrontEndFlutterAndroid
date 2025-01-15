@@ -15,11 +15,8 @@ class RegisterController extends GetxController {
   var isPasswordVisible = false.obs;
   var isConfirmPasswordVisible = false.obs;
   
-  
-
   var isLoading = false.obs;
   var errorMessage = ''.obs;
-
 
   // Toggle password visibility
   void togglePasswordVisibility() {
@@ -36,57 +33,65 @@ class RegisterController extends GetxController {
     // Handle sign-up logic
     if (passwordController.text == confirmPasswordController.text) {
       // Validación de campos vacíos
-    if (nameController.text.isEmpty || passwordController.text.isEmpty || emailController.text.isEmpty || usernameController.text.isEmpty) {
-      errorMessage.value = 'Campos vacíos';
-      Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
-      return;
-    }
-    
-    // Validación de longitud mínima de contraseña
-    if (passwordController.text.length < 7) {
-      errorMessage.value = 'La contraseña debe tener al menos 7 caracteres';
-      Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
-      return;
-    }
-
-    // Validación de formato de correo electrónico
-    if (!GetUtils.isEmail(emailController.text)) {
-      errorMessage.value = 'Correo electrónico no válido';
-      Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
-      return;
-    }
-
-    isLoading.value = true;
-
-    try {
-      UserModel newUser = UserModel(
-        username: usernameController.text,
-        name: nameController.text,
-        password: passwordController.text,
-        email: emailController.text,
-        actualUbication: List.empty(),
-        admin: true,
-        avatar: '',
-        home: ''
-      );
-
-      final response = await userService.createUser(newUser);
-
-      if (response != null && response== 201) {
-        Get.snackbar('Éxito', 'Usuario creado exitosamente');
-        Get.toNamed('/login');
-      } else {
-        errorMessage.value = 'Error: Este E-Mail o Teléfono ya están en uso';
+      if (nameController.text.isEmpty || passwordController.text.isEmpty || emailController.text.isEmpty || usernameController.text.isEmpty) {
+        errorMessage.value = 'Campos vacíos';
         Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+        return;
       }
-    } catch (e) {
-      errorMessage.value = 'Error al registrar usuario';
-      Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
-    } finally {
-      isLoading.value = false;
-    }
+    
+      // Validación de longitud mínima de contraseña
+      if (passwordController.text.length < 7) {
+        errorMessage.value = 'La contraseña debe tener al menos 7 caracteres';
+        Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+        return;
+      }
+
+      // Validación de formato de correo electrónico
+      if (!GetUtils.isEmail(emailController.text)) {
+        errorMessage.value = 'Correo electrónico no válido';
+        Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+        return;
+      }
+
+      isLoading.value = true;
+
+      try {
+        UserModel newUser = UserModel(
+          username: usernameController.text,
+          name: nameController.text,
+          password: passwordController.text,
+          email: emailController.text,
+          actualUbication: List.empty(),
+          admin: true,
+          avatar: '',
+          home: ''
+        );
+
+        final response = await userService.createUser(newUser);
+
+         print('Respuesta del servidor: $response');
+
+        if (response != null) {
+          if (response == 201) {
+            Get.snackbar('Éxito', 'Usuario creado exitosamente');
+            Get.toNamed('/login');
+          } else if (response == 301) {
+            errorMessage.value = 'El nombre de usuario ya está en uso';
+            Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+          } else if (response == 302) {
+            errorMessage.value = 'El correo electrónico ya está en uso';
+            Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+          }
+        }
+      } catch (e) {
+        errorMessage.value = 'Error al registrar usuario';
+        Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+      } finally {
+        isLoading.value = false;
+      }
     } else {
       errorMessage.value = 'Las contraseñas no coinciden';
+      Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
     }
   }
 }
