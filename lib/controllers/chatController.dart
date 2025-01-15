@@ -80,6 +80,44 @@ import '../services/chatService.dart';
 class ChatController extends GetxController {
   final ChatService _chatService = ChatService();
   final RxList<Message> messages = <Message>[].obs;
+  final RxString currentChatId = ''.obs;
+
+  // Conectar y abrir chat único
+  Future<void> startChat(String senderUsername, String receiverUsername) async {
+    try {
+      // Llama al método del servicio para obtener o crear el chat
+      await _chatService.startUniqueChat(
+        senderUsername: senderUsername,
+        receiverUsername: receiverUsername,
+        onSuccess: (chatId) {
+          print('[INFO] Chat iniciado con ID: $chatId');
+          currentChatId.value = chatId; // Actualiza el chatId actual
+          connectToChat(chatId, senderUsername); // Conecta al chat
+        },
+        onError: (error) {
+          print('[ERROR] No se pudo iniciar el chat: $error');
+        },
+      );
+    } catch (e) {
+      print('[ERROR] Excepción al iniciar chat: $e');
+    }
+  }
+
+  /*
+  void startChat(String senderUsername, String receiverUsername) {
+    _chatService.startUniqueChat(
+      senderUsername: senderUsername,
+      receiverUsername: receiverUsername,
+      onSuccess: (chatId) {
+        currentChatId.value = chatId;
+        connectToChat(chatId, senderUsername);
+      },
+      onError: (error) {
+        print('[ERROR] No se pudo iniciar el chat: $error');
+      },
+    );
+  }
+  */
 
   void connectToChat(String chatId, String senderUsername) {
     _chatService.connect(senderUsername);

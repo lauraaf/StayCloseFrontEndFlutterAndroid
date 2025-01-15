@@ -222,7 +222,11 @@ class ChatService {
 
   // Escuchar mensajes entrantes
   void onReceiveMessage(Function(Map<String, dynamic>) callback) {
+    //Eliminar cualquier escucha previa del evento 'receiveMessage'
+    _socket.off('receiveMessage');
+    //Registramos una nueva escucha para 'receiveMessage'
     _socket.on('receiveMessage', (data) {
+      print('[INFO] Mensaje recibido: $data');
       if (data is Map<String, dynamic>) {
         callback(data);
       } else {
@@ -246,6 +250,74 @@ class ChatService {
       } else {
         print('Formato inesperado al cargar mensajes: $data');
       }
+    });
+  }
+
+  //// Obtener o crear un chat único
+  /*
+  void startUniqueChat({
+    required String senderUsername,
+    required String receiverUsername,
+    required Function(String chatId) onSuccess,
+    required Function(String error) onError,
+  }) {
+    if (!_isConnected) {
+      print('[ERROR] No conectado al servidor.');
+      onError('No conectado al servidor.');
+      return;
+    }
+
+    _socket.emit('startUniqueChat', {
+      'senderUsername': senderUsername,
+      'receiverUsername': receiverUsername,
+    });
+
+    _socket.on('openChat', (data) {
+      print('[INFO] Chat abierto: $data');
+      if (data is Map<String, dynamic> && data.containsKey('chatId')) {
+        onSuccess(data['chatId']);
+      } else {
+        onError('[ERROR] Formato de respuesta inesperado.');
+      }
+    });
+
+    _socket.on('error', (data) {
+      print('[ERROR] Error del servidor: $data');
+      onError(data.toString());
+    });
+  }
+  */
+  Future<void> startUniqueChat({
+    required String senderUsername,
+    required String receiverUsername,
+    required Function(String chatId) onSuccess,
+    required Function(String error) onError,
+  }) async {
+    if (!_isConnected) {
+      print('[ERROR] No conectado al servidor.');
+      onError('No conectado al servidor.');
+      return;
+    }
+
+    // Emitir el evento al servidor
+    _socket.emit('startUniqueChat', {
+      'senderUsername': senderUsername,
+      'receiverUsername': receiverUsername,
+    });
+
+    // Escuchar la respuesta del servidor
+    _socket.once('openChat', (data) {
+      print('[INFO] Chat abierto: $data');
+      if (data is Map<String, dynamic> && data.containsKey('chatId')) {
+        onSuccess(data['chatId']);
+      } else {
+        onError('[ERROR] Formato de respuesta inesperado.');
+      }
+    });
+
+    _socket.once('error', (data) {
+      print('[ERROR] Error del servidor: $data');
+      onError(data.toString());
     });
   }
 

@@ -6,6 +6,7 @@ import '../services/chatService.dart';
 import '../controllers/userController.dart';
 import '../screen/chatScreen.dart';
 import 'package:flutter_application_1/controllers/userController.dart';
+import '../controllers/chatController.dart';
 
 class UserListScreen extends StatefulWidget {
   @override
@@ -15,6 +16,8 @@ class UserListScreen extends StatefulWidget {
 class _UserListScreenState extends State<UserListScreen> {
   final ChatService _chatService = ChatService();
   final UserController _userController = Get.find<UserController>();
+  final ChatController chatController = Get.put(ChatController());
+
   List<ConnectedUser> connectedUsers = [];
   bool isLoading = true;
 
@@ -66,21 +69,31 @@ class _UserListScreenState extends State<UserListScreen> {
                     final user = connectedUsers[index];
                     return ListTile(
                       title: Text(user.username),
-                      onTap: () {
+                      onTap: () async {
                         String senderId = _userController.currentUserName.value;
                         String receiverId = user.username;
-                        String chatId = '${senderId}_$receiverId';
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChatScreen(
-                              chatId: chatId,
-                              senderId: senderId,
-                              receiverId: receiverId,
-                              
-                            ),
-                          ),
-                        );
+                        //String chatId = '${senderId}_$receiverId';
+                         try {
+                                 // Llama a la función del controlador para iniciar el chat
+                              await chatController.startChat(senderId, receiverId);
+
+                                 // Luego navega al ChatScreen
+                             Navigator.push(
+                                context,
+                              MaterialPageRoute(
+        builder: (context) => ChatScreen(
+          senderUsername: senderId,
+          receiverUsername: receiverId,
+        ),
+      ),
+    );
+  } catch (e) {
+    print('Error al iniciar el chat: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('No se pudo iniciar el chat')),
+    );
+  }
+                        
                       },
                     );
                   },

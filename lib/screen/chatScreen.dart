@@ -281,39 +281,49 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 */
 
+/*
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/chatController.dart';
 
 class ChatScreen extends StatelessWidget {
-  final String chatId;
-  final String senderId;
-  final String receiverId;
+  //final String chatId;
+  //final String senderId;
+  //final String receiverId;
+  final String senderUsername;
+  final String receiverUsername;
   final ChatController chatController = Get.put(ChatController());
 
   ChatScreen({
-    required this.chatId,
-    required this.senderId,
-    required this.receiverId,
+    //required this.chatId,
+    //required this.senderId,
+    //required this.receiverId,
+    required this.senderUsername,
+    required this.receiverUsername,
   });
 
   @override
   Widget build(BuildContext context) {
-    chatController.connectToChat(chatId, senderId);
+    chatController.connectToChat(senderUsername, receiverUsername);
 
     final messageController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Chat con $receiverId')),
-      body: Column(
+      appBar: AppBar(title: Text('Chat con $receiverUsername')),
+      body: 
+      Obx(() {
+        if (chatController.currentChatId.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        retur Column(
         children: [
           Expanded(
-            child: Obx(() {
-              return ListView.builder(
+            child:ListView.builder(
                 itemCount: chatController.messages.length,
                 itemBuilder: (context, index) {
                   final message = chatController.messages[index];
-                  final isSender = message.senderId == senderId;
+                  final isSender = message.senderId == senderUsername;
                   return Align(
                     alignment:
                         isSender ? Alignment.centerRight : Alignment.centerLeft,
@@ -332,6 +342,8 @@ class ChatScreen extends StatelessWidget {
                   );
                 },
               );
+          );
+      
             }),
           ),
           Padding(
@@ -352,11 +364,11 @@ class ChatScreen extends StatelessWidget {
                   onPressed: () {
                     if (messageController.text.isNotEmpty) {
                       chatController.sendMessage(
-                        chatId,
-                        senderId,
-                        messageController.text,
-                        receiverId,
-                      );
+                        chatController.currentChatId.value,
+                         senderUsername,
+                        messageController.text, 
+                        receiverUsername,
+                        );
                       messageController.clear();
                     }
                   },
@@ -366,6 +378,103 @@ class ChatScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+*/
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controllers/chatController.dart';
+
+class ChatScreen extends StatelessWidget {
+  final String senderUsername;
+  final String receiverUsername;
+  final ChatController chatController = Get.put(ChatController());
+
+  ChatScreen({
+    required this.senderUsername,
+    required this.receiverUsername,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Conectar al chat
+    chatController.connectToChat(senderUsername, receiverUsername);
+
+    final messageController = TextEditingController();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat con $receiverUsername'),
+      ),
+      body: Obx(() {
+        // Verificar si el chatId está disponible
+        if (chatController.currentChatId.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        // Construir la interfaz del chat
+        return Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: chatController.messages.length,
+                itemBuilder: (context, index) {
+                  final message = chatController.messages[index];
+                  final isSender = message.senderId == senderUsername;
+                  return Align(
+                    alignment:
+                        isSender ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(12.0),
+                      decoration: BoxDecoration(
+                        color: isSender ? Colors.blue : Colors.grey,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Text(
+                        message.content,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      decoration: const InputDecoration(
+                        hintText: 'Escribe un mensaje...',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () {
+                      if (messageController.text.isNotEmpty) {
+                        chatController.sendMessage(
+                          chatController.currentChatId.value,
+                          senderUsername,
+                          messageController.text,
+                          receiverUsername,
+                        );
+                        messageController.clear();
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }
