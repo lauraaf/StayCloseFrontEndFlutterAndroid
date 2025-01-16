@@ -100,32 +100,64 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                
-                // Password Field with Visibility Toggle
+
+                // Password Field with Strength Feedback
                 Obx(() {
-                  return TextField(
-                    controller: registerController.passwordController,
-                    cursorColor: Colors.white,
-                    obscureText: !registerController.isPasswordVisible.value,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña'.tr,
-                      labelStyle: TextStyle(color: Colors.white),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      border: OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          registerController.isPasswordVisible.value
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          registerController.togglePasswordVisibility();
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: registerController.passwordController,
+                        cursorColor: Colors.white,
+                        obscureText:
+                            !registerController.isPasswordVisible.value,
+                        onChanged: (password) {
+                          registerController.validatePassword(
+                              password); // Validació en temps real
                         },
+                        decoration: InputDecoration(
+                          labelText: 'Contraseña'.tr,
+                          labelStyle: TextStyle(color: Colors.white),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          border: OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              registerController.isPasswordVisible.value
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              registerController.togglePasswordVisibility();
+                            },
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 10),
+                      // Text explaining the password requirements
+                      Text(
+                        'Debe tener al menos 7 caracteres, una mayúscula, una minúscula, un número y un carácter especial'
+                            .tr,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      LinearProgressIndicator(
+                        value: registerController.passwordStrength.value,
+                        backgroundColor: Colors.grey[300],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          registerController.passwordStrength.value == 1
+                              ? Colors.green
+                              : registerController.passwordStrength.value >= 0.5
+                                  ? Colors.yellow
+                                  : Colors.red,
+                        ),
+                      ),
+                    ],
                   );
                 }),
 
@@ -136,7 +168,8 @@ class RegisterPage extends StatelessWidget {
                   return TextField(
                     controller: registerController.confirmPasswordController,
                     cursorColor: Colors.white,
-                    obscureText: !registerController.isConfirmPasswordVisible.value,
+                    obscureText:
+                        !registerController.isConfirmPasswordVisible.value,
                     decoration: InputDecoration(
                       labelText: 'Confirmar Contraseña'.tr,
                       labelStyle: TextStyle(color: Colors.white),
