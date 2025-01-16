@@ -22,7 +22,6 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    print("Vamos a obtener la ubicacion del usuario");
     _getUserLocation(); // Obtener la ubicación del usuario al entrar al mapa
   }
 
@@ -36,8 +35,6 @@ class _MapScreenState extends State<MapScreen> {
     if (!serviceEnabled) {
       print("Los servicios de ubicación no están habilitados.");
       return;
-    } else {
-      print("Servicios de ubicación habilitados.");
     }
 
     // Verificar si se tiene permiso para acceder a la ubicación
@@ -47,11 +44,7 @@ class _MapScreenState extends State<MapScreen> {
       if (permission == LocationPermission.denied) {
         print("Permiso de ubicación denegado.");
         return;
-      } else {
-        print("Permiso de ubicación concedido.");
       }
-    } else {
-      print("Permiso de ubicación ya concedido.");
     }
 
     // Obtener la ubicación actual del usuario
@@ -59,9 +52,6 @@ class _MapScreenState extends State<MapScreen> {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      print("Ubicación obtenida: Lat: ${position.latitude}, Lon: ${position.longitude}");
-
-      // Actualizar el estado con las coordenadas obtenidas
       setState(() {
         userLatitude = position.latitude;
         userLongitude = position.longitude;
@@ -70,20 +60,6 @@ class _MapScreenState extends State<MapScreen> {
       // Llamamos a la función para obtener las ubicaciones cercanas
       if (userLatitude != null && userLongitude != null) {
         await ubiListController.getNearbyUbis(userLatitude!, userLongitude!, 10); // Buscar ubicaciones cercanas a 10 km de distancia
-      }
-
-      // Añadir el marcador en el mapa
-      if (userLatitude != null && userLongitude != null) {
-        final userMarker = Marker(
-          point: LatLng(userLatitude!, userLongitude!),
-          builder: (ctx) => const Icon(
-            Icons.location_on,
-            color: Colors.red, // Color rojo para la ubicación del usuario
-            size: 38.0,
-          ),
-        );
-
-        print("Marcador añadido en la ubicación del usuario.");
       }
     } catch (e) {
       print("Error al obtener la ubicación: $e");
@@ -98,7 +74,7 @@ class _MapScreenState extends State<MapScreen> {
         backgroundColor: Color(0xFF89AFAF),
         actions: [
           // Botón para cambio de idioma
-          PopupMenuButton<String>(
+          PopupMenuButton<String>( // Menú para cambio de idioma
             onSelected: (String languageCode) {
               if (languageCode == 'ca') {
                 Get.updateLocale(Locale('ca', 'ES'));
@@ -131,7 +107,9 @@ class _MapScreenState extends State<MapScreen> {
           children: [
             FlutterMap(
               options: MapOptions(
-                center: LatLng(41.382395521312176, 2.1567611541534366),
+                center: userLatitude != null && userLongitude != null
+                    ? LatLng(userLatitude!, userLongitude!)
+                    : LatLng(41.382395521312176, 2.1567611541534366),
                 zoom: 13.0,
               ),
               children: [
@@ -147,7 +125,7 @@ class _MapScreenState extends State<MapScreen> {
                         point: LatLng(userLatitude!, userLongitude!),
                         builder: (ctx) => const Icon(
                           Icons.location_on,
-                          color: Colors.red, // Color rojo para indicar la ubicación del usuario
+                          color: Colors.red, // Color rojo para la ubicación del usuario
                           size: 38.0,
                         ),
                       ),
@@ -175,57 +153,55 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
 
+            // Elementos adicionales, como el título y las ubicaciones cercanas
             Positioned(
-                  top: 8, // Ajusta la distancia desde la parte superior
-                  right: 27, // Centra el texto horizontalmente
-                  child: Container(
-                    width: 290, // Cambia este valor para ajustar el ancho del recuadro
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(191, 255, 255, 255), // Color de fondo del recuadro
-                      borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
-                      border: Border.all(color: Color.fromARGB(255, 84, 91, 111), width: 1.5), // Borde con el color deseado
-                    ),
-                    child: Center(  // Usamos Center para centrar el texto en ambos ejes
-                      child: Text(
-                        'Punts propers a tú',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 84, 91, 111), // Cambia el color si lo deseas
-                        ),
+              top: 8, 
+              right: 27, 
+              child: Container(
+                width: 290, 
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(191, 255, 255, 255), 
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(color: Color.fromARGB(255, 84, 91, 111), width: 1.5), 
+                ),
+                child: Center(
+                  child: Text(
+                    'Puntos cercanos a ti'.tr,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 84, 91, 111),
                     ),
                   ),
                 ),
+              ),
             ),
-            // Mostrar tarjetas debajo del mapa con las ubicaciones cercanas
             Positioned(
               top: 58,
               right: 10,
               child: Container(
-                width: 320, // Ajusta el ancho según lo necesites
-                height: 450, // Ajusta la altura para que haya espacio para el título y la lista
+                width: 320, 
+                height: 450, 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Lista de ubicaciones
                     Expanded(
                       child: Obx(() {
-                       return ListView.builder(
-                         controller: ubiListController.scrollController, // Asociamos el ScrollController
-                          itemCount: ubiListController.ubis.length + 1, // Añadimos uno para mostrar el indicador de carga
+                        return ListView.builder(
+                          controller: ubiListController.scrollController,
+                          itemCount: ubiListController.ubis.length + 1,
                           itemBuilder: (context, index) {
                             if (index == ubiListController.ubis.length) {
-                              // Si hemos llegado al final, mostramos un indicador de carga
                               return ubiListController.isLoading.value
                                   ? const Padding(
                                       padding: EdgeInsets.symmetric(vertical: 16.0),
                                       child: Center(child: CircularProgressIndicator()),
-                                      )
+                                    )
                                   : const SizedBox.shrink();
                             } else {
                               var ubi = ubiListController.ubis[index];
-                              return UbiCard(ubi: ubi); // Mostrar las ubicaciones
+                              return UbiCard(ubi: ubi);
                             }
                           },
                         );
@@ -235,6 +211,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
             ),
+            // Card de la información de los puntos de ubicación
             Obx(() {
               final selectedUbi = ubiController.selectedUbi.value;
               if (selectedUbi != null) {
@@ -292,89 +269,93 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
- void _showAddUbiDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Center(
-                  child: Text(
-                    'Nova Ubicació',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF89AFAF),
+  void _showAddUbiDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                 // const Center(
+                   Text(
+                      'Nueva ubicación'.tr,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF89AFAF),
+                      ),
+                    ),
+                  //),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: ubiController.nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Nombre'.tr,
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: ubiController.nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nom',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: ubiController.addressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Adreça (carrer, localitat)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: ubiController.horariController,
-                  decoration: const InputDecoration(
-                    labelText: 'Horari',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: ubiController.tipoController,
-                  decoration: const InputDecoration(
-                    labelText: 'Tipus',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: ubiController.comentariController,
-                  decoration: const InputDecoration(
-                    labelText: 'Comentari',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await ubiController.createUbi();
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF89AFAF),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.addressController,
+                    decoration: InputDecoration(
+                      labelText: 'Dirección (calle, número de portería, localidad)'.tr,
+                      border: OutlineInputBorder(),
                     ),
-                    child: const Text('Crear Ubicació'),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.horariController,
+                    decoration: InputDecoration(
+                      labelText: 'Horario'.tr,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.tipoController,
+                    decoration: InputDecoration(
+                      labelText: 'Tipo'.tr,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: ubiController.comentariController,
+                    decoration: InputDecoration(
+                      labelText: 'Comentario'.tr,
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        //ubiController.getCoordinatesFromAddress(ubiController.addressController.text);
+                        await ubiController.createUbi();  // Llamar a la función de creación
+                        Navigator.of(context).pop();  // Cerrar el diálogo después de crear
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF89AFAF),
+                      ),
+                      child: Text(
+                        'Crear ubicación'.tr,
+                         style: TextStyle(color: Colors.white), // Texto en blanco
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
       },
     );
   }
