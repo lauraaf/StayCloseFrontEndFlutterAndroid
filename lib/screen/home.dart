@@ -5,16 +5,19 @@ import 'package:intl/intl.dart';
 import 'package:flutter_application_1/controllers/userController.dart';
 import 'package:flutter_application_1/controllers/eventController.dart';
 import 'package:flutter_application_1/screen/calendarScreen.dart';
+import 'package:flutter_application_1/controllers/themeController.dart';
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  final EventController eventController = Get.put(EventController()); // Instancia de EventController
+  final EventController eventController =
+      Get.put(EventController()); // Instancia de EventController
 
   @override
   void initState() {
@@ -49,11 +52,27 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     Get.put(UserController());
+
+    // Obtenim el ThemeController per a cridar la funció
+    final ThemeController themeController = Get.find();
+    
+    // Obtenim el mode actual (0 per clar, 1 per fosc)
+    int modeStatus = themeController.getModeStatus();
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Inicio'.tr), // Traducción dinámica
-        backgroundColor: Color(0xFF89AFAF),
+        backgroundColor: modeStatus == 0 ? Color(0xFF89AFAF) : Colors.black45,
         actions: [
+          // Botón para cambiar tema
+          IconButton(
+            icon: Icon(Icons.brightness_6),
+            onPressed: () {
+              final ThemeController themeController = Get.find();
+              themeController.toggleTheme();
+            },
+          ),
           // Botón para cambio de idioma
           PopupMenuButton<String>(
             onSelected: (String languageCode) {
@@ -76,17 +95,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ],
       ),
       body: Container(
-        color: Color(0xFFE0F7FA),
+        color: modeStatus == 0 ? Color(0xFFE0F7FA) : Colors.black, 
         child: Center(
           child: Container(
             padding: EdgeInsets.all(20),
             margin: EdgeInsets.symmetric(horizontal: 300),
             decoration: BoxDecoration(
-              color: Color.fromARGB(194, 162, 204, 204),
+              color: modeStatus == 0 ? Color.fromARGB(194, 162, 204, 204) : Colors.grey[800]!,
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black26,
+                  color: modeStatus == 0 ? Colors.black26 : Colors.white54,
                   blurRadius: 10,
                   offset: Offset(0, 5),
                 ),
@@ -100,16 +119,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: modeStatus == 0 ? Colors.white : Colors.white70,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Ens alegra tenir-te aquí. Gaudeix d\'aquesta aplicació i mantén la teva comunitat segura.'.tr,
+                  'Ens alegra tenir-te aquí. Gaudeix d\'aquesta aplicació i mantén la teva comunitat segura.'
+                      .tr,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white70,
+                    color: modeStatus == 0 ? Colors.white70 : Colors.white54,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -133,7 +153,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: modeStatus == 0 ? Colors.white : Colors.white70,
                   ),
                 ),
                 SizedBox(height: 10),
@@ -147,11 +167,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     return ExpansionTile(
                       title: Text(
                         'Ver eventos próximos'.tr,
-                        style: TextStyle(fontSize: 16, color: Colors.black),
+                        style: TextStyle(fontSize: 16, color: modeStatus == 0 ? Colors.black : Colors.white),
                       ),
                       children: eventController.events.map((event) {
                         return Card(
-                          color: Colors.white,
+                          color: modeStatus == 0 ? Colors.white : Colors.grey[700],
                           margin: EdgeInsets.symmetric(vertical: 2),
                           child: ListTile(
                             title: Text(event.name),
@@ -175,7 +195,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ElevatedButton(
                   onPressed: _contactEmergency,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(214, 255, 67, 67),
+                    backgroundColor: modeStatus == 0 ? Color.fromARGB(214, 255, 67, 67) : Colors.grey[800]!,
                     shape: CircleBorder(),
                     padding: EdgeInsets.all(20),
                   ),
@@ -193,3 +213,5 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 }
+
+

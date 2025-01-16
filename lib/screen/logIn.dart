@@ -5,6 +5,7 @@ import 'package:flutter_application_1/controllers/userController.dart';
 import 'package:cloudinary_flutter/cloudinary_context.dart';
 import 'package:cloudinary_flutter/image/cld_image.dart';
 import 'package:cloudinary_url_gen/cloudinary.dart';
+import 'package:flutter_application_1/controllers/themeController.dart';
 
 class LogInPage extends StatelessWidget {
   final UserController userController = Get.put(UserController());
@@ -16,6 +17,14 @@ class LogInPage extends StatelessWidget {
         title: Text('Iniciar Sesión'.tr), // Traducción dinámica
         backgroundColor: Color(0xFF89AFAF),
         actions: [
+          // Botón para cambiar tema
+          IconButton(
+            icon: Icon(Icons.brightness_6),
+            onPressed: () {
+              final ThemeController themeController = Get.find();
+              themeController.toggleTheme();
+            },
+          ),
           // Botón para cambio de idioma
           PopupMenuButton<String>(
             onSelected: (String languageCode) {
