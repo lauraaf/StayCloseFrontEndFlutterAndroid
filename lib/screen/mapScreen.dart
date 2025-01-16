@@ -167,7 +167,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    'Punts propers a tú',
+                    'Puntos cercanos a ti'.tr,
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -211,6 +211,51 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
             ),
+            // Card de la información de los puntos de ubicación
+            Obx(() {
+              final selectedUbi = ubiController.selectedUbi.value;
+              if (selectedUbi != null) {
+                return Positioned(
+                  top: 7,
+                  right: 323,
+                  child: Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      width: 250,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('${selectedUbi.name}', style: TextStyle(fontWeight: FontWeight.bold)),
+                              IconButton(
+                                icon: Icon(Icons.close, color: Colors.red),
+                                iconSize: 20,
+                                onPressed: () {
+                                  ubiController.selectedUbi.value = null;
+                                },
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Text('· Dirección: ${selectedUbi.address}'.tr),
+                          SizedBox(height: 5),
+                          Text('· Tipo: ${selectedUbi.tipo}'.tr),
+                          SizedBox(height: 5),
+                          Text('· Comentario: ${selectedUbi.comentari}'.tr),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return Container();
+            }),
           ],
         );
       }),
@@ -238,53 +283,53 @@ class _MapScreenState extends State<MapScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Center(
-                    child: Text(
-                      'Nova Ubicació',
+                 // const Center(
+                   Text(
+                      'Nueva ubicación'.tr,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF89AFAF),
                       ),
                     ),
-                  ),
+                  //),
                   const SizedBox(height: 20),
                   TextField(
                     controller: ubiController.nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nom',
+                    decoration: InputDecoration(
+                      labelText: 'Nombre'.tr,
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.addressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Adreça (carrer, localitat)',
+                    decoration: InputDecoration(
+                      labelText: 'Dirección (calle, número de portería, localidad)'.tr,
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.horariController,
-                    decoration: const InputDecoration(
-                      labelText: 'Horari',
+                    decoration: InputDecoration(
+                      labelText: 'Horario'.tr,
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.tipoController,
-                    decoration: const InputDecoration(
-                      labelText: 'Tipus',
+                    decoration: InputDecoration(
+                      labelText: 'Tipo'.tr,
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: ubiController.comentariController,
-                    decoration: const InputDecoration(
-                      labelText: 'Comentari',
+                    decoration: InputDecoration(
+                      labelText: 'Comentario'.tr,
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 3,
@@ -300,7 +345,10 @@ class _MapScreenState extends State<MapScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF89AFAF),
                       ),
-                      child: const Text('Crear Ubicació'),
+                      child: Text(
+                        'Crear ubicación'.tr,
+                         style: TextStyle(color: Colors.white), // Texto en blanco
+                      ),
                     ),
                   ),
                 ],

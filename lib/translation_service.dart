@@ -78,7 +78,11 @@ class TranslationService extends Translations {
       'Cerrar':'Close',
       'Mis Posts':'My Posts',
       'Todos':'All',
-      'No hay posts disponibles para esta categoría':'No posts available for this category'
+      'No hay posts disponibles para esta categoría':'No posts available for this category',
+      'Puntos cercanos a ti':'Points near you',
+      'Nueva ubicación':'New ubication',
+      'Dirección (calle, número de portería, localidad)':'Address (street, gate number, town)',
+      'Crear ubicación':'Create location'
     },
     'es_ES': {
       'Registrarse': 'Registrarse',
@@ -155,8 +159,11 @@ class TranslationService extends Translations {
       'Cerrar':'Cerrar',
       'Mis Posts':'Mis Posts',
       'Todos':'Todos',
-      'No hay posts disponibles para esta categoría':'No hay posts disponibles para esta categoría'
-
+      'No hay posts disponibles para esta categoría':'No hay posts disponibles para esta categoría',
+      'Puntos cercanos a ti':'Puntos cercanos a ti',
+      'Nueva ubicación':'Nueva ubicación',
+      'Dirección (calle, número de portería, localidad)':'Dirección (calle, número de portería, localidad)',
+      'Crear ubicación':'Crear ubicación'
     },
     'ca_ES': {
       'Registrarse': 'Registrar-se',
@@ -233,7 +240,11 @@ class TranslationService extends Translations {
       'Cerrar':'Tanca',
       'Mis Posts':'Els meus Posts',
       'Todos':'Tots',
-      'No hay posts disponibles para esta categoría':'No hi ha posts disponibles per aquesta categoria'
+      'No hay posts disponibles para esta categoría':'No hi ha posts disponibles per aquesta categoria',
+      'Puntos cercanos a ti':'Punts propers a tú',
+      'Nueva ubicación':'Nova ubicació',
+      'Dirección (calle, número de portería, localidad)':'Adreça (carrer, número de porteria, localitat)',
+      'Crear ubicación':'Crear ubicació'      
     },
   };
 }
