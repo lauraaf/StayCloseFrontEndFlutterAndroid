@@ -62,7 +62,7 @@ class UserService {
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
-        await prefs.setString('user_id', decodedToken['id'] ?? ''); // Manejar `null`
+        await prefs.setString('user_id', decodedToken['id'] ?? ''); // Manejar null
         await prefs.setString('username', decodedToken['username'] ?? '');
         await prefs.setString('email', decodedToken['email'] ?? '');
         await prefs.setBool('is_admin', decodedToken['admin'] ?? true);
