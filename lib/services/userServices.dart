@@ -62,7 +62,7 @@ class UserService {
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
-        await prefs.setString('user_id', decodedToken['id'] ?? ''); // Manejar `null`
+        await prefs.setString('user_id', decodedToken['id'] ?? ''); // Manejar null
         await prefs.setString('username', decodedToken['username'] ?? '');
         await prefs.setString('email', decodedToken['email'] ?? '');
         await prefs.setBool('is_admin', decodedToken['admin'] ?? true);
@@ -229,7 +229,10 @@ class UserService {
 
   print('request');
   // Realizar la solicitud DELETE para eliminar al usuario
-  Response response = await dio.delete('$baseUrl/user/$id');
+  //Response response = await dio.delete('$baseUrl/user/$id');
+
+  // Deshabilitar usuario
+  Response response = await dio.patch('$baseUrl/user/disable/$id');
   
   // Obtener los datos de la respuesta
   data = response.data.toString();
