@@ -229,7 +229,10 @@ class UserService {
 
   print('request');
   // Realizar la solicitud DELETE para eliminar al usuario
-  Response response = await dio.delete('$baseUrl/user/$id');
+  //Response response = await dio.delete('$baseUrl/user/$id');
+
+  // Deshabilitar usuario
+  Response response = await dio.patch('/disable/$id');
   
   // Obtener los datos de la respuesta
   data = response.data.toString();
