@@ -46,6 +46,8 @@ class Googleauthservices {
         password: randomPassword, // La contrasenya aleatòria generada
         actualUbication: [],
         admin: true,
+        avatar: '',
+        home: ''
       );
       return user;
     } catch (error) {
