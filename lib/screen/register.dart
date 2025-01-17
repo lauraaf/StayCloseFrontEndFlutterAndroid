@@ -13,7 +13,7 @@ class RegisterPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registrarse'.tr),
+        title: Text('Registrarse'.tr,            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), // Tamaño y estilo fijo del texto)
         // Cambiar el color de fondo del AppBar dependiendo del tema
         backgroundColor: themeController.isDarkMode.value
             ? Color(0xFF555A6F) // Color para el modo oscuro

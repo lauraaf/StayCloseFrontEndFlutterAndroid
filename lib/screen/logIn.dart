@@ -18,7 +18,8 @@ class LogInPage extends StatelessWidget {
         preferredSize: Size.fromHeight(kToolbarHeight), // Usamos el tamaño predeterminado del AppBar
         child: Obx(() {
           return AppBar(
-            title: Text('Iniciar Sesión'.tr), // Traducción dinámica
+            title: Text('Iniciar Sesión'.tr,
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), // Tamaño y estilo fijo del texto)
             // Color de fondo del AppBar dependiendo del tema
             backgroundColor: themeController.isDarkMode.value
                 ? Color(0xFF555A6F) // Color para el modo oscuro
