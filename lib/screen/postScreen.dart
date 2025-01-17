@@ -12,13 +12,25 @@ class PostsScreen extends StatefulWidget {
 class _PostsScreenState extends State<PostsScreen> {
   final PostController postController = Get.put(PostController());
   final PostsListController postsListController = Get.put(PostsListController());
-
+  final ScrollController _scrollController = ScrollController();
   String selectedType = 'Todos';
 
   @override
   void initState() {
     super.initState();
-    postsListController.fetchPosts();
+    postsListController.fetchPosts(); // Llamada inicial para obtener posts
+    _scrollController.addListener(() {
+      // Detectar el final de la lista para cargar más posts
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+        postsListController.fetchMorePosts(); // Llamar a fetchMorePosts
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _filterPostsByType(String type) {
@@ -26,7 +38,7 @@ class _PostsScreenState extends State<PostsScreen> {
       selectedType = type;
     });
     if (type == 'Todos') {
-      postsListController.fetchPosts();
+      postsListController.resetPage(); // Reset de la pagina antes de un nuevo fetch
     } else {
       postController.fetchPostsByType(type);
     }
@@ -36,10 +48,7 @@ class _PostsScreenState extends State<PostsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Foro de Posts'.tr,
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text('Foro de Posts'.tr, style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF89AFAF),
         actions: [
           PopupMenuButton<String>(
@@ -88,21 +97,16 @@ class _PostsScreenState extends State<PostsScreen> {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: ['Todos', 'Película', 'Serie', 'Libro', 'Podcast', 'Música']
-                    .map((type) {
+                children: ['Todos', 'Película', 'Serie', 'Libro', 'Podcast', 'Música','Otros'].map((type) {
                   return ElevatedButton(
                     onPressed: () {
                       _filterPostsByType(type);
                     },
                     child: Text(type.tr),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: selectedType == type
-                          ? const Color.fromRGBO(137, 175, 175, 1)
-                          : const Color.fromARGB(255, 178, 178, 178),
+                      backgroundColor: selectedType == type ? const Color.fromRGBO(137, 175, 175, 1) : const Color.fromARGB(255, 178, 178, 178),
                       foregroundColor: Colors.white,
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                      ),
+                      textStyle: const TextStyle(color: Colors.white),
                     ),
                   );
                 }).toList(),
@@ -112,27 +116,19 @@ class _PostsScreenState extends State<PostsScreen> {
                 if (postController.isLoading.value) {
                   return Center(child: CircularProgressIndicator());
                 } else if (selectedType != 'Todos' && postController.postsByType.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No hay posts disponibles para esta categoría".tr,
-                      style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF)),
-                    ),
-                  );
+                  return Center(child: Text("No hay posts disponibles para esta categoría".tr, style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF))));
                 } else if (selectedType == 'Todos' && postsListController.postList.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No hay posts disponibles".tr,
-                      style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF)),
-                    ),
-                  );
+                  return Center(child: Text("No hay posts disponibles".tr, style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF))));
                 } else {
-                  var postsToDisplay = selectedType == 'Todos'
-                      ? postsListController.postList
-                      : postController.postsByType;
+                  var postsToDisplay = selectedType == 'Todos' ? postsListController.postList : postController.postsByType;
                   return Expanded(
                     child: ListView.builder(
-                      itemCount: postsToDisplay.length,
+                      controller: _scrollController,
+                      itemCount: postsToDisplay.length + 1,
                       itemBuilder: (context, index) {
+                        if (index == postsToDisplay.length) {
+                          return Center(child: CircularProgressIndicator());
+                        }
                         final post = postsToDisplay[index];
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -251,7 +247,7 @@ class _PostsScreenState extends State<PostsScreen> {
       },
     );
   }
-
+  
   // Mostrar el cuadro de diálogo para crear un nuevo post
   void _showAddPostDialog(BuildContext context) {
     showDialog(
@@ -269,7 +265,7 @@ class _PostsScreenState extends State<PostsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                                        children: [
                       Center(
                         child: Text(
                           'Nuevo Post'.tr,
@@ -300,7 +296,6 @@ class _PostsScreenState extends State<PostsScreen> {
                         maxLines: 3,
                       ),
                       const SizedBox(height: 16),
-                      // Campo para el tipo de post (Dropdown)
                       // Dropdown para seleccionar el tipo de post
                       Obx(() {
                         return DropdownButton<String>(
@@ -312,15 +307,13 @@ class _PostsScreenState extends State<PostsScreen> {
                           onChanged: (String? newValue) {
                             postController.postType.value = newValue ?? '';
                           },
-                          items: <String>['', 'Libro'.tr, 'Película'.tr, 'Música'.tr, 'Serie'.tr, 'Otro'.tr]
+                          items: <String>['', 'Libro'.tr, 'Película'.tr, 'Música'.tr, 'Podcast', 'Serie'.tr, 'Otro'.tr]
                               .map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Text(value.tr),
                             );
                           }).toList(),
-                          dropdownColor: Colors.white,  // Fondo blanco para el dropdown
-                          underline: Container(),  // Eliminar línea de subrayado
                         );
                       }),
                       const SizedBox(height: 16),
@@ -347,10 +340,9 @@ class _PostsScreenState extends State<PostsScreen> {
                       Center(
                         child: ElevatedButton(
                           onPressed: () async {
-                            // Llamar al método para crear el post
                             postController.createPost();
                             postsListController.fetchPosts(); 
-                            Navigator.of(context).pop();  // Cerrar el cuadro de diálogo después de crear el post
+                            Navigator.of(context).pop();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFF89AFAF),
