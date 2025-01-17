@@ -23,6 +23,10 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
   final _passController = TextEditingController();
   final _homeController = TextEditingController();
 
+  final _streetController = TextEditingController();
+  final _numberController = TextEditingController();
+  final _provinceController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -48,7 +52,15 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         _nameController.text = userController.user.value!.name;
         _emailController.text = userController.user.value!.email;
         // No se establece el texto del _passController para no mostrar la contraseña
-        _homeController.text = userController.user.value!.home;
+        if (userController.user.value!.home != null) {
+          var homeAddressParts = userController.user.value!.home!.split(", ");
+          if (homeAddressParts.length == 3) {
+            _streetController.text = homeAddressParts[0];
+            _numberController.text = homeAddressParts[1];
+            _provinceController.text = homeAddressParts[2];
+          }
+          //_homeController.text = userController.user.value!.home;
+        }
       });
     } else {
       Get.snackbar('Error'.tr, 'No se pudo obtener los datos del usuario'.tr);
@@ -60,7 +72,13 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
     String newName = _nameController.text.trim();
     String newEmail = _emailController.text.trim();
     String newPassword = _passController.text.trim();
-    String newHomeAddress = _homeController.text.trim();
+    
+    String newStreet = _streetController.text.trim();
+    String newNumber = _numberController.text.trim();
+    String newProvince = _provinceController.text.trim();
+    //String newHomeAddress = _homeController.text.trim();
+
+    String newHomeAddress = "$newStreet, $newNumber, $newProvince";
 
     if (newUsername.isEmpty || newEmail.isEmpty || newPassword.isEmpty) {
       Get.snackbar('Error'.tr, 'Los campos no pueden estar vacíos'.tr);
@@ -77,20 +95,29 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
 
       // Actualizar los datos del usuario con la nueva imagen, si hay
       UserModel updatedUser = UserModel(
-        username: newUsername.isNotEmpty ? newUsername : userController.user.value!.username,
+        username: newUsername.isNotEmpty
+            ? newUsername
+            : userController.user.value!.username,
         name: newName.isNotEmpty ? newName : userController.user.value!.name,
-        email: newEmail.isNotEmpty ? newEmail : userController.user.value!.email,
-        password: userController.user.value!.password, // No actualizamos la contraseña aquí
+        email:
+            newEmail.isNotEmpty ? newEmail : userController.user.value!.email,
+        password: userController
+            .user.value!.password, // No actualizamos la contraseña aquí
         actualUbication: userController.user.value!.actualUbication,
         inHome: userController.user.value!.inHome,
         admin: userController.user.value!.admin,
         disabled: userController.user.value!.disabled,
-        avatar: avatarUrl.isNotEmpty ? avatarUrl : userController.user.value!.avatar, // Usar la URL de la imagen
-        home: newHomeAddress.isNotEmpty ? newHomeAddress : userController.user.value!.home,
+        avatar: avatarUrl.isNotEmpty
+            ? avatarUrl
+            : userController.user.value!.avatar, // Usar la URL de la imagen
+        home: newHomeAddress.isNotEmpty
+            ? newHomeAddress
+            : userController.user.value!.home,
       );
 
       // Guardar los cambios
-      await userService.editUser(updatedUser, _userId!, newPassword); // Pasa la contraseña al servicio
+      await userService.editUser(
+          updatedUser, _userId!, newPassword); // Pasa la contraseña al servicio
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('username', newUsername);
@@ -131,7 +158,9 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('¿Estas Seguro?'.tr),
-          content: Text('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.'.tr),
+          content: Text(
+              '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.'
+                  .tr),
           actions: [
             TextButton(
               onPressed: () {
@@ -139,7 +168,6 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
               },
               child: Text('Cancelar'.tr),
             ),
-            
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
@@ -223,7 +251,8 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                             return userController.selectedImage.value != null
                                 ? ClipOval(
                                     child: Image.memory(
-                                      userController.selectedImage.value!, // Accede al valor de selectedImage
+                                      userController.selectedImage
+                                          .value!, // Accede al valor de selectedImage
                                       fit: BoxFit.cover,
                                       width: 160,
                                       height: 160,
@@ -253,14 +282,56 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                         labelText: 'Nombre Completo'.tr,
                         border: OutlineInputBorder(),
                       ),
-                    ),const SizedBox(height: 16),
-                    TextField(
+                    ),
+                    const SizedBox(height: 16),
+                    /*TextField(
                       controller: _homeController,
                       decoration: InputDecoration(
                         labelText: 'Dirección de tu casa'.tr,
                         border: OutlineInputBorder(),
                       ),
-                    ),
+                    ),*/
+                                      // Text a dalt per a la direcció de casa
+                  Text(
+                    'Dirección de tu casa'.tr,  // Afegim un text descriptiu
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  // La fila que conté els tres camps de text
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _streetController,
+                          decoration: InputDecoration(
+                            labelText: 'Carrer'.tr,
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),  // Separació entre els camps
+                      Expanded(
+                        child: TextField(
+                          controller: _numberController,
+                          decoration: InputDecoration(
+                            labelText: 'Número'.tr,
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),  // Separació entre els camps
+                      Expanded(
+                        child: TextField(
+                          controller: _provinceController,
+                          decoration: InputDecoration(
+                            labelText: 'Provincia'.tr,
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
                     const SizedBox(height: 16),
                     TextField(
                       controller: _emailController,
