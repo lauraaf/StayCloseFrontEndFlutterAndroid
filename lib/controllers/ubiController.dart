@@ -36,10 +36,10 @@ class UbiController extends GetxController {
   void onInit() {
     super.onInit();
     fetchUbis();
-    _loadUserAddress();
+    loadUserAddress();
   }
 
-  Future<void> _loadUserAddress() async {
+  Future<Map<String, double>> loadUserAddress() async {
     try {
       // Obtenir l'ID de l'usuari des de SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -50,76 +50,78 @@ class UbiController extends GetxController {
         var user = await userService.getUser(userId);
         if (user != null) {
           _address.value = user.home ?? 'Adreça no disponible';
-        // Un cop tinguem l'adreça, obtenim les coordenades
-        await getCoordinatesFromAddress(_address.value);
+          // Un cop tinguem l'adreça, obtenim les coordenades
+          return await getCoordinatesFromAddress(_address.value);
+          
         } else {
           print('No s\'han pogut carregar les dades del usuari.');
+          throw Exception('No s\'han pogut carregar les dades del usuari.');
+          
         }
       } else {
         print('ID de l\'usuari no disponible a SharedPreferences.');
+        throw Exception('ID de l\'usuari no disponible a SharedPreferences.');
       }
     } catch (e) {
       print('Error carregant l\'adreça del usuari: $e');
+      throw Exception('Error carregant l\'adreça del usuari: $e');
     }
   }
 
-  // Funció per obtenir coordenades de l'adreça
- // Funció per obtenir coordenades de l'adreça
 // Funció per obtenir coordenades de l'adreça
-// Funció per obtenir coordenades de l'adreça
-Future<Map<String, double>> getCoordinatesFromAddress(String address) async {
-  try {
-    // Fem la crida HTTP a l'API de Nominatim per obtenir les coordenades
-    print("Obteniendo coordenadas para la dirección: $address");
-    final url = Uri.parse(
-        'https://nominatim.openstreetmap.org/search?q=$address&format=json&limit=1');
-    final response = await http.get(url);
-    print("Respuesta de la API: ${response.body}");
+  Future<Map<String, double>> getCoordinatesFromAddress(String address) async {
+    try {
+      // Fem la crida HTTP a l'API de Nominatim per obtenir les coordenades
+      print("Obteniendo coordenadas para la dirección: $address");
+      final url = Uri.parse(
+          'https://nominatim.openstreetmap.org/search?q=$address&format=json&limit=1');
+      final response = await http.get(url);
+      print("Respuesta de la API: ${response.body}");
 
-    // Comprovem que la resposta és correcte
-    if (response.statusCode == 200) {
-      print("code 200-------------------");
+      // Comprovem que la resposta és correcte
+      if (response.statusCode == 200) {
+        print("code 200-------------------");
 
-      final List<dynamic> data = json.decode(response.body);
-      print("data: $data");
+        final List<dynamic> data = json.decode(response.body);
+        print("data: $data");
 
-      // Si hi ha dades disponibles
-      if (data.isNotEmpty) {
-        // Processem les coordenades utilitzant tokens
-        final tokens = response.body.split(',');
+        // Si hi ha dades disponibles
+        if (data.isNotEmpty) {
+          // Processem les coordenades utilitzant tokens
+          final tokens = response.body.split(',');
 
-        // Buscar les claus 'lat' i 'lon' dins dels tokens
-        String? latToken =
-            tokens.firstWhere((token) => token.contains('"lat"'), orElse: () => '');
-        String? lonToken =
-            tokens.firstWhere((token) => token.contains('"lon"'), orElse: () => '');
+          // Buscar les claus 'lat' i 'lon' dins dels tokens
+          String? latToken = tokens
+              .firstWhere((token) => token.contains('"lat"'), orElse: () => '');
+          String? lonToken = tokens
+              .firstWhere((token) => token.contains('"lon"'), orElse: () => '');
 
-        // Extraiem els valors numèrics després de "lat" i "lon"
-        if (latToken.isNotEmpty && lonToken.isNotEmpty) {
-          final double lat = double.parse(
-              latToken.split(':')[1].replaceAll('"', '').trim());
-          final double lon = double.parse(
-              lonToken.split(':')[1].replaceAll('"', '').trim());
+          // Extraiem els valors numèrics després de "lat" i "lon"
+          if (latToken.isNotEmpty && lonToken.isNotEmpty) {
+            final double lat =
+                double.parse(latToken.split(':')[1].replaceAll('"', '').trim());
+            final double lon =
+                double.parse(lonToken.split(':')[1].replaceAll('"', '').trim());
 
-          print('Latitud: $lat');
-          print('Longitud: $lon');
+            print('Latitud: $lat');
+            print('Longitud: $lon');
 
-          // Retornem un mapa amb les coordenades
-          return {'latitude': lat, 'longitude': lon};
+            // Retornem un mapa amb les coordenades
+            return {'latitude': lat, 'longitude': lon};
+          } else {
+            throw Exception('No se encontraron valores de latitud o longitud.');
+          }
         } else {
-          throw Exception('No se encontraron valores de latitud o longitud.');
+          throw Exception('Adreça no trobada.');
         }
       } else {
-        throw Exception('Adreça no trobada.');
+        throw Exception('Error en la crida a l\'API.');
       }
-    } else {
-      throw Exception('Error en la crida a l\'API.');
+    } catch (e) {
+      print('Error al geocodificar l\'adreça: $e');
+      rethrow; // Tornem a llençar l'error per gestionar-lo a fora si cal
     }
-  } catch (e) {
-    print('Error al geocodificar l\'adreça: $e');
-    rethrow; // Tornem a llençar l'error per gestionar-lo a fora si cal
   }
-}
 
   // Obtener todas las ubicaciones
   Future<void> fetchUbis() async {

@@ -32,9 +32,11 @@ class _MapScreenState extends State<MapScreen> {
   // Funció per obtenir la ubicació de la casa de l'usuari
   Future<void> _loadHomeLocation() async {
     try {
-      final coordinates = await ubiController.getCoordinatesFromAddress(ubiController.address);
+      final coordinates = await ubiController.loadUserAddress();
+
       homeLatitude = coordinates['latitude'];
       homeLongitude = coordinates['longitude'];
+
       setState(() {});
       print('Ubicació de la casa: Lat: $homeLatitude, Lon: $homeLongitude');
     } catch (e) {
