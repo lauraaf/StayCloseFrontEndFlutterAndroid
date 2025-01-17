@@ -7,32 +7,33 @@ import 'package:flutter_application_1/services/postServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:typed_data';
 import 'package:image_picker_web/image_picker_web.dart';
+import 'package:flutter_application_1/controllers/postsListController.dart'; // Asegúrate de este import
 
 class PostController extends GetxController {
   final PostService postService = Get.put(PostService());
   final TextEditingController ownerController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final PostsListController postsListController = Get.put(PostsListController());
 
   var postType = ''.obs;
   var isLoading = false.obs;
   var errorMessage = ''.obs;
-  var postsByType = <PostModel>[].obs;  // Nova variable per guardar els posts filtrats
+  var postsByType = <PostModel>[].obs; // Variable para guardar los posts filtrados
+  Uint8List? selectedImage; // Bytes de la imagen seleccionada
+  var uploadedImageUrl = ''.obs; // URL de la imagen subida a Cloudinary
 
   @override
   void onInit() {
     super.onInit();
-    _loadUsername();  // Cargar el username cuando se inicializa el controlador
+    _loadUsername(); // Cargar el username cuando se inicializa el controlador
   }
 
   // Método para cargar el username desde SharedPreferences
   void _loadUsername() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';  // Recupera el username o un string vacío
-    ownerController.text = username;  // Rellenar el campo de autor
+    String username = prefs.getString('username') ?? ''; // Recupera el username o un string vacío
+    ownerController.text = username; // Rellenar el campo de autor
   }
-
-  Uint8List? selectedImage; // Bytes de la imagen seleccionada
-  var uploadedImageUrl = ''.obs; // URL de la imagen subida a Cloudinary
 
   // Seleccionar imagen desde el dispositivo
   Future<void> pickImage() async {
@@ -90,7 +91,7 @@ class PostController extends GetxController {
     }
   }
 
-  // Mapeig entre categories i els seus codis
+  // Mapeo entre categorías y sus códigos
   final Map<String, String> categoryCodes = {
     'Película': 'P',
     'Libro': 'L',
@@ -100,9 +101,9 @@ class PostController extends GetxController {
     'Otro': 'O',
   };
 
-  // Funció per traduir la categoria seleccionada al codi
+  // Función para traducir la categoría seleccionada al código
   String getCategoryCode(String category) {
-    return categoryCodes[category] ?? 'O'; // Per defecte "O" (Otro)
+    return categoryCodes[category] ?? 'O'; // Por defecto "O" (Otro)
   }
 
   // Crear un nuevo post
@@ -127,7 +128,7 @@ class PostController extends GetxController {
       return;
     }
 
-    // Tradueix el tipus de post al codi correcte abans d’enviar
+    // Traduce el tipo de post al código correcto antes de enviar
     String translatedPostType = getCategoryCode(postType.value);
     print("Aquest es el codi per la categoria del post:" + translatedPostType);
 
@@ -145,6 +146,7 @@ class PostController extends GetxController {
       final statusCode = await postService.createPost(newPost);
       if (statusCode == 201) {
         Get.snackbar('Éxito', 'Post creado con éxito');
+        postsListController.fetchPosts(); // Actualizar la lista de posts
         Get.toNamed('/posts');
       } else {
         errorMessage.value = 'Error al crear el post';
@@ -180,11 +182,11 @@ class PostController extends GetxController {
     }
   }
 
-  // Afegir la funció per obtenir els posts filtrats per tipus
+  // Función para obtener los posts filtrados por tipo de post
   void fetchPostsByType(String type) async {
     isLoading.value = true;
     
-    // Tradueix el tipus de post al codi correcte abans d’enviar
+    // Traduce el tipo de post al código correcto antes de enviar
     String translatedPostType = getCategoryCode(type);
     try {
       var posts = await postService.getPostsByType(translatedPostType);
