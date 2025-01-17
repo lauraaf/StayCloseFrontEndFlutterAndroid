@@ -24,6 +24,9 @@ class UserController extends GetxController {
   // Usando Rxn para que sea nullable (inicialmente vacío)
   var user = Rxn<UserModel>();
 
+  var connectedUsers = <UserModel>[].obs; // Lista de usuarios conectados
+  var searchResults = <UserModel>[].obs; // Resultados de búsqueda
+
 // Método para obtener un usuario por su ID
   Future<void> fetchUser(String id) async {
     try {
@@ -144,6 +147,24 @@ class UserController extends GetxController {
     } catch (e) {
       Get.snackbar('Error', 'No se pudo seleccionar la imagen: $e',
           snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  //Buscar usuario por username
+  // Buscar usuario por username
+  Future<void> searchUser(String username) async {
+    try {
+      isLoading.value = true;
+      UserModel? user = await userService.getUserByUsername(username);
+      if (user != null) {
+        searchResults.value = [user];
+      } else {
+        searchResults.clear();
+      }
+    } catch (e) {
+      print("Error al buscar usuario: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 

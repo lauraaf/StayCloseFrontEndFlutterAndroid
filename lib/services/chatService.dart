@@ -140,6 +140,7 @@ class ChatService {
 
 */
 
+/* FUNCIONA
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatService {
@@ -252,9 +253,11 @@ class ChatService {
       }
     });
   }
+  */
+//fUNCIONA
 
-  //// Obtener o crear un chat único
-  /*
+// Obtener o crear un chat único
+/*NOGUNCIONAAAAAA
   void startUniqueChat({
     required String senderUsername,
     required String receiverUsername,
@@ -286,7 +289,9 @@ class ChatService {
       onError(data.toString());
     });
   }
-  */
+  //no funciona
+
+  //////Funcionaaaa
   Future<void> startUniqueChat({
     required String senderUsername,
     required String receiverUsername,
@@ -327,6 +332,62 @@ class ChatService {
       _socket.disconnect();
       _isConnected = false;
       print('Desconectado del servidor.');
+    }
+  }
+}
+
+*/
+/*
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class ChatService {
+  static const String baseUrl = "http://127.0.0.1:3000/api/chat";
+
+  // Método para iniciar un chat
+  static Future<String> startChat(String sender, String receiver) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/start"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "sender": sender,
+        "receiver": receiver,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['chatId']; // Devuelve el chatId
+    } else {
+      throw Exception("Error al iniciar el chat");
+    }
+  }
+}
+
+*/
+
+import 'package:dio/dio.dart';
+
+class ChatService {
+  static final Dio _dio =
+      Dio(BaseOptions(baseUrl: "http://127.0.0.1:3000/api/chat"));
+
+  // Método para obtener o crear un chat
+  static Future<String> createOrGetChat({
+    required String sender,
+    required String receiver,
+  }) async {
+    try {
+      final response = await _dio.post(
+        "/createOrGetChat",
+        data: {"sender": sender, "receiver": receiver},
+      );
+
+      return response.data['chatId']; // Retornar el chatId
+    } catch (e) {
+      print("Error al buscar o crear chat: $e");
+      throw Exception("No se pudo obtener el chatId");
     }
   }
 }

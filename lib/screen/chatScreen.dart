@@ -1,13 +1,15 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/chatController.dart';
 
 class ChatScreen extends StatelessWidget {
+  final String chatId;
   final String senderUsername;
   final String receiverUsername;
   final ChatController chatController = Get.put(ChatController());
 
   ChatScreen({
+    required this.chatId,
     required this.senderUsername,
     required this.receiverUsername,
   });
@@ -188,3 +190,5 @@ class ChatScreen extends StatelessWidget {
     );
   }
 }
+
+*/

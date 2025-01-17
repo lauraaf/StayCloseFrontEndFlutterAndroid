@@ -291,6 +291,24 @@ class UserService {
     }
   }
 
+  //Buscar un usuario por su username
+
+  Future<UserModel?> getUserByUsername(String username) async {
+    try {
+      final response =
+          await dio.get('$baseUrl/user/getUserByUsername/$username');
+      if (response.statusCode == 200) {
+        return UserModel.fromJson(response.data);
+      } else {
+        print('Error al obtener usuario: ${response.data}');
+        return null;
+      }
+    } catch (e) {
+      print('Error al obtener usuario: $e');
+      return null;
+    }
+  }
+
   // Método para obtener un usuario por su ID
   /*Future<UserModel?> getUserById(String id) async {
     try {
