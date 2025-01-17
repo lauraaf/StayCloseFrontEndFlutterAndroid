@@ -138,44 +138,86 @@ class UserService {
     }
   }
 
- Future<int> EditUser(UserModel newUser, String id) async {
-  print('EditUser');
-  print('try');
-  
-  // Llamar a _setAuthHeaders() para asegurarnos de que el token esté configurado
-  await _setAuthHeaders();
+    Future<int> editUser(UserModel newUser, String id, String password) async {
+    print('EditUser');
+    print('try');
+    
+    // Llamar a _setAuthHeaders() para asegurarnos de que el token esté configurado
+    await _setAuthHeaders();
 
-  print('request');
-  // Realizar la solicitud PUT para editar los datos del usuario
-  Response response = await dio.put('$baseUrl/user/update/$id', data: newUser.toJson());
+    print('request');
+    // Realizar la solicitud PUT para editar los datos del usuario, incluyendo la contraseña en la URL
+    Response response = await dio.put(
+      '$baseUrl/user/update/$id/$password', // Añadimos la contraseña a la URL
+      data: newUser.toJson(),
+    );
 
-  // Obtener los datos de la respuesta
-  data = response.data.toString();
-  print('Data: $data');
-  
-  // Obtener el status code de la respuesta
-  statusCode = response.statusCode;
-  print('Status code: $statusCode');
+    // Obtener los datos de la respuesta
+    data = response.data.toString();
+    print('Data: $data');
+    
+    // Obtener el status code de la respuesta
+    statusCode = response.statusCode;
+    print('Status code: $statusCode');
 
-  // Manejar las posibles respuestas del servidor
-  if (statusCode == 200) {
-    // Si el usuario se edita correctamente
-    print('User edited successfully');
-    return 200;  // Devolvemos el código de éxito
-  } else if (statusCode == 400) {
-    // Si hay un error con la solicitud
-    print('400 - Bad request');
-    return 400;
-  } else if (statusCode == 500) {
-    // Si hay un error interno del servidor
-    print('500 - Server error');
-    return 500;
-  } else {
-    // Si hay un error desconocido
-    print('-1 - Unknown error');
-    return -1;
+    // Manejar las posibles respuestas del servidor
+    if (statusCode == 200) {
+      // Si el usuario se edita correctamente
+      print('User edited successfully');
+      return 200;  // Devolvemos el código de éxito
+    } else if (statusCode == 400) {
+      // Si hay un error con la solicitud
+      print('400 - Bad request');
+      return 400;
+    } else if (statusCode == 500) {
+      // Si hay un error interno del servidor
+      print('500 - Server error');
+      return 500;
+    } else {
+      // Si hay un error desconocido
+      print('-1 - Unknown error');
+      return -1;
+    }
   }
-}
+
+  /*Future<int> EditUser(UserModel newUser, String id) async {
+    print('EditUser');
+    print('try');
+    
+    // Llamar a _setAuthHeaders() para asegurarnos de que el token esté configurado
+    await _setAuthHeaders();
+
+    print('request');
+    // Realizar la solicitud PUT para editar los datos del usuario
+    Response response = await dio.put('$baseUrl/user/update/$id', data: newUser.toJson());
+
+    // Obtener los datos de la respuesta
+    data = response.data.toString();
+    print('Data: $data');
+    
+    // Obtener el status code de la respuesta
+    statusCode = response.statusCode;
+    print('Status code: $statusCode');
+
+    // Manejar las posibles respuestas del servidor
+    if (statusCode == 200) {
+      // Si el usuario se edita correctamente
+      print('User edited successfully');
+      return 200;  // Devolvemos el código de éxito
+    } else if (statusCode == 400) {
+      // Si hay un error con la solicitud
+      print('400 - Bad request');
+      return 400;
+    } else if (statusCode == 500) {
+      // Si hay un error interno del servidor
+      print('500 - Server error');
+      return 500;
+    } else {
+      // Si hay un error desconocido
+      print('-1 - Unknown error');
+      return -1;
+    }
+  }*/
 
 
   Future<int> deleteUser(String id) async {

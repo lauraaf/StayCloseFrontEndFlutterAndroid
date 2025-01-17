@@ -40,18 +40,16 @@ class UserController extends GetxController {
   }
 
   // Método para editar un usuario
-  void editUser(UserModel updatedUser, String id) async {
+  void editUser(UserModel updatedUser, String id, String password) async {
     try {
-      final result = await userService.EditUser(updatedUser, id);
+      final result = await userService.editUser(updatedUser, id, password);
       print("result: $result");
       if (result == 200) {
         user.value = updatedUser; // Actualizar el estado reactivo
         Get.snackbar('Éxito', 'Usuario actualizado correctamente');
         if (user.value != null) {
           usernameController.text = user.value!.username; // Usa el valor si no es nulo
-          
         }
-
       } else {
         Get.snackbar('Error', 'No se pudo actualizar el usuario');
       }
@@ -60,6 +58,7 @@ class UserController extends GetxController {
       print('Error al actualizar el usuario: $e');
     }
   }
+
   // Toggle password visibility
   void togglePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;

@@ -47,7 +47,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         _usernameController.text = userController.user.value!.username;
         _nameController.text = userController.user.value!.name;
         _emailController.text = userController.user.value!.email;
-        _passController.text = userController.user.value!.password;
+        // No se establece el texto del _passController para no mostrar la contraseña
         _homeController.text = userController.user.value!.home;
       });
     } else {
@@ -80,7 +80,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         username: newUsername.isNotEmpty ? newUsername : userController.user.value!.username,
         name: newName.isNotEmpty ? newName : userController.user.value!.name,
         email: newEmail.isNotEmpty ? newEmail : userController.user.value!.email,
-        password: newPassword.isNotEmpty ? newPassword : userController.user.value!.password,
+        password: userController.user.value!.password, // No actualizamos la contraseña aquí
         actualUbication: userController.user.value!.actualUbication,
         inHome: userController.user.value!.inHome,
         admin: userController.user.value!.admin,
@@ -90,7 +90,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
       );
 
       // Guardar los cambios
-      userController.editUser(updatedUser, _userId!);
+      await userService.editUser(updatedUser, _userId!, newPassword); // Pasa la contraseña al servicio
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('username', newUsername);
