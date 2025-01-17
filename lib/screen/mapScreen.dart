@@ -19,10 +19,27 @@ class _MapScreenState extends State<MapScreen> {
   double? userLatitude;
   double? userLongitude;
 
+  double? homeLatitude;
+  double? homeLongitude;
+
   @override
   void initState() {
     super.initState();
     _getUserLocation(); // Obtener la ubicación del usuario al entrar al mapa
+    _loadHomeLocation();
+  }
+
+  // Funció per obtenir la ubicació de la casa de l'usuari
+  Future<void> _loadHomeLocation() async {
+    try {
+      final coordinates = await ubiController.getCoordinatesFromAddress(ubiController.address);
+      homeLatitude = coordinates['latitude'];
+      homeLongitude = coordinates['longitude'];
+      setState(() {});
+      print('Ubicació de la casa: Lat: $homeLatitude, Lon: $homeLongitude');
+    } catch (e) {
+      print('Error al obtenir la ubicació de la casa: $e');
+    }
   }
 
   // Función para obtener la ubicación del usuario
@@ -126,6 +143,16 @@ class _MapScreenState extends State<MapScreen> {
                         builder: (ctx) => const Icon(
                           Icons.location_on,
                           color: Colors.red, // Color rojo para la ubicación del usuario
+                          size: 38.0,
+                        ),
+                      ),
+                    // Marcador de la casa del usuario (en azul)
+                    if (homeLatitude != null && homeLongitude != null)
+                      Marker(
+                        point: LatLng(homeLatitude!, homeLongitude!),
+                        builder: (ctx) => const Icon(
+                          Icons.home,
+                          color: Colors.blue, // Color azul para la casa
                           size: 38.0,
                         ),
                       ),
