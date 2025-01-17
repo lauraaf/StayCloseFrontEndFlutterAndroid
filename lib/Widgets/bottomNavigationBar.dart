@@ -18,41 +18,50 @@ class BottomNavScaffold extends StatelessWidget {
     final chatLabel = 'Chat'.tr;
     final profileLabel = 'Perfil'.tr;
 
+    // Obtener el tema actual (claro u oscuro)
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: child,
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
           currentIndex: navController.selectedIndex.value,
           onTap: navController.navigateTo,
-          selectedItemColor: Color(0xFF89AFAF), // Verde claro (estética del Home)
-          unselectedItemColor: Color(0xFF4D6F6F), // Verde oscuro/gris para elementos no seleccionados
-          backgroundColor: Color(0xFFE0F7FA), // Fondo azul claro (coherente con Home)
+          selectedItemColor: isDarkMode
+              ? Colors.tealAccent // Teal claro para el modo oscuro
+              : Color(0xFF89AFAF), // Verde claro para el modo claro
+          unselectedItemColor: isDarkMode
+              ? Colors.grey[500] // Gris más oscuro para el modo oscuro
+              : Color(0xFF4D6F6F), // Verde oscuro/gris para elementos no seleccionados en modo claro
+          backgroundColor: isDarkMode
+              ? Colors.black87 // Fondo oscuro para el modo oscuro
+              : Color(0xFFE0F7FA), // Fondo azul claro para el modo claro
           elevation: 5, // Sombra suave para el diseño
           type: BottomNavigationBarType.fixed, // Fija para mantener los elementos en su lugar
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: homeLabel, // Usamos la variable en lugar de .tr en una constante
+              label: homeLabel,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.app_registration_sharp),
-              label: foroLabel, // Usamos la variable en lugar de .tr en una constante
+              label: foroLabel,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.location_on_outlined),
-              label: mapLabel, // Usamos la variable en lugar de .tr en una constante
+              label: mapLabel,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month_outlined),
-              label: calendarLabel, // Usamos la variable en lugar de .tr en una constante
+              label: calendarLabel,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.forum_outlined),
-              label: chatLabel, // Usamos la variable en lugar de .tr en una constante
+              label: chatLabel,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
-              label: profileLabel, // Usamos la variable en lugar de .tr en una constante
+              label: profileLabel,
             ),
           ],
         ),

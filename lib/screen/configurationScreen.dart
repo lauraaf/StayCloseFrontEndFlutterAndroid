@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter_application_1/controllers/userController.dart';
 import 'package:flutter_application_1/models/user.dart';
 import 'package:flutter_application_1/services/userServices.dart';
+import 'package:flutter_application_1/controllers/themeController.dart'; // Importar el ThemeController
 
 class ConfiguracionScreen extends StatefulWidget {
   @override
@@ -159,8 +160,11 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtener el tema actual
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Color(0xFFE5E5E5),
+      backgroundColor: isDarkMode ? Colors.black87 : Color(0xFFE5E5E5), // Fondo basado en el tema
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -168,7 +172,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
             Container(
               width: 600,
               decoration: BoxDecoration(
-                color: Color(0xFF89AFAF),
+                color: isDarkMode ? Colors.grey[800] : Color(0xFF89AFAF),
                 borderRadius: BorderRadius.circular(20.0),
                 boxShadow: [
                   BoxShadow(
@@ -185,7 +189,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                   "Configuración de Perfil".tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -197,7 +201,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
               width: 700,
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDarkMode ? Colors.grey[850] : Colors.white, // Fondo en modo oscuro o claro
                 borderRadius: BorderRadius.circular(20.0),
                 boxShadow: [
                   BoxShadow(
