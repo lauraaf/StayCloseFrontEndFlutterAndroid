@@ -62,6 +62,12 @@ dependencies:
 
   # Paquet llibreria geocoding per passar d'una adreça a coordenades
   geocoding: ^2.0.4
+  firebase_auth: ^5.3.4
+
+  # Dependencies per registre i login amb google
+  google_identity_services_web: ^0.3.3
+  google_sign_in: ^6.2.2
+  google_sign_in_web: ^0.12.4+3
 
 dev_dependencies:
   flutter_test:

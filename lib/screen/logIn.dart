@@ -5,9 +5,13 @@ import 'package:flutter_application_1/controllers/userController.dart';
 import 'package:cloudinary_flutter/cloudinary_context.dart';
 import 'package:cloudinary_flutter/image/cld_image.dart';
 import 'package:cloudinary_url_gen/cloudinary.dart';
+//GoogleAuthService
+import 'package:flutter_application_1/services/googleAuthServices.dart';
+import 'package:flutter_application_1/controllers/registerController.dart';
 
 class LogInPage extends StatelessWidget {
   final UserController userController = Get.put(UserController());
+  final RegisterController registerController = Get.put(RegisterController());
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +148,22 @@ class LogInPage extends StatelessWidget {
                     return Container();
                   }
                 }),
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  onPressed: registerController.signUpWithGoogle,
+                  icon: Image.asset(
+                    'assets/icons/google_logo.png', // Ruta de la imagen del logo de Google
+                    height: 20,
+                  ),
+                  label: Text(
+                    "Iniciar sesión con Google",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF89AFAF),
+                    foregroundColor: Colors.white,
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Text(
                   '¿Aún no tienes una cuenta? Regístrate'.tr,

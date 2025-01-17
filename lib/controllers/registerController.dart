@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/services/googleAuthServices.dart';
 import 'package:get/get.dart';
 import 'package:flutter_application_1/services/userServices.dart';
 import 'package:flutter_application_1/models/user.dart';
 
 class RegisterController extends GetxController {
   final UserService userService = Get.put(UserService());
+  //afegim GoogleAuth Service
+  final Googleauthservices googleAuth = Googleauthservices();
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -102,33 +105,59 @@ class RegisterController extends GetxController {
 
         final response = await userService.createUser(newUser);
 
-        print('Respuesta del servidor: $response');
-
-        if (response != null) {
-          if (response == 201) {
-            Get.snackbar('Éxito', 'Usuario creado exitosamente');
-            Get.toNamed('/login');
-          } else if (response == 301) {
-            errorMessage.value = 'El nombre de usuario ya está en uso';
-            Get.snackbar('Error', errorMessage.value,
-                snackPosition: SnackPosition.BOTTOM);
-          } else if (response == 302) {
-            errorMessage.value = 'El correo electrónico ya está en uso';
-            Get.snackbar('Error', errorMessage.value,
-                snackPosition: SnackPosition.BOTTOM);
-          }
-        }
-      } catch (e) {
-        errorMessage.value = 'Error al registrar usuario';
-        Get.snackbar('Error', errorMessage.value,
-            snackPosition: SnackPosition.BOTTOM);
-      } finally {
-        isLoading.value = false;
+      if (response != null && response== 201) {
+        Get.snackbar('Éxito', 'Usuario creado exitosamente');
+        Get.toNamed('/login');
+      } else {
+        errorMessage.value = 'Error: Este E-Mail o Teléfono ya están en uso';
+        Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
       }
+    } catch (e) {
+      errorMessage.value = 'Error al registrar usuario';
+      Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
     } else {
       errorMessage.value = 'Las contraseñas no coinciden';
       Get.snackbar('Error', errorMessage.value,
           snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  // Sign up logic
+  void signUpWithGoogle() async {
+    try{
+      final googleUser = await googleAuth.signInWithGooggle();
+      if (googleUser != null){
+        final response = await userService.createUser(googleUser);
+        if (response == 201){
+          Get.snackbar('Éxito', 'Registro con Google exitoso');
+          final logIn = (
+            username: googleUser.username,
+            password: googleUser.password,
+          );
+          final response2 = await userService.logIn(logIn);
+          if (response2 == 200) {
+            // Manejo de respuesta exitosa
+            Get.snackbar('Éxito', 'Inicio de sesión exitoso');
+            Text('Bienvenido, ${googleUser.username ?? "Cargando..."}');
+            Get.toNamed('/home');
+          } else {
+          errorMessage.value = 'Usuario o contraseña incorrectos';
+          }  
+        } else {
+          Get.snackbar('Error', 'No se pudo registrar con Google');
+        }
+      } else {
+        errorMessage.value = 'Error: Este E-Mail o Teléfono ya están en uso';
+        Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+      }
+    } catch (e) {
+      errorMessage.value = 'Error al registrar usuario';
+      Get.snackbar('Error', errorMessage.value, snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
     }
   }
 }
