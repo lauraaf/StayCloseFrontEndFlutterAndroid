@@ -1,6 +1,8 @@
-import 'package:cloudinary_flutter/cloudinary_object.dart';
+  import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+
 import 'package:flutter_application_1/controllers/userController.dart';
 import 'package:flutter_application_1/Widgets/bottomNavigationBar.dart';
 import 'package:flutter_application_1/screen/postScreen.dart';
@@ -18,6 +20,7 @@ import 'package:flutter_application_1/controllers/themeController.dart';
 
 void main() {
   CloudinaryContext.cloudinary = Cloudinary.fromCloudName(cloudName: "djen7vqby");
+  GetStorage.init(); // Inicializar GetStorage para guardar el estado del tema
   Get.put(UserController());  // Esto asegura que el controlador se ponga en el GetX 'depósito'
   Get.put(ThemeController());
   runApp(
@@ -115,3 +118,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

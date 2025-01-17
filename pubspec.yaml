@@ -62,6 +62,7 @@ dependencies:
 
   # Paquet llibreria geocoding per passar d'una adreça a coordenades
   geocoding: ^2.0.4
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:

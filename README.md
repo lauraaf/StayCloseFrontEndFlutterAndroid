@@ -9,6 +9,7 @@ to execute
 - flutter doctor
 - flutter run
 
+- flutter pub add get_storage
 ---------------------------------------
 Lucia:
 Se ha de hacer un cambio de la estructura del modelo y de las funciones basicas del mapa para que funcione y se muestre todo correctamente.
