@@ -154,7 +154,7 @@ class _MapScreenState extends State<MapScreen> {
                         point: LatLng(homeLatitude!, homeLongitude!),
                         builder: (ctx) => const Icon(
                           Icons.home,
-                          color: Colors.blue, // Color azul para la casa
+                          color: Color.fromARGB(255, 103, 158, 132), // Color azul para la casa
                           size: 38.0,
                         ),
                       ),
