@@ -232,7 +232,7 @@ class UserService {
   //Response response = await dio.delete('$baseUrl/user/$id');
 
   // Deshabilitar usuario
-  Response response = await dio.patch('/disable/$id');
+  Response response = await dio.patch('$baseUrl/user/disable/$id');
   
   // Obtener los datos de la respuesta
   data = response.data.toString();
