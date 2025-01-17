@@ -15,7 +15,8 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final UbiController ubiController = Get.put(UbiController());
   final UbiListController ubiListController = Get.put(UbiListController());
-
+  String selectedType = 'Todos';
+  
   double? userLatitude;
   double? userLongitude;
 
@@ -84,6 +85,21 @@ class _MapScreenState extends State<MapScreen> {
       print("Error al obtener la ubicación: $e");
     }
   }
+
+
+// Funció per filtrar ubicacions segons tipus
+void _filterLocationsByType(String type) {
+  print("Arribo aqui amb el tipus: $type");
+  setState(() {
+    selectedType = type; // Actualitza la variable per filtrar
+    if (type == 'Todos') {
+      ubiController.fetchUbis(); // Mostra totes les ubicacions
+    } else {
+      print("Es otro tipo de ubi------");
+      ubiController.fetchUbisByType(type); // Filtra les ubicacions segons el tipus seleccionat
+    }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -182,6 +198,46 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
 
+// Barra de filtros
+          Positioned(
+            top: 8,
+            left: 8,
+            right: 8,
+            child: Container(
+              height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(8.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: ['Punto lila', 'Hospital', 'Centro', 'Otro']
+                    .map((type) {
+                  return ElevatedButton(
+                    onPressed: () {
+                      _filterLocationsByType(type);
+                    },
+                    child: Text(type.tr),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: selectedType == type
+                          ? const Color(0xFF89AFAF)
+                          : const Color.fromARGB(255, 178, 178, 178),
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
             // Elementos adicionales, como el título y las ubicaciones cercanas
             Positioned(
               top: 8, 

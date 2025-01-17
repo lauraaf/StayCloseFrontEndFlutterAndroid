@@ -148,4 +148,27 @@ class UbiService {
       throw e; // Lanzamos el error para ser manejado más arriba
     }
   }
+
+  // Función para obtener la lista de ubis por tipo
+  Future<List<UbiModel>> getUbisByType(String type) async {
+    print('getubisByType');
+    try {
+      // Enviar solicitud GET para obtener las ubis
+      var res = await dio.get('$baseUrl/api/ubi/type/$type');
+      print(res);
+      List<dynamic> responseData = res.data;
+      print("respuesta: $responseData");
+      // Convertir la respuesta en una lista de ubiModel
+      List<UbiModel> ubis = responseData
+          .map((data) => UbiModel.fromJson(data))
+          .toList();
+      print("la ubi es: $ubis");
+      return ubis;
+    } catch (e) {
+      print('Error fetching ubis: $e');
+      throw e;
+    }
+  }
+
+
 }
