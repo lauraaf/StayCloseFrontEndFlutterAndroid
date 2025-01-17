@@ -96,8 +96,10 @@ class UserController extends GetxController {
         Get.snackbar('Éxito', 'Inicio de sesión exitoso');
         Text('Bienvenido, ${user.value?.name ?? "Cargando..."}');
         Get.toNamed('/home');
-      } else {
-        errorMessage.value = 'Usuario o contraseña incorrectos';
+      } else if (responseData == 300){
+        errorMessage.value = 'Usuario deshabilitado'.tr;
+      } else{
+        errorMessage.value = 'Usuario o contraseña incorrectos'.tr;
       }
     } catch (e) {
       errorMessage.value = 'Error: No se pudo conectar con la API';

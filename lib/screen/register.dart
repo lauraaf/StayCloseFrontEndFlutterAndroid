@@ -138,8 +138,7 @@ class RegisterPage extends StatelessWidget {
                       const SizedBox(height: 10),
                       // Text explaining the password requirements
                       Text(
-                        'Debe tener al menos 7 caracteres, una mayúscula, una minúscula, un número y un carácter especial'
-                            .tr,
+                        'Debe tener al menos 7 caracteres, una mayúscula, una minúscula, un número y un carácter especial'.tr,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,

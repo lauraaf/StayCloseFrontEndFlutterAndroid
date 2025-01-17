@@ -156,7 +156,7 @@ class LogInPage extends StatelessWidget {
                     height: 20,
                   ),
                   label: Text(
-                    "Iniciar sesión con Google",
+                    "Iniciar sesión con Google".tr,
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(

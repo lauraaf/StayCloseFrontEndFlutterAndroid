@@ -159,8 +159,8 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         return AlertDialog(
           title: Text('¿Estas Seguro?'.tr),
           content: Text(
-              '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.'
-                  .tr),
+              '¿Estás seguro de que deseas eliminar tu cuenta?'.tr
+            ),
           actions: [
             TextButton(
               onPressed: () {
@@ -304,7 +304,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                         child: TextField(
                           controller: _streetController,
                           decoration: InputDecoration(
-                            labelText: 'Carrer'.tr,
+                            labelText: 'Calle'.tr,
                             border: OutlineInputBorder(),
                           ),
                         ),
