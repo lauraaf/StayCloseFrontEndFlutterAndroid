@@ -353,6 +353,48 @@ class UserService {
     }
   }
 
+  //Obtenir la direcció de casa d'un usuari
+  Future<String?> getHomeUser(String username) async {
+    try {
+      print('Fetching home address for user with username: $username');
+
+      // Llamar a _setAuthHeaders() para asegurarnos de que el token esté configurado
+      await _setAuthHeaders();
+
+      // Realizar la solicitud GET para obtener la dirección de la casa del usuario
+      final response = await dio.get('$baseUrl/user/home/$username');
+
+      if (response.statusCode == 200) {
+        // Si la respuesta es exitosa, se retorna la dirección de la casa directamente
+        print('Home address fetched successfully: ${response.data}');
+        return response.data;
+      } else {
+        // Si el código de estado no es 200, retornamos null y mostramos el código de error
+        print('Failed to fetch home address. Status code: ${response.statusCode}');
+        return null;
+      }
+    } on DioError catch (e) {
+      // Manejo de errores específicos de Dio
+      if (e.response != null) {
+        print('Error fetching home address: ${e.response?.statusCode}, ${e.response?.data}');
+        // Aquí puedes procesar los errores de red o de servidor
+        if (e.response?.statusCode == 404) {
+          print('Home address not found.');
+        } else if (e.response?.statusCode == 500) {
+          print('Server error. Please try again later.');
+        }
+      } else {
+        print('Error fetching home address: No response from server. ${e.message}');
+      }
+      return null;
+    } catch (e) {
+      // Captura cualquier otro tipo de error
+      print('Unexpected error fetching home address: $e');
+      return null;
+    }
+  }
+
+
   // Método para obtener un usuario por su ID
   /*Future<UserModel?> getUserById(String id) async {
     try {

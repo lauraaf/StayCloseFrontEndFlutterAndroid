@@ -492,12 +492,23 @@ void _filterLocationsByType(String type) {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: ubiController.tipoController,
+                    DropdownButtonFormField<String>(
+                      value: ubiController.tipoController.text.isEmpty ? null : ubiController.tipoController.text,
                       decoration: InputDecoration(
                         labelText: 'Tipo'.tr,
                         border: OutlineInputBorder(),
                       ),
+                      items: [
+                        DropdownMenuItem(value: 'Hospital', child: Text('Hospital')),
+                        DropdownMenuItem(value: 'Punto lila', child: Text('Punto lila')),
+                        DropdownMenuItem(value: 'Centro', child: Text('Centro')),
+                        DropdownMenuItem(value: 'Otros', child: Text('Otros')),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          ubiController.tipoController.text = value!;
+                        });
+                      },
                     ),
                     const SizedBox(height: 16),
                     TextField(

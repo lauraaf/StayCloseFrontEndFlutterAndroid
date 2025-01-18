@@ -1,10 +1,13 @@
+import 'dart:async'; // Importar dart:async para StreamSubscription
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../services/messageService.dart';
+import '../services/userServices.dart'; // Importar UserService
 import '../controllers/userController.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:geolocator/geolocator.dart'; // Importar Geolocator
 import 'package:url_launcher/url_launcher.dart'; // Importar URL Launcher
+import '../controllers/ubiController.dart'; // Importar UbiController
 
 class SendMessageScreen extends StatefulWidget {
   final String receiverUsername;
@@ -23,6 +26,9 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, dynamic>> _messages = [];
   late IO.Socket _socket;
+  final UserService _userService = UserService(); // Instanciar UserService
+  final UbiController _ubiController = UbiController(); // Instanciar UbiController
+  StreamSubscription<Position>? _positionStreamSubscription; // Subscription para el stream de ubicación
 
   @override
   void initState() {
@@ -34,6 +40,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   @override
   void dispose() {
     _socket.disconnect();
+    _positionStreamSubscription?.cancel(); // Cancelar la suscripción al stream de ubicación
     super.dispose();
   }
 
@@ -95,6 +102,60 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     }
   }
 
+  Future<void> _sendHomeStatus() async {
+    try {
+      String currentUsername = Get.find<UserController>().currentUserName.value;
+      String? homeAddress = await _userService.getHomeUser(currentUsername);
+
+      if (homeAddress != null) {
+        // Obtener coordenadas de la dirección de casa
+        Map<String, double> homeCoordinates =
+            await _ubiController.getCoordinatesFromAddress(homeAddress);
+
+        // Enviar mensaje "Me dirijo a casa"
+        await MessageService.sendMessage(
+          chatId: widget.chatId,
+          senderUsername: currentUsername,
+          receiverUsername: widget.receiverUsername,
+          content: 'Me dirijo a casa',
+        );
+
+        // Comprobar la ubicación continuamente
+        _positionStreamSubscription = Geolocator.getPositionStream(
+          locationSettings: LocationSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: 10,
+          ),
+        ).listen((Position position) async {
+          double distanceInMeters = Geolocator.distanceBetween(
+            position.latitude,
+            position.longitude,
+            homeCoordinates['latitude']!,
+            homeCoordinates['longitude']!,
+          );
+
+          if (distanceInMeters < 100) {
+            // Enviar mensaje "Ya estoy en casa" cuando se detecta que el usuario ha llegado a casa
+            await MessageService.sendMessage(
+              chatId: widget.chatId,
+              senderUsername: currentUsername,
+              receiverUsername: widget.receiverUsername,
+              content: 'Ya estoy en casa',
+            );
+
+            // Cancelar la suscripción al stream de ubicación
+            _positionStreamSubscription?.cancel();
+          }
+        });
+      } else {
+        Get.snackbar('Error', 'No se pudo obtener la dirección de casa');
+      }
+    } catch (e) {
+      print('Error al obtener la dirección de casa: $e');
+      Get.snackbar('Error', 'No se pudo obtener la dirección de casa');
+    }
+  }
+
   // Método para abrir el enlace de Google Maps
   Future<void> _openMap(String url) async {
     if (await canLaunch(url)) {
@@ -102,10 +163,6 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     } else {
       Get.snackbar("Error", "No se pudo abrir el enlace");
     }
-  }
-
-  Future<void> _sendHomeStatus() async {
-    print('Enviando estado "En Casa"...');
   }
 
   Future<void> _sendMessage() async {
@@ -141,20 +198,22 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                 final isSender = message['sender'] ==
                     Get.find<UserController>().currentUserName.value;
                 return Align(
-                  alignment:
-                      isSender ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: isSender
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.all(8.0),
                     padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
-                      color:
-                          isSender ? Color(0xFF89AFAF) : Colors.grey.shade300,
+                      color: isSender
+                          ? Color(0xFF89AFAF)
+                          : Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: message['content'].contains('<a href="')
                         ? GestureDetector(
-                            onTap: () => _openMap(
-                                message['content'].substring(
+                            onTap: () => _openMap(message['content']
+                                .substring(
                                     message['content'].indexOf('"') + 1,
                                     message['content'].lastIndexOf('"'))),
                             child: Text(
