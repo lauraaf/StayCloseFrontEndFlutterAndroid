@@ -11,11 +11,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UbiController extends GetxController {
   final ubiService = UbiService();
+
   var ubis = <UbiModel>[].obs;
-  var nearbyUbisNames =
-      <String>[].obs; // Lista solo de los nombres de las ubicaciones cercanas
+  var ubisByType = <UbiModel>[].obs;
   var isLoading = false.obs;
+  var isLoadingByType = false.obs;
+
+  var nearbyUbisNames =<String>[].obs; // Lista solo de los nombres de las ubicaciones cercanas
+  
   var errorMessage = ''.obs;
+  var ubiType = ''.obs;
+  var selectedType = 'Todos' .obs;
+  
 
   final RxString _address = ''.obs;
   final UserService userService = Get.put(UserService());
@@ -27,6 +34,7 @@ class UbiController extends GetxController {
   TextEditingController tipoController = TextEditingController();
   TextEditingController comentariController = TextEditingController();
   TextEditingController horariController = TextEditingController();
+
   var selectedUbi = Rx<UbiModel?>(null); // Ubicación seleccionada (reactiva)
 
   var latitude;
@@ -126,13 +134,35 @@ class UbiController extends GetxController {
   // Obtener todas las ubicaciones
   Future<void> fetchUbis() async {
     isLoading.value = true;
+    isLoadingByType.value = false;
+    selectedType='Todos' .obs;
     try {
       final fetchedUbis = await ubiService.getUbis();
       ubis.value = fetchedUbis;
+      // print("el getUbis es--------------: $ubis.value");
     } catch (e) {
       errorMessage.value = 'Error al cargar las ubicaciones.';
     } finally {
       isLoading.value = false;
+    }
+  }
+
+   // Función para obtener las ubis filtradas por tipo
+  void fetchUbisByType(String type) async {
+    isLoadingByType.value = true;
+    isLoading.value = false;
+
+    // Traduce el tipo de post al código correcto antes de enviar
+    String translatedUbiType = getCategoryCode(type);
+    print("la traduccion del tipo es: $translatedUbiType");
+    selectedType = translatedUbiType .obs;
+    try {
+      final fetchedUbisType = await ubiService.getUbisByType(translatedUbiType);
+      print("el getUbis es: $ubis");
+      ubisByType.value=fetchedUbisType;
+
+    } finally {
+      isLoadingByType.value = false;
     }
   }
 
@@ -141,13 +171,16 @@ class UbiController extends GetxController {
     isLoading.value = true;
     try {
       final address = addressController.text.trim();
-
+      
       if (address.isEmpty) {
         Get.snackbar("Error", "La dirección no puede estar vacía.");
         isLoading.value = false;
         return;
       }
 
+// Get the category code
+final categoryCode = categoryCodes[tipoController.text.trim()];
+print("esta es la categoria al crear: $categoryCode");
       // Hacer la solicitud de geocodificación para obtener las coordenadas
       final url = Uri.parse(
           'https://nominatim.openstreetmap.org/search?q=$address&format=json&limit=1');
@@ -172,7 +205,7 @@ class UbiController extends GetxController {
           // Crear la ubicación (UbiModel)
           final newUbi = UbiModel(
             name: nameController.text.trim(),
-            tipo: tipoController.text.trim(),
+            tipo: categoryCode!,
             horari: horariController.text.trim(),
             ubication: ubication, // Usamos la instancia de Ubication aquí
             address: address,
@@ -231,4 +264,17 @@ class UbiController extends GetxController {
   void clearSelectedUbi() {
     selectedUbi.value = null;
   }
+
+  // Mapeo entre categorías y sus códigos
+  final Map<String, String> categoryCodes = {
+    'Punto lila': 'P',
+    'Hospital': 'H',
+    'Centro': 'C',
+    'Otros': 'O',
+  };
+  // Función para traducir la categoría seleccionada al código
+  String getCategoryCode(String category) {
+    return categoryCodes[category] ?? 'O'; // Por defecto "O" (Otro)
+  }
+
 }

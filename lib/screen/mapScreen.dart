@@ -18,7 +18,8 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final UbiController ubiController = Get.put(UbiController());
   final UbiListController ubiListController = Get.put(UbiListController());
-
+  String selectedType = 'Todos';
+  
   double? userLatitude;
   double? userLongitude;
 
@@ -30,6 +31,8 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _getUserLocation(); // Obtener la ubicación del usuario al entrar al mapa
     _loadHomeLocation();
+    // Inicializar selectedType en el controlador 
+    WidgetsBinding.instance.addPostFrameCallback((_) { ubiController.selectedType.value = 'Todos'; ubiController.fetchUbis(); });// Cargar todas las ubicaciones al iniciar });
   }
 
   // Funció per obtenir la ubicació de la casa de l'usuari
@@ -102,6 +105,19 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+
+// Funció per filtrar ubicacions segons tipus
+void _filterLocationsByType(String type) {
+  setState(() {
+    selectedType = type; // Actualitza la variable per filtrar
+    if (type == 'Todos') {
+      ubiController.fetchUbis(); // Mostra totes les ubicacions
+    } else {
+      ubiController.fetchUbisByType(type); // Filtra les ubicacions segons el tipus seleccionat
+    }
+  });
+}
+
   @override
   Widget build(BuildContext context) {
     final ThemeController themeController = Get.find();
@@ -152,7 +168,7 @@ class _MapScreenState extends State<MapScreen> {
       body: Obx(() {
         bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-        if (ubiController.isLoading.value) {
+        if (ubiController.isLoading.value || ubiController.isLoadingByType.value) {
           return Center(child: CircularProgressIndicator());
         }
 
@@ -178,6 +194,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
                 MarkerLayer(
                   markers: [
+
                     // Marcador de la ubicación del usuario (en rojo)
                     if (userLatitude != null && userLongitude != null)
                       Marker(
@@ -189,6 +206,7 @@ class _MapScreenState extends State<MapScreen> {
                           size: 38.0,
                         ),
                       ),
+
                     // Marcador de la casa del usuario (en azul)
                     if (homeLatitude != null && homeLongitude != null)
                       Marker(
@@ -199,12 +217,35 @@ class _MapScreenState extends State<MapScreen> {
                           size: 38.0,
                         ),
                       ),
-                    // Otros marcadores para las ubicaciones
+                      //Marcador de todos
+                    if(ubiController.selectedType.value == 'Todos')
+// Otros marcadores para las ubicaciones
                     ...ubiController.ubis.map((ubi) {
                       final latitude =
                           ubi.ubication.latitud ?? 41.382395521312176;
                       final longitude =
                           ubi.ubication.longitud ?? 2.1567611541534366;
+                    
+                      return Marker(
+                        point: LatLng(latitude, longitude),
+                        builder: (ctx) => GestureDetector(
+                          onTap: () {
+                            ubiController.selectUbi(ubi);
+                          },
+                          child: const Icon(
+                            Icons.place,
+                            color: Color.fromARGB(255, 84, 91, 111),
+                            size: 38.0,
+                          ),
+                        ),
+                    );
+                    }).toList(),
+
+                    if(ubiController.selectedType.value != 'Todos')
+                      // Otros marcadores para las ubicaciones
+                    ...ubiController.ubisByType.map((ubi) {
+                      final latitude = ubi.ubication.latitud ?? 41.382395521312176;
+                      final longitude = ubi.ubication.longitud ?? 2.1567611541534366;
 
                       return Marker(
                         point: LatLng(latitude, longitude),
@@ -225,6 +266,51 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
 
+          // Barra de filtros
+          Positioned(
+            top: 30,
+            left: 8,
+            right: 8,
+            child: Container(
+              //height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(0, 255, 255, 255),
+                borderRadius: BorderRadius.circular(8.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color.fromARGB(0, 158, 158, 158),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                  ),
+                ],
+              ),
+              child: Wrap(
+                spacing: 100.0, // Espacio entre los botones
+                runSpacing: 10.0, // Espacio entre las filas si los botones se dividen
+                alignment: WrapAlignment.center, // Alinea los botones al centro
+                
+                children: ['Punto lila' .tr, 'Hospital' .tr, 'Centro' .tr, 'Otros' .tr, 'Todos' .tr]
+                    .map((type) {
+                  return ElevatedButton(
+                    onPressed: () {
+                      selectedType = type;
+                      _filterLocationsByType(type);
+                      
+                    },
+                    child: Text(type.tr),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: selectedType == type
+                          ? const Color(0xFF89AFAF)
+                          : const Color.fromARGB(255, 178, 178, 178),
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
             // Elementos adicionales, como el título y las ubicaciones cercanas
             Positioned(
               top: 8, 
@@ -319,7 +405,14 @@ class _MapScreenState extends State<MapScreen> {
                           SizedBox(height: 5),
                           Text('· Dirección: ${selectedUbi.address}'.tr),
                           SizedBox(height: 5),
-                          Text('· Tipo: ${selectedUbi.tipo}'.tr),
+                          if (selectedUbi.tipo=='P')
+                          Text('· Tipo: Punto lila'.tr),
+                          if (selectedUbi.tipo=='H')
+                          Text('· Tipo: Hospital'.tr),
+                          if (selectedUbi.tipo=='C')
+                          Text('· Tipo: Centro'.tr),
+                          if (selectedUbi.tipo=='O')
+                          Text('· Tipo: Otro'.tr),
                           SizedBox(height: 5),
                           Text('· Comentario: ${selectedUbi.comentari}'.tr),
                         ],

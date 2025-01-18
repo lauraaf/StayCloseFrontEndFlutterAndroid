@@ -50,15 +50,37 @@ class UbiService {
       var res = await dio.get('$baseUrl/api/ubi');
       print(res);
       List<dynamic> responseData = res.data;
-      print(responseData);
+      print("Totes les ubicacions: $responseData");
 
       List<UbiModel> ubis = responseData
           .map((data) => UbiModel.fromJson(data))
           .toList();
-
+print("Totes les ubicacions JSON------------: $ubis");
       return ubis;
     } catch (e) {
       print('Error fetching ubications: $e');
+      throw e;
+    }
+  }
+
+  // Función para obtener la lista de ubis por tipo
+  Future<List<UbiModel>> getUbisByType(String type) async {
+    print('getubisByType');
+    try {
+      // Enviar solicitud GET para obtener las ubis
+      var res = await dio.get('$baseUrl/api/ubi/type/$type');
+      print(res);
+      List<dynamic> responseData = res.data;
+      print("respuesta: $responseData");
+      // Convertir la respuesta en una lista de ubiModel
+      List<UbiModel> ubis = []; // Asegúrate de inicializarla correctamente o vaciarla cada vez que necesites llenar nuevos datos.
+      ubis = responseData
+          .map((data) => UbiModel.fromJson(data))
+          .toList();
+      print("la ubi es: $ubis");
+      return ubis;
+    } catch (e) {
+      print('Error fetching ubis: $e');
       throw e;
     }
   }
@@ -148,4 +170,8 @@ class UbiService {
       throw e; // Lanzamos el error para ser manejado más arriba
     }
   }
+
+  
+
+
 }
