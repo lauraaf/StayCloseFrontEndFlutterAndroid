@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Message {
   final String senderId;
   final String content;
@@ -28,5 +30,12 @@ class Message {
       'content': content,
       'timestamp': timestamp.toIso8601String(),
     };
+  }
+
+  //Hora
+
+  String get formattedTime {
+    final DateFormat formatter = DateFormat('hh:mm a');
+    return formatter.format(timestamp);
   }
 }

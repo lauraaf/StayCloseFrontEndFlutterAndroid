@@ -1,4 +1,4 @@
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_application_1/services/userServices.dart';
 import 'package:flutter_application_1/models/user.dart';
@@ -50,8 +50,9 @@ class UserListController extends GetxController {
   }
 }
 
-*/
 
+
+/*
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/userController.dart';
@@ -145,3 +146,4 @@ class SearchUserScreen extends StatelessWidget {
     );
   }
 }
+*/
