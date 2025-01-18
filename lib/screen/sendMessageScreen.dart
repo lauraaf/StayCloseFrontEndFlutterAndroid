@@ -27,8 +27,13 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   final List<Map<String, dynamic>> _messages = [];
   late IO.Socket _socket;
   final UserService _userService = UserService(); // Instanciar UserService
-  final UbiController _ubiController = UbiController(); // Instanciar UbiController
-  StreamSubscription<Position>? _positionStreamSubscription; // Subscription para el stream de ubicación
+  final UbiController _ubiController =
+      UbiController(); // Instanciar UbiController
+  StreamSubscription<Position>?
+      _positionStreamSubscription; // Subscription para el stream de ubicación
+  final ScrollController _scrollController = ScrollController();
+
+  ///-----
 
   @override
   void initState() {
@@ -40,7 +45,9 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   @override
   void dispose() {
     _socket.disconnect();
-    _positionStreamSubscription?.cancel(); // Cancelar la suscripción al stream de ubicación
+    _positionStreamSubscription
+        ?.cancel(); // Cancelar la suscripción al stream de ubicación
+    _scrollController.dispose(); // Liberar el controlador de scroll
     super.dispose();
   }
 
@@ -55,15 +62,33 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
 
     _socket.connect();
     _socket.emit('joinChat', widget.chatId);
+    /*
 
     _socket.on('newMessage', (data) {
       setState(() {
         _messages.add(data);
       });
+      
+    });
+    */
+    _socket.on('newMessage', (data) {
+      setState(() {
+        _messages.add(data);
+      });
+
+      // Desplazar automáticamente al final
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
     });
 
     _socket.onConnect((_) => print('Conectado al servidor de WebSocket'));
-    _socket.onDisconnect((_) => print('Desconectado del servidor de WebSocket'));
+    _socket
+        .onDisconnect((_) => print('Desconectado del servidor de WebSocket'));
   }
 
   Future<void> _loadMessages() async {
@@ -92,7 +117,8 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
         chatId: widget.chatId,
         senderUsername: Get.find<UserController>().currentUserName.value,
         receiverUsername: widget.receiverUsername,
-        content: '¡Estoy Aquí! <a href="$locationLink">¡Estoy Aquí!</a>', // Mensaje con el enlace
+        content:
+            '¡Estoy Aquí! <a href="$locationLink">¡Estoy Aquí!</a>', // Mensaje con el enlace
       );
 
       print('Ubicación enviada: $locationLink');
@@ -175,6 +201,15 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
           content: _messageController.text,
         );
         _messageController.clear();
+
+        // Desplazar automáticamente al final
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        });
       } catch (e) {
         Get.snackbar("Error", "No se pudo enviar el mensaje");
       }
@@ -192,30 +227,28 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController, // Asigna el ScrollController aquí
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
                 final isSender = message['sender'] ==
                     Get.find<UserController>().currentUserName.value;
                 return Align(
-                  alignment: isSender
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
+                  alignment:
+                      isSender ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.all(8.0),
                     padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
-                      color: isSender
-                          ? Color(0xFF89AFAF)
-                          : Colors.grey.shade300,
+                      color:
+                          isSender ? Color(0xFF89AFAF) : Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: message['content'].contains('<a href="')
                         ? GestureDetector(
-                            onTap: () => _openMap(message['content']
-                                .substring(
-                                    message['content'].indexOf('"') + 1,
-                                    message['content'].lastIndexOf('"'))),
+                            onTap: () => _openMap(message['content'].substring(
+                                message['content'].indexOf('"') + 1,
+                                message['content'].lastIndexOf('"'))),
                             child: Text(
                               '¡Estoy Aquí!',
                               style: TextStyle(
