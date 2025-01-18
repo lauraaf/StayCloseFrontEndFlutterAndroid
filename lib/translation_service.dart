@@ -91,7 +91,10 @@ class TranslationService extends Translations {
       'Seleccionar Fecha':'Select Date',
       'Usuario deshabilitado':'User disabled',
       'Usuario o contraseña incorrectos':'Incorrect username or password',
-      'Iniciar sesión con Google':'LogIn with Google'
+      'Iniciar sesión con Google':'LogIn with Google',
+      'Punto lila' : 'Safe point', 
+      'Hospital' : 'Hospital', 
+      'Centro' :'Center'
     },
     'es_ES': {
       'Registrarse': 'Registrarse',
@@ -181,7 +184,10 @@ class TranslationService extends Translations {
       'Seleccionar Fecha':'Seleccionar Fecha',
       'Usuario deshabilitado':'Usuario deshabilitado',
       'Usuario o contraseña incorrectos':'Usuario o contraseña incorrectos',
-      'Iniciar sesión con Google':'Iniciar sesión con Google'
+      'Iniciar sesión con Google':'Iniciar sesión con Google',
+      'Punto lila' : 'Punto lila', 
+      'Hospital' : 'Hospital', 
+      'Centro' :'Centro'
     },
     'ca_ES': {
       'Registrarse': 'Registrar-se',
@@ -263,11 +269,10 @@ class TranslationService extends Translations {
       'Nueva ubicación':'Nova ubicació',
       'Dirección (calle, número de portería, localidad)':'Adreça (carrer, número de porteria, localitat)',
       'Crear ubicación':'Crear ubicació',
-,
       'Punto lila' : 'Punt lila', 
       'Hospital' : 'Hospital', 
-      'Centro' :'Centre', 
-      'Otros' : 'Altres', 'Debe tener al menos 7 caracteres, una mayúscula, una minúscula, un número y un carácter especial':'Ha de tenir almenys 7 caràcters, una majúscula, una minúscula, un número i un caràcter especial',
+      'Centro' :'Centre',
+      'Debe tener al menos 7 caracteres, una mayúscula, una minúscula, un número y un carácter especial':'Ha de tenir almenys 7 caràcters, una majúscula, una minúscula, un número i un caràcter especial',
       'Calle':'Carrer',
       'Número':'Número',
       'Provincia':'Província',
