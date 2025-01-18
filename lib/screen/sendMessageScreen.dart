@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../services/messageService.dart';
 import '../controllers/userController.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:geolocator/geolocator.dart'; // Importar Geolocator
+import 'package:url_launcher/url_launcher.dart'; // Importar URL Launcher
 
 class SendMessageScreen extends StatefulWidget {
   final String receiverUsername;
@@ -54,8 +56,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     });
 
     _socket.onConnect((_) => print('Conectado al servidor de WebSocket'));
-    _socket
-        .onDisconnect((_) => print('Desconectado del servidor de WebSocket'));
+    _socket.onDisconnect((_) => print('Desconectado del servidor de WebSocket'));
   }
 
   Future<void> _loadMessages() async {
@@ -70,7 +71,37 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   }
 
   Future<void> _sendLocation() async {
-    print('Enviando ubicación...');
+    try {
+      // Obtener la ubicación actual
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      // Crear el enlace de Google Maps
+      String locationLink =
+          'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
+
+      // Enviar el mensaje con el texto "¡Estoy Aquí!" y el enlace de ubicación
+      await MessageService.sendMessage(
+        chatId: widget.chatId,
+        senderUsername: Get.find<UserController>().currentUserName.value,
+        receiverUsername: widget.receiverUsername,
+        content: '¡Estoy Aquí! <a href="$locationLink">¡Estoy Aquí!</a>', // Mensaje con el enlace
+      );
+
+      print('Ubicación enviada: $locationLink');
+    } catch (e) {
+      print('Error al obtener la ubicación: $e');
+      Get.snackbar('Error', 'No se pudo obtener la ubicación');
+    }
+  }
+
+  // Método para abrir el enlace de Google Maps
+  Future<void> _openMap(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url); // Abrir el enlace en Google Maps
+    } else {
+      Get.snackbar("Error", "No se pudo abrir el enlace");
+    }
   }
 
   Future<void> _sendHomeStatus() async {
@@ -120,11 +151,24 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                           isSender ? Color(0xFF89AFAF) : Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: Text(
-                      message['content'],
-                      style: TextStyle(
-                          color: isSender ? Colors.white : Colors.black87),
-                    ),
+                    child: message['content'].contains('<a href="')
+                        ? GestureDetector(
+                            onTap: () => _openMap(
+                                message['content'].substring(
+                                    message['content'].indexOf('"') + 1,
+                                    message['content'].lastIndexOf('"'))),
+                            child: Text(
+                              '¡Estoy Aquí!',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          )
+                        : Text(
+                            message['content'],
+                            style: TextStyle(color: Colors.black87),
+                          ),
                   ),
                 );
               },
