@@ -11,13 +11,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UbiController extends GetxController {
   final ubiService = UbiService();
+
   var ubis = <UbiModel>[].obs;
-  var nearbyUbisNames =
-      <String>[].obs; // Lista solo de los nombres de las ubicaciones cercanas
+  var ubisByType = <UbiModel>[].obs;
   var isLoading = false.obs;
+  var isLoadingByType = false.obs;
+
+  var nearbyUbisNames =<String>[].obs; // Lista solo de los nombres de las ubicaciones cercanas
+  
   var errorMessage = ''.obs;
   var ubiType = ''.obs;
-  var ubisByType = <UbiModel>[].obs;
+  var selectedType = 'Todos' .obs;
   
 
   final RxString _address = ''.obs;
@@ -30,8 +34,8 @@ class UbiController extends GetxController {
   TextEditingController tipoController = TextEditingController();
   TextEditingController comentariController = TextEditingController();
   TextEditingController horariController = TextEditingController();
-  var selectedUbi = Rx<UbiModel?>(null); // Ubicación seleccionada (reactiva)
 
+  var selectedUbi = Rx<UbiModel?>(null); // Ubicación seleccionada (reactiva)
 
   var latitude;
   var longitude;
@@ -130,10 +134,12 @@ class UbiController extends GetxController {
   // Obtener todas las ubicaciones
   Future<void> fetchUbis() async {
     isLoading.value = true;
+    isLoadingByType.value = false;
+    selectedType='Todos' .obs;
     try {
       final fetchedUbis = await ubiService.getUbis();
       ubis.value = fetchedUbis;
-       print("el getUbis es--------------: $ubis.value");
+      // print("el getUbis es--------------: $ubis.value");
     } catch (e) {
       errorMessage.value = 'Error al cargar las ubicaciones.';
     } finally {
@@ -143,19 +149,20 @@ class UbiController extends GetxController {
 
    // Función para obtener las ubis filtradas por tipo
   void fetchUbisByType(String type) async {
-    isLoading.value = true;
-    print("este es el tipo del controller: $type");
+    isLoadingByType.value = true;
+    isLoading.value = false;
+
     // Traduce el tipo de post al código correcto antes de enviar
     String translatedUbiType = getCategoryCode(type);
     print("la traduccion del tipo es: $translatedUbiType");
+    selectedType = translatedUbiType .obs;
     try {
       final fetchedUbisType = await ubiService.getUbisByType(translatedUbiType);
       print("el getUbis es: $ubis");
-      //ubis.value=;
       ubisByType.value=fetchedUbisType;
 
     } finally {
-      isLoading.value = false;
+      isLoadingByType.value = false;
     }
   }
 
@@ -252,13 +259,11 @@ print("esta es la categoria al crear: $categoryCode");
   void selectUbi(UbiModel ubi) {
     selectedUbi.value = ubi; // Actualiza la ubicación seleccionada
   }
-  
 
   // Limpiar la ubicación seleccionada
   void clearSelectedUbi() {
     selectedUbi.value = null;
   }
-
 
   // Mapeo entre categorías y sus códigos
   final Map<String, String> categoryCodes = {
@@ -272,5 +277,4 @@ print("esta es la categoria al crear: $categoryCode");
     return categoryCodes[category] ?? 'O'; // Por defecto "O" (Otro)
   }
 
- 
 }

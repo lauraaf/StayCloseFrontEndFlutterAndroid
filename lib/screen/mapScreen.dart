@@ -28,6 +28,8 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _getUserLocation(); // Obtener la ubicación del usuario al entrar al mapa
     _loadHomeLocation();
+    // Inicializar selectedType en el controlador 
+    WidgetsBinding.instance.addPostFrameCallback((_) { ubiController.selectedType.value = 'Todos'; ubiController.fetchUbis(); });// Cargar todas las ubicaciones al iniciar });
   }
 
   // Funció per obtenir la ubicació de la casa de l'usuari
@@ -89,14 +91,11 @@ class _MapScreenState extends State<MapScreen> {
 
 // Funció per filtrar ubicacions segons tipus
 void _filterLocationsByType(String type) {
-  print("Arribo aqui amb el tipus: $type");
   setState(() {
     selectedType = type; // Actualitza la variable per filtrar
     if (type == 'Todos') {
-      print("Es TODAS LAS ubi------");
       ubiController.fetchUbis(); // Mostra totes les ubicacions
     } else {
-      print("Es otro tipo de ubi------");
       ubiController.fetchUbisByType(type); // Filtra les ubicacions segons el tipus seleccionat
     }
   });
@@ -131,8 +130,7 @@ void _filterLocationsByType(String type) {
         ],
       ),
       body: Obx(() {
-        if (ubiController.isLoading.value) {
-          print("---------------------Aqui estan todas las ubicaciones impresas en el mapa");
+        if (ubiController.isLoading.value || ubiController.isLoadingByType.value) {
           return Center(child: CircularProgressIndicator());
         }
 
@@ -156,6 +154,7 @@ void _filterLocationsByType(String type) {
                 ),
                 MarkerLayer(
                   markers: [
+
                     // Marcador de la ubicación del usuario (en rojo)
                     if (userLatitude != null && userLongitude != null)
                       Marker(
@@ -166,6 +165,7 @@ void _filterLocationsByType(String type) {
                           size: 38.0,
                         ),
                       ),
+
                     // Marcador de la casa del usuario (en azul)
                     if (homeLatitude != null && homeLongitude != null)
                       Marker(
@@ -176,8 +176,31 @@ void _filterLocationsByType(String type) {
                           size: 38.0,
                         ),
                       ),
-                    // Otros marcadores para las ubicaciones
+                      //Marcador de todos
+                    if(ubiController.selectedType.value == 'Todos')
+// Otros marcadores para las ubicaciones
                     ...ubiController.ubis.map((ubi) {
+                      final latitude = ubi.ubication.latitud ?? 41.382395521312176;
+                      final longitude = ubi.ubication.longitud ?? 2.1567611541534366;
+                    
+                      return Marker(
+                        point: LatLng(latitude, longitude),
+                        builder: (ctx) => GestureDetector(
+                          onTap: () {
+                            ubiController.selectUbi(ubi);
+                          },
+                          child: const Icon(
+                            Icons.place,
+                            color: Color.fromARGB(255, 84, 91, 111),
+                            size: 38.0,
+                          ),
+                        ),
+                    );
+                    }).toList(),
+
+                    if(ubiController.selectedType.value != 'Todos')
+                      // Otros marcadores para las ubicaciones
+                    ...ubiController.ubisByType.map((ubi) {
                       final latitude = ubi.ubication.latitud ?? 41.382395521312176;
                       final longitude = ubi.ubication.longitud ?? 2.1567611541534366;
 
@@ -200,32 +223,37 @@ void _filterLocationsByType(String type) {
               ],
             ),
 
-// Barra de filtros
+          // Barra de filtros
           Positioned(
-            top: 8,
+            top: 30,
             left: 8,
             right: 8,
             child: Container(
-              height: 50,
+              //height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
+                color: const Color.fromARGB(0, 255, 255, 255),
                 borderRadius: BorderRadius.circular(8.0),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: const Color.fromARGB(0, 158, 158, 158),
                     spreadRadius: 2,
                     blurRadius: 5,
                   ),
                 ],
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: ['Punto lila', 'Hospital', 'Centro', 'Otro']
+              child: Wrap(
+                spacing: 100.0, // Espacio entre los botones
+                runSpacing: 10.0, // Espacio entre las filas si los botones se dividen
+                alignment: WrapAlignment.center, // Alinea los botones al centro
+                
+                children: ['Punto lila', 'Hospital', 'Centro', 'Otro', 'Todos']
                     .map((type) {
                   return ElevatedButton(
                     onPressed: () {
+                      selectedType = type;
                       _filterLocationsByType(type);
+                      
                     },
                     child: Text(type.tr),
                     style: ElevatedButton.styleFrom(
