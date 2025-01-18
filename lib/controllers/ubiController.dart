@@ -32,6 +32,7 @@ class UbiController extends GetxController {
   TextEditingController horariController = TextEditingController();
   var selectedUbi = Rx<UbiModel?>(null); // Ubicación seleccionada (reactiva)
 
+
   var latitude;
   var longitude;
 
@@ -132,8 +133,27 @@ class UbiController extends GetxController {
     try {
       final fetchedUbis = await ubiService.getUbis();
       ubis.value = fetchedUbis;
+       print("el getUbis es--------------: $ubis.value");
     } catch (e) {
       errorMessage.value = 'Error al cargar las ubicaciones.';
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+   // Función para obtener las ubis filtradas por tipo
+  void fetchUbisByType(String type) async {
+    isLoading.value = true;
+    print("este es el tipo del controller: $type");
+    // Traduce el tipo de post al código correcto antes de enviar
+    String translatedUbiType = getCategoryCode(type);
+    print("la traduccion del tipo es: $translatedUbiType");
+    try {
+      final fetchedUbisType = await ubiService.getUbisByType(translatedUbiType);
+      print("el getUbis es: $ubis");
+      //ubis.value=;
+      ubisByType.value=fetchedUbisType;
+
     } finally {
       isLoading.value = false;
     }
@@ -232,6 +252,7 @@ print("esta es la categoria al crear: $categoryCode");
   void selectUbi(UbiModel ubi) {
     selectedUbi.value = ubi; // Actualiza la ubicación seleccionada
   }
+  
 
   // Limpiar la ubicación seleccionada
   void clearSelectedUbi() {
@@ -251,21 +272,5 @@ print("esta es la categoria al crear: $categoryCode");
     return categoryCodes[category] ?? 'O'; // Por defecto "O" (Otro)
   }
 
-  // Función para obtener las ubis filtradas por tipo
-  void fetchUbisByType(String type) async {
-    isLoading.value = true;
-    print("este es el tipo del controller: $type");
-    // Traduce el tipo de post al código correcto antes de enviar
-    String translatedUbiType = getCategoryCode(type);
-    print("la traduccion del tipo es: $translatedUbiType");
-    try {
-      var ubis = await ubiService.getUbisByType(translatedUbiType);
-      print("el getUbis es: $ubis");
-          print("Detalles de los ubis: ${ubis.map((ubi) => ubi.toString()).join(", ")}");
-
-      ubisByType.assignAll(ubis);
-    } finally {
-      isLoading.value = false;
-    }
-  }
+ 
 }

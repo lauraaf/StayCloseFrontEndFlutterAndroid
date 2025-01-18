@@ -93,6 +93,7 @@ void _filterLocationsByType(String type) {
   setState(() {
     selectedType = type; // Actualitza la variable per filtrar
     if (type == 'Todos') {
+      print("Es TODAS LAS ubi------");
       ubiController.fetchUbis(); // Mostra totes les ubicacions
     } else {
       print("Es otro tipo de ubi------");
@@ -131,6 +132,7 @@ void _filterLocationsByType(String type) {
       ),
       body: Obx(() {
         if (ubiController.isLoading.value) {
+          print("---------------------Aqui estan todas las ubicaciones impresas en el mapa");
           return Center(child: CircularProgressIndicator());
         }
 
