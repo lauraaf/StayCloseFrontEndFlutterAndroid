@@ -1,9 +1,13 @@
+//V1.2
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:flutter_application_1/services/userServices.dart';
 import 'package:flutter_application_1/controllers/userController.dart'; // Controlador para crear el post
 import 'configurationScreen.dart'; // Importamos la nueva pantalla de configuración
+import 'package:flutter_application_1/controllers/themeController.dart';
+
 
 class PerfilScreen extends StatefulWidget {
   @override
@@ -55,95 +59,120 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Perfil'.tr, style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF89AFAF),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (String languageCode) {
-              if (languageCode == 'ca') {
-                Get.updateLocale(Locale('ca', 'ES'));
-              } else if (languageCode == 'es') {
-                Get.updateLocale(Locale('es', 'ES'));
-              } else if (languageCode == 'en') {
-                Get.updateLocale(Locale('en', 'US'));
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(value: 'ca', child: Text('Català')),
-                PopupMenuItem(value: 'es', child: Text('Español')),
-                PopupMenuItem(value: 'en', child: Text('English')),
-              ];
-            },
-          ),
-        ],
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 80,
-                  backgroundImage: _avatarUrl != null
-                      ? NetworkImage(_avatarUrl!) // Si hi ha URL, carrega l'avatar
-                      : null,
-                  backgroundColor: Colors.grey[300],
-                  child: _avatarUrl == null
-                      ? Icon(
-                          Icons.person,
-                          size: 80,
-                          color: Colors.white,
-                        )
-                      : null,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  _username ?? 'Nombre del Usuario'.tr,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF89AFAF),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  _email ?? 'usuario@example.com'.tr,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: 200,
-                  child: _buildProfileButton(context, 'Configuración'.tr),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: 200,
-                  child: _buildProfileButton(context, 'Cerrar Sesión'.tr),
-                ),
-              ],
+Widget build(BuildContext context) {
+  // Obtener el ThemeController para acceder a la función de cambio de tema
+  final ThemeController themeController = Get.find();
+  
+  return Scaffold(
+    appBar: PreferredSize(
+      preferredSize: Size.fromHeight(kToolbarHeight), // Usamos el tamaño predeterminado del AppBar
+      child: Obx(() {
+        return AppBar(
+          title: Text('Perfil'.tr, // Traducción dinámica
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), // Tamaño y estilo fijo del texto
+            backgroundColor: themeController.isDarkMode.value
+                ? Color(0xFF555A6F) // Color para el modo oscuro
+                : Color(0xFF89AFAF), // Color para el modo claro
+            toolbarHeight: 70.0, // Altura fija del AppBar
+          actions: [
+            IconButton(
+              icon: Icon(Icons.brightness_6),
+              onPressed: () {
+                themeController.toggleTheme(); // Cambiar tema
+              },
+              color: Colors.white, // El color debe coincidir con el estilo del tema
             ),
+            PopupMenuButton<String>(
+              onSelected: (String languageCode) {
+                if (languageCode == 'ca') {
+                  Get.updateLocale(Locale('ca', 'ES'));
+                } else if (languageCode == 'es') {
+                  Get.updateLocale(Locale('es', 'ES'));
+                } else if (languageCode == 'en') {
+                  Get.updateLocale(Locale('en', 'US'));
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem(value: 'ca', child: Text('Català')),
+                  PopupMenuItem(value: 'es', child: Text('Español')),
+                  PopupMenuItem(value: 'en', child: Text('English')),
+                ];
+              },
+            ),
+          ],
+        );
+      }),
+    ),
+    body: Center(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 80,
+                backgroundImage: _avatarUrl != null
+                    ? NetworkImage(_avatarUrl!) // Si hi ha URL, carrega l'avatar
+                    : null,
+                backgroundColor: Colors.grey[300],
+                child: _avatarUrl == null
+                    ? Icon(
+                        Icons.person,
+                        size: 80,
+                        color: Colors.white,
+                      )
+                    : null,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                _username ?? 'Nombre del Usuario'.tr,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF89AFAF),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                _email ?? 'usuario@example.com'.tr,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: 200,
+                child: _buildProfileButton(context, 'Configuración'.tr),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 200,
+                child: _buildProfileButton(context, 'Cerrar Sesión'.tr),
+              ),
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildProfileButton(BuildContext context, String text) {
+Widget _buildProfileButton(BuildContext context, String text) {
+  final ThemeController themeController = Get.find();
+  return Obx(() {
     return ElevatedButton(
       onPressed: () => _onButtonPressed(context, text),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFF89AFAF),
-        foregroundColor: Colors.white,
+        backgroundColor: themeController.isDarkMode.value
+            ? Color(0xFF555A6F) // Color de fondo para el modo oscuro
+            : Color(0xFF89AFAF), // Color de fondo para el modo claro
+        foregroundColor: themeController.isDarkMode.value
+            ? Colors.white // Color del texto para el modo oscuro
+            : Colors.black, // Color del texto para el modo claro
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -158,7 +187,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
         ),
       ),
     );
-  }
+  });
+}
+
 
   void _onButtonPressed(BuildContext context, String route) {
     if (route == 'Cerrar Sesión'.tr) {

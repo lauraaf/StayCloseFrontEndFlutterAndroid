@@ -68,6 +68,7 @@ dependencies:
   google_identity_services_web: ^0.3.3
   google_sign_in: ^6.2.2
   google_sign_in_web: ^0.12.4+3
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:

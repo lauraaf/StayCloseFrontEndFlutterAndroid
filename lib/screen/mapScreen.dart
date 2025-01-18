@@ -1,3 +1,5 @@
+//V1.2
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_application_1/controllers/ubiController.dart';
 import 'package:flutter_application_1/controllers/ubiListController.dart';
 import 'package:flutter_application_1/widgets/ubiCard.dart';
 import 'package:geolocator/geolocator.dart'; // Paquete para geolocalización
+import 'package:flutter_application_1/controllers/themeController.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -80,6 +83,20 @@ class _MapScreenState extends State<MapScreen> {
       if (userLatitude != null && userLongitude != null) {
         await ubiListController.getNearbyUbis(userLatitude!, userLongitude!, 10); // Buscar ubicaciones cercanas a 10 km de distancia
       }
+
+      // Añadir el marcador en el mapa
+      if (userLatitude != null && userLongitude != null) {
+        final userMarker = Marker(
+          point: LatLng(userLatitude!, userLongitude!),
+          builder: (ctx) => const Icon(
+            Icons.location_on,
+            color: Colors.red, // Color rojo para la ubicación del usuario
+            size: 38.0,
+          ),
+        );
+
+        print("Marcador añadido en la ubicación del usuario.");
+      }
     } catch (e) {
       print("Error al obtener la ubicación: $e");
     }
@@ -87,33 +104,54 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeController themeController = Get.find();
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Mapa'.tr), // Traducción dinámica
-        backgroundColor: Color(0xFF89AFAF),
-        actions: [
-          // Botón para cambio de idioma
-          PopupMenuButton<String>( // Menú para cambio de idioma
-            onSelected: (String languageCode) {
-              if (languageCode == 'ca') {
-                Get.updateLocale(Locale('ca', 'ES'));
-              } else if (languageCode == 'es') {
-                Get.updateLocale(Locale('es', 'ES'));
-              } else if (languageCode == 'en') {
-                Get.updateLocale(Locale('en', 'US'));
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(value: 'ca', child: Text('Català')),
-                PopupMenuItem(value: 'es', child: Text('Español')),
-                PopupMenuItem(value: 'en', child: Text('English')),
-              ];
-            },
-          ),
-        ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(
+            kToolbarHeight), // Usamos el tamaño predeterminado del AppBar
+        child: Obx(() {
+          return AppBar(
+            title: Text('Mapa'.tr, // Traducción dinámica
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), // Tamaño y estilo fijo del texto
+            backgroundColor: themeController.isDarkMode.value
+                ? Color(0xFF555A6F) // Color para el modo oscuro
+                : Color(0xFF89AFAF), // Color para el modo claro
+            toolbarHeight: 70.0, // Altura fija del AppBar
+            actions: [
+              IconButton(
+                icon: Icon(Icons.brightness_6),
+                onPressed: () {
+                  themeController.toggleTheme(); // Cambiar tema
+                },
+                color: Colors
+                    .white, // El color debe coincidir con el estilo del tema
+              ),
+              PopupMenuButton<String>( // Menú para cambio de idioma
+                onSelected: (String languageCode) {
+                  if (languageCode == 'ca') {
+                    Get.updateLocale(Locale('ca', 'ES'));
+                  } else if (languageCode == 'es') {
+                    Get.updateLocale(Locale('es', 'ES'));
+                  } else if (languageCode == 'en') {
+                    Get.updateLocale(Locale('en', 'US'));
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem(value: 'ca', child: Text('Català')),
+                    PopupMenuItem(value: 'es', child: Text('Español')),
+                    PopupMenuItem(value: 'en', child: Text('English')),
+                  ];
+                },
+              ),
+            ],
+          );
+        }),
       ),
       body: Obx(() {
+        bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
         if (ubiController.isLoading.value) {
           return Center(child: CircularProgressIndicator());
         }
@@ -133,7 +171,9 @@ class _MapScreenState extends State<MapScreen> {
               ),
               children: [
                 TileLayer(
-                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  urlTemplate: isDarkMode
+                      ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                      : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                   subdomains: ['a', 'b', 'c'],
                 ),
                 MarkerLayer(
@@ -144,7 +184,8 @@ class _MapScreenState extends State<MapScreen> {
                         point: LatLng(userLatitude!, userLongitude!),
                         builder: (ctx) => const Icon(
                           Icons.location_on,
-                          color: Colors.red, // Color rojo para la ubicación del usuario
+                          color: Colors
+                              .red, // Color rojo para la ubicación del usuario
                           size: 38.0,
                         ),
                       ),
@@ -160,8 +201,10 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                     // Otros marcadores para las ubicaciones
                     ...ubiController.ubis.map((ubi) {
-                      final latitude = ubi.ubication.latitud ?? 41.382395521312176;
-                      final longitude = ubi.ubication.longitud ?? 2.1567611541534366;
+                      final latitude =
+                          ubi.ubication.latitud ?? 41.382395521312176;
+                      final longitude =
+                          ubi.ubication.longitud ?? 2.1567611541534366;
 
                       return Marker(
                         point: LatLng(latitude, longitude),
@@ -261,7 +304,9 @@ class _MapScreenState extends State<MapScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('${selectedUbi.name}', style: TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${selectedUbi.name}',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               IconButton(
                                 icon: Icon(Icons.close, color: Colors.red),
                                 iconSize: 20,
@@ -292,99 +337,113 @@ class _MapScreenState extends State<MapScreen> {
         onPressed: () {
           _showAddUbiDialog(context);
         },
-        backgroundColor: Color(0xFF89AFAF),
-        child: Icon(Icons.add),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[800] // Color para modo oscuro
+            : Color(0xFF89AFAF), // Color para modo claro
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white // Ícono blanco en modo oscuro
+              : Colors.black, // Ícono negro en modo claro
+        ),
       ),
     );
   }
 
-  void _showAddUbiDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                 // const Center(
-                   Text(
-                      'Nueva ubicación'.tr,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF89AFAF),
+   void _showAddUbiDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                   // const Center(
+                     Text(
+                        'Nueva ubicación'.tr,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF89AFAF),
+                        ),
+                      ),
+                    //),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: ubiController.nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Nombre'.tr,
+                        border: OutlineInputBorder(),
                       ),
                     ),
-                  //),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: ubiController.nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Nombre'.tr,
-                      border: OutlineInputBorder(),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: ubiController.addressController,
+                      decoration: InputDecoration(
+                        labelText: 'Dirección (calle, número de portería, localidad)'.tr,
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.addressController,
-                    decoration: InputDecoration(
-                      labelText: 'Dirección (calle, número de portería, localidad)'.tr,
-                      border: OutlineInputBorder(),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: ubiController.horariController,
+                      decoration: InputDecoration(
+                        labelText: 'Horario'.tr,
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.horariController,
-                    decoration: InputDecoration(
-                      labelText: 'Horario'.tr,
-                      border: OutlineInputBorder(),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: ubiController.tipoController,
+                      decoration: InputDecoration(
+                        labelText: 'Tipo'.tr,
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.tipoController,
-                    decoration: InputDecoration(
-                      labelText: 'Tipo'.tr,
-                      border: OutlineInputBorder(),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: ubiController.comentariController,
+                      decoration: InputDecoration(
+                        labelText: 'Comentario'.tr,
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: ubiController.comentariController,
-                    decoration: InputDecoration(
-                      labelText: 'Comentario'.tr,
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () async {
+                    const SizedBox(height: 20),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
                         //ubiController.getCoordinatesFromAddress(ubiController.addressController.text);
-                        await ubiController.createUbi();  // Llamar a la función de creación
-                        Navigator.of(context).pop();  // Cerrar el diálogo después de crear
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF89AFAF),
-                      ),
-                      child: Text(
+                          await ubiController.createUbi();  // Llamar a la función de creación
+                          Navigator.of(context).pop();  // Cerrar el diálogo después de crear
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[800] // Color para modo oscuro
+                                : Color(0xFF89AFAF), // Color para modo claro
+                        foregroundColor: Theme.of(context).brightness ==
+                                Brightness.dark
+                            ? Colors.white // Texto en blanco para modo oscuro
+                            : Colors.black, // Texto en negro para modo claro
+                        ),
+                        child: Text(
                         'Crear ubicación'.tr,
                          style: TextStyle(color: Colors.white), // Texto en blanco
                       ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
+          );
       },
     );
   }

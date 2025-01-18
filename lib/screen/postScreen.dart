@@ -1,8 +1,11 @@
+//V1.2
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controllers/postsListController.dart';
 import 'package:flutter_application_1/controllers/postController.dart';
 import 'package:flutter_application_1/Widgets/postCard.dart';
 import 'package:get/get.dart';
+import 'package:flutter_application_1/controllers/themeController.dart';
 
 class PostsScreen extends StatefulWidget {
   @override
@@ -44,50 +47,86 @@ class _PostsScreenState extends State<PostsScreen> {
     }
   }
 
+  /* void _changeTheme() {
+    // Cambiar el tema entre oscuro y claro
+    final currentTheme = Theme.of(context).brightness;
+    if (currentTheme == Brightness.dark) {
+      // Si está en modo oscuro, cambiamos a modo claro
+      Get.changeTheme(ThemeData.light());
+    } else {
+      // Si está en modo claro, cambiamos a modo oscuro
+      Get.changeTheme(ThemeData.dark());
+    }
+  }*/
+
   @override
   Widget build(BuildContext context) {
+// Obtener el ThemeController para acceder a la función de cambio de tema
+    final ThemeController themeController = Get.find();
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Foro de Posts'.tr, style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF89AFAF),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (String languageCode) {
-              if (languageCode == 'ca') {
-                Get.updateLocale(Locale('ca', 'ES'));
-              } else if (languageCode == 'es') {
-                Get.updateLocale(Locale('es', 'ES'));
-              } else if (languageCode == 'en') {
-                Get.updateLocale(Locale('en', 'US'));
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(value: 'ca', child: Text('Català')),
-                PopupMenuItem(value: 'es', child: Text('Español')),
-                PopupMenuItem(value: 'en', child: Text('English')),
-              ];
-            },
-          ),
-          Container(
-            margin: const EdgeInsets.only(right: 16.0),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                _fetchMyPosts();
-              },
-              icon: const Icon(Icons.account_circle),
-              label: Text('Mis Posts'.tr),
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                backgroundColor: const Color.fromARGB(187, 255, 255, 255),
-                foregroundColor: const Color.fromARGB(255, 84, 91, 111),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight), // Usamos el tamaño predeterminado del AppBar
+        child: Obx(() {
+          return AppBar(
+            title: Text('Foro'.tr, // Traducción dinámica
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), // Tamaño y estilo fijo del texto
+            backgroundColor: themeController.isDarkMode.value
+                ? Color(0xFF555A6F) // Color para el modo oscuro
+                : Color(0xFF89AFAF), // Color para el modo claro
+            toolbarHeight: 70.0, // Altura fija del AppBar
+            actions: [
+              // Icono para cambiar el tema, antes de los tres puntos
+              IconButton(
+                icon: Icon(Icons.brightness_6),
+                onPressed: () {
+                  themeController.toggleTheme(); // Cambiar tema
+                }, // Cambiar tema,
+                color: Colors
+                    .white, // El color debe coincidir con el estilo del tema
               ),
-            ),
-          ),
-        ],
+              // Los tres puntos (menú de opciones)
+              PopupMenuButton<String>(
+                onSelected: (String languageCode) {
+                  if (languageCode == 'ca') {
+                    Get.updateLocale(Locale('ca', 'ES'));
+                  } else if (languageCode == 'es') {
+                    Get.updateLocale(Locale('es', 'ES'));
+                  } else if (languageCode == 'en') {
+                    Get.updateLocale(Locale('en', 'US'));
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem(value: 'ca', child: Text('Català')),
+                    PopupMenuItem(value: 'es', child: Text('Español')),
+                    PopupMenuItem(value: 'en', child: Text('English')),
+                  ];
+                },
+              ),
+              // Botón para mis posts
+              Container(
+                margin: const EdgeInsets.only(right: 16.0),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _fetchMyPosts();
+                  },
+                  icon: const Icon(Icons.account_circle),
+                  label: Text('Mis Posts'.tr),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 12.0),
+                    backgroundColor: const Color.fromARGB(187, 255, 255, 255),
+                    foregroundColor: const Color.fromARGB(255, 84, 91, 111),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }),
       ),
       body: Center(
         child: Container(
@@ -97,14 +136,31 @@ class _PostsScreenState extends State<PostsScreen> {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: ['Todos', 'Película', 'Serie', 'Libro', 'Podcast', 'Música','Otros'].map((type) {
+                children: [
+                  'Todos',
+                  'Película',
+                  'Serie',
+                  'Libro',
+                  'Podcast',
+                  'Música'
+                ].map((type) {
+                  // Obtén el valor de si el tema está oscuro o claro
+                  final isDarkMode =
+                      Theme.of(context).brightness == Brightness.dark;
+
+                  // Define el color según el modo
+                  final buttonColor = isDarkMode
+                      ? Color(0xFF555A6F) // Color para el modo oscuro
+                      : Color(0xFF89AFAF); // Color para el modo claro
+
                   return ElevatedButton(
                     onPressed: () {
                       _filterPostsByType(type);
                     },
                     child: Text(type.tr),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: selectedType == type ? const Color.fromRGBO(137, 175, 175, 1) : const Color.fromARGB(255, 178, 178, 178),
+                      backgroundColor:
+                          buttonColor, // Cambia el color de fondo según el modo
                       foregroundColor: Colors.white,
                       textStyle: const TextStyle(color: Colors.white),
                     ),
@@ -115,10 +171,22 @@ class _PostsScreenState extends State<PostsScreen> {
               Obx(() {
                 if (postController.isLoading.value) {
                   return Center(child: CircularProgressIndicator());
-                } else if (selectedType != 'Todos' && postController.postsByType.isEmpty) {
-                  return Center(child: Text("No hay posts disponibles para esta categoría".tr, style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF))));
-                } else if (selectedType == 'Todos' && postsListController.postList.isEmpty) {
-                  return Center(child: Text("No hay posts disponibles".tr, style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF))));
+                } else if (selectedType != 'Todos' &&
+                    postController.postsByType.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No hay posts disponibles para esta categoría".tr,
+                      style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF)),
+                    ),
+                  );
+                } else if (selectedType == 'Todos' &&
+                    postsListController.postList.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No hay posts disponibles".tr,
+                      style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF)),
+                    ),
+                  );
                 } else {
                   var postsToDisplay = selectedType == 'Todos' ? postsListController.postList : postController.postsByType;
                   return Expanded(
@@ -161,88 +229,86 @@ class _PostsScreenState extends State<PostsScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ),
-          child: GetBuilder<PostController>(
-            init: postController,
-            builder: (controller) {
-              return FutureBuilder(
-                future: postController.fetchMyPosts(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Padding(
-                      padding: EdgeInsets.all(20.0),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Center(
-                        child: Text(
-                          'Error al cargar los posts: ${snapshot.error}'.tr,
-                          style: const TextStyle(fontSize: 16, color: Colors.red),
+          child: GetBuilder<PostController>(builder: (controller) {
+            return FutureBuilder(
+              future: postController.fetchMyPosts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                } else if (snapshot.hasError) {
+                  return Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Center(
+                      child: Text(
+                        'Error al cargar los posts: ${snapshot.error}'.tr,
+                        style: const TextStyle(fontSize: 16, color: Colors.red),
+                      ),
+                    ),
+                  );
+                } else {
+                  final myPosts = snapshot.data ?? [];
+                  return Container(
+                    padding: const EdgeInsets.all(16.0),
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Mis Posts'.tr,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF89AFAF),
+                          ),
                         ),
-                      ),
-                    );
-                  } else {
-                    final myPosts = snapshot.data ?? [];
-                    return Container(
-                      padding: const EdgeInsets.all(16.0),
-                      width: MediaQuery.of(context).size.width * 0.6,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Mis Posts'.tr,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF89AFAF),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          if (myPosts.isEmpty)
-                            Center(
-                              child: Text(
-                                "No tienes posts todavía.".tr,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0xFF89AFAF),
-                                ),
-                              ),
-                            )
-                          else
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: myPosts.length,
-                                itemBuilder: (context, index) {
-                                  final post = myPosts[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                    child: PostCard(post: post),
-                                  );
-                                },
-                              ),
-                            ),
-                          const SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                        if (myPosts.isEmpty)
                           Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF89AFAF),
+                            child: Text(
+                              "No tienes posts todavía.".tr,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF89AFAF),
                               ),
-                              child: Text('Cerrar'.tr),
+                            ),
+                          )
+                        else
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: myPosts.length,
+                              itemBuilder: (context, index) {
+                                final post = myPosts[index];
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: PostCard(post: post),
+                                );
+                              },
                             ),
                           ),
-                        ],
-                      ),
-                    );
-                  }
-                },
-              );
-            },
-          ),
+                        const SizedBox(height: 20),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF89AFAF),
+                            ),
+                            child: Text('Cerrar'.tr),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
+            );
+          }),
         );
       },
     );
@@ -299,7 +365,9 @@ class _PostsScreenState extends State<PostsScreen> {
                       // Dropdown para seleccionar el tipo de post
                       Obx(() {
                         return DropdownButton<String>(
-                          value: postController.postType.value.isEmpty ? null : postController.postType.value,
+                          value: postController.postType.value.isEmpty
+                              ? null
+                              : postController.postType.value,
                           hint: Text(
                             'Selecciona el tipo de post'.tr,
                             style: TextStyle(color: Color(0xFF89AFAF)),
@@ -307,13 +375,22 @@ class _PostsScreenState extends State<PostsScreen> {
                           onChanged: (String? newValue) {
                             postController.postType.value = newValue ?? '';
                           },
-                          items: <String>['', 'Libro'.tr, 'Película'.tr, 'Música'.tr, 'Podcast', 'Serie'.tr, 'Otro'.tr]
-                              .map<DropdownMenuItem<String>>((String value) {
+                          items: <String>[
+                            '',
+                            'Libro'.tr,
+                            'Película'.tr,
+                            'Música'.tr,
+                            'Serie'.tr,
+                            'Otro'.tr
+                          ].map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Text(value.tr),
                             );
                           }).toList(),
+                          dropdownColor:
+                              Colors.white, // Fondo blanco para el dropdown
+                          underline: Container(), // Eliminar línea de subrayado
                         );
                       }),
                       const SizedBox(height: 16),
