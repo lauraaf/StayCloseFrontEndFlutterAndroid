@@ -21,11 +21,15 @@ class LogInPage extends StatelessWidget {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight), // Usamos el tamaño predeterminado del AppBar
+        preferredSize: Size.fromHeight(
+            kToolbarHeight), // Usamos el tamaño predeterminado del AppBar
         child: Obx(() {
           return AppBar(
             title: Text('Iniciar Sesión'.tr,
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), // Tamaño y estilo fijo del texto)
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight:
+                        FontWeight.bold)), // Tamaño y estilo fijo del texto)
             // Color de fondo del AppBar dependiendo del tema
             backgroundColor: themeController.isDarkMode.value
                 ? Color(0xFF555A6F) // Color para el modo oscuro
@@ -35,7 +39,8 @@ class LogInPage extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.brightness_6),
                 onPressed: () {
-                  themeController.toggleTheme(); // Cambia entre modo oscuro y claro
+                  themeController
+                      .toggleTheme(); // Cambia entre modo oscuro y claro
                 },
               ),
               // Botón para cambiar idioma
@@ -99,10 +104,12 @@ class LogInPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Imagen de Cloudinary
+                  /*
+                // Imagen de Cloudinary
                   CldImageWidget(
                     publicId: 'logo_ounbww',
                   ),
+                  */
                   const SizedBox(height: 20),
                   TextField(
                     controller: userController.usernameController,
@@ -197,22 +204,22 @@ class LogInPage extends StatelessWidget {
                       return Container();
                     }
                   }),
-                const SizedBox(height: 10),
-                ElevatedButton.icon(
-                  onPressed: registerController.signUpWithGoogle,
-                  icon: Image.asset(
-                    'assets/icons/google_logo.png', // Ruta de la imagen del logo de Google
-                    height: 20,
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: registerController.signUpWithGoogle,
+                    icon: Image.asset(
+                      'assets/icons/google_logo.png', // Ruta de la imagen del logo de Google
+                      height: 20,
+                    ),
+                    label: Text(
+                      "Iniciar sesión con Google".tr,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF89AFAF),
+                      foregroundColor: Colors.white,
+                    ),
                   ),
-                  label: Text(
-                    "Iniciar sesión con Google".tr,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF89AFAF),
-                    foregroundColor: Colors.white,
-                  ),
-                ),
                   const SizedBox(height: 10),
                   Text(
                     '¿Aún no tienes una cuenta? Regístrate'.tr,

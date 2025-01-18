@@ -28,18 +28,28 @@ class BottomNavScaffold extends StatelessWidget {
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
           currentIndex: navController.selectedIndex.value,
-          onTap: navController.navigateTo,
+          //onTap: navController.navigateTo,
+          onTap: (index) {
+            if (index == 4) {
+              // Índice correspondiente al chat
+              Get.toNamed('/chat'); // Navegar a la lista de usuarios
+            } else {
+              navController.navigateTo(index); // Navegar a otras pantallas
+            }
+          },
           selectedItemColor: isDarkMode
               ? Colors.tealAccent // Teal claro para el modo oscuro
               : Color(0xFF89AFAF), // Verde claro para el modo claro
           unselectedItemColor: isDarkMode
               ? Colors.grey[500] // Gris más oscuro para el modo oscuro
-              : Color(0xFF4D6F6F), // Verde oscuro/gris para elementos no seleccionados en modo claro
+              : Color(
+                  0xFF4D6F6F), // Verde oscuro/gris para elementos no seleccionados en modo claro
           backgroundColor: isDarkMode
               ? Colors.black87 // Fondo oscuro para el modo oscuro
               : Color(0xFFE0F7FA), // Fondo azul claro para el modo claro
           elevation: 5, // Sombra suave para el diseño
-          type: BottomNavigationBarType.fixed, // Fija para mantener los elementos en su lugar
+          type: BottomNavigationBarType
+              .fixed, // Fija para mantener los elementos en su lugar
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),

@@ -2,6 +2,7 @@
 
 import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/screen/UserListScreen.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_application_1/controllers/userController.dart';
@@ -18,11 +19,14 @@ import 'package:flutter_application_1/screen/calendarScreen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_application_1/translation_service.dart'; // Asegúrate de que el archivo esté en la ruta correcta
 import 'package:flutter_application_1/controllers/themeController.dart';
+import 'package:flutter_application_1/screen/chatScreen.dart';
 
 void main() {
-  CloudinaryContext.cloudinary = Cloudinary.fromCloudName(cloudName: "djen7vqby");
+  CloudinaryContext.cloudinary =
+      Cloudinary.fromCloudName(cloudName: "djen7vqby");
   GetStorage.init(); // Inicializar GetStorage para guardar el estado del tema
-  Get.put(UserController());  // Esto asegura que el controlador se ponga en el GetX 'depósito'
+  Get.put(
+      UserController()); // Esto asegura que el controlador se ponga en el GetX 'depósito'
   Get.put(ThemeController());
   runApp(
     MyApp(),
@@ -32,16 +36,17 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-    final ThemeController themeController = Get.find(); // Obtiene el controlador del tema
+    final ThemeController themeController =
+        Get.find(); // Obtiene el controlador del tema
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-            theme: ThemeData.light().copyWith(
+      theme: ThemeData.light().copyWith(
         primaryColor: Colors.teal,
         scaffoldBackgroundColor: Color(0xFFE0F7FA),
         appBarTheme: AppBarTheme(
           backgroundColor: Color(0xFF89AFAF),
-          titleTextStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          titleTextStyle:
+              TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         textTheme: TextTheme(
           bodyLarge: TextStyle(color: Colors.black),
@@ -50,21 +55,26 @@ class MyApp extends StatelessWidget {
         ),
       ),
       darkTheme: ThemeData.dark().copyWith(
-        primaryColor: Colors.grey[800],  // Color principal per al mode fosc (gris fosc)
-        scaffoldBackgroundColor: Color(0xFF121212), // Fons fosc per les pantalles
+        primaryColor:
+            Colors.grey[800], // Color principal per al mode fosc (gris fosc)
+        scaffoldBackgroundColor:
+            Color(0xFF121212), // Fons fosc per les pantalles
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.grey[850], // AppBar en gris fosc
-          titleTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          titleTextStyle:
+              TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         textTheme: TextTheme(
           bodyLarge: TextStyle(color: Colors.white),
           bodyMedium: TextStyle(color: Colors.white70),
           titleLarge: TextStyle(color: Colors.white),
         ),
-        buttonTheme: ButtonThemeData(buttonColor: Colors.grey[700]), // Botons amb gris fosc
+        buttonTheme: ButtonThemeData(
+            buttonColor: Colors.grey[700]), // Botons amb gris fosc
         iconTheme: IconThemeData(color: Colors.white70), // Icones en gris clar
       ),
-      themeMode: themeController.isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
+      themeMode:
+          themeController.isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
       locale: Locale('es', 'ES'), // Idioma predeterminado
       translations: TranslationService(), // Usa la nueva clase de traducción
       fallbackLocale: Locale('en', 'US'), // Idioma de respaldo
@@ -82,12 +92,12 @@ class MyApp extends StatelessWidget {
         // Ruta de inicio de sesión
         GetPage(
           name: '/login',
-          page: () => LogInPage(), 
+          page: () => LogInPage(),
         ),
-         // Ruta de registro
+        // Ruta de registro
         GetPage(
           name: '/register',
-          page: () => RegisterPage(), 
+          page: () => RegisterPage(),
         ),
         // Ruta de la pantalla principal con BottomNavScaffold
         GetPage(
@@ -106,11 +116,13 @@ class MyApp extends StatelessWidget {
           name: '/calendario',
           page: () => BottomNavScaffold(child: CalendarScreen()),
         ),
-        /*
+
         GetPage(
           name: '/chat',
-          page: () => BottomNavScaffold(child: PerfilScreen()),
-        ),*/
+          page: () => BottomNavScaffold(
+            child: UserListScreen(),
+          ),
+        ),
         GetPage(
           name: '/perfil',
           page: () => BottomNavScaffold(child: PerfilScreen()),
@@ -119,4 +131,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

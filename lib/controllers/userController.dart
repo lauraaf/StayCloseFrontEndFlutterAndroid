@@ -6,10 +6,11 @@ import 'dart:typed_data';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserController extends GetxController {
   final UserService userService = Get.put(UserService());
+  var currentUserName = ''.obs;
 
   // Controladores de texto para la UI
   final TextEditingController usernameController = TextEditingController();
@@ -19,9 +20,12 @@ class UserController extends GetxController {
   var isLoading = false.obs;
   var errorMessage = ''.obs;
   var isPasswordVisible = false.obs;
-  
+
   // Usando Rxn para que sea nullable (inicialmente vacío)
   var user = Rxn<UserModel>();
+
+  var connectedUsers = <UserModel>[].obs; // Lista de usuarios conectados
+  var searchResults = <UserModel>[].obs; // Resultados de búsqueda
 
 // Método para obtener un usuario por su ID
   Future<void> fetchUser(String id) async {
@@ -30,6 +34,7 @@ class UserController extends GetxController {
       print("fetch $fetchedUser");
       if (fetchedUser != null) {
         user.value = fetchedUser;
+        currentUserName.value = fetchedUser.username; // Actualiza el username
       } else {
         Get.snackbar('Error', 'Usuario no encontrado');
       }
@@ -48,7 +53,8 @@ class UserController extends GetxController {
         user.value = updatedUser; // Actualizar el estado reactivo
         Get.snackbar('Éxito', 'Usuario actualizado correctamente');
         if (user.value != null) {
-          usernameController.text = user.value!.username; // Usa el valor si no es nulo
+          usernameController.text =
+              user.value!.username; // Usa el valor si no es nulo
         }
       } else {
         Get.snackbar('Error', 'No se pudo actualizar el usuario');
@@ -72,7 +78,7 @@ class UserController extends GetxController {
       return;
     }
 
-    print('estoy en el login de usercontroller');
+    print('estoy en el login de usercontroller iniciando sesión ');
 
     final logIn = (
       username: usernameController.text,
@@ -87,18 +93,21 @@ class UserController extends GetxController {
       // Llamada al servicio para iniciar sesión
       final responseData = await userService.logIn(logIn);
 
-      
-
-      print('el response data es:${ responseData}');
+      print('el response data es:${responseData}');
 
       if (responseData == 200) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        final username = prefs.getString('username') ?? '';
+        currentUserName.value = username;
+
+        print('Inicio de sesión exitoso. Username: $username');
         // Manejo de respuesta exitosa
         Get.snackbar('Éxito', 'Inicio de sesión exitoso');
         Text('Bienvenido, ${user.value?.name ?? "Cargando..."}');
         Get.toNamed('/home');
-      } else if (responseData == 300){
+      } else if (responseData == 300) {
         errorMessage.value = 'Usuario deshabilitado'.tr;
-      } else{
+      } else {
         errorMessage.value = 'Usuario o contraseña incorrectos'.tr;
       }
     } catch (e) {
@@ -123,11 +132,12 @@ class UserController extends GetxController {
   }
 
   // Método para crear una nueva experiencia
-  Rxn<Uint8List> selectedImage = Rxn<Uint8List>(); // Bytes de la imagen seleccionada
+  Rxn<Uint8List> selectedImage =
+      Rxn<Uint8List>(); // Bytes de la imagen seleccionada
   var uploadedImageUrl = ''.obs; // URL de la imagen subida a Cloudinary
 
   // Seleccionar imagen desde el dispositivo
- Future<void> pickImage() async {
+  Future<void> pickImage() async {
     try {
       Uint8List? imageBytes = await ImagePickerWeb.getImageAsBytes();
       if (imageBytes != null) {
@@ -137,7 +147,26 @@ class UserController extends GetxController {
         Get.snackbar('Éxito', 'Imagen seleccionada correctamente');
       }
     } catch (e) {
-      Get.snackbar('Error', 'No se pudo seleccionar la imagen: $e', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Error', 'No se pudo seleccionar la imagen: $e',
+          snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  //Buscar usuario por username
+  // Buscar usuario por username
+  Future<void> searchUser(String username) async {
+    try {
+      isLoading.value = true;
+      UserModel? user = await userService.getUserByUsername(username);
+      if (user != null) {
+        searchResults.value = [user];
+      } else {
+        searchResults.clear();
+      }
+    } catch (e) {
+      print("Error al buscar usuario: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -180,5 +209,4 @@ class UserController extends GetxController {
       isLoading.value = false;
     }
   }
-
 }

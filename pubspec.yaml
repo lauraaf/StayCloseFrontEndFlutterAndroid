@@ -2,7 +2,7 @@ name: flutter_application_1
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -69,6 +69,7 @@ dependencies:
   google_sign_in: ^6.2.2
   google_sign_in_web: ^0.12.4+3
   get_storage: ^2.1.1
+  socket_io_client: ^3.0.2
 
 dev_dependencies:
   flutter_test:
