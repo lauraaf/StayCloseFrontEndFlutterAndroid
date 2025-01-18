@@ -142,7 +142,8 @@ class _PostsScreenState extends State<PostsScreen> {
                   'Serie',
                   'Libro',
                   'Podcast',
-                  'Música'
+                  'Música',
+                  'Otro'
                 ].map((type) {
                   // Obtén el valor de si el tema está oscuro o claro
                   final isDarkMode =
@@ -381,6 +382,7 @@ class _PostsScreenState extends State<PostsScreen> {
                             'Película'.tr,
                             'Música'.tr,
                             'Serie'.tr,
+                            'Podcast'.tr,
                             'Otro'.tr
                           ].map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(

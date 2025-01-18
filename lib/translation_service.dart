@@ -94,7 +94,8 @@ class TranslationService extends Translations {
       'Iniciar sesión con Google':'LogIn with Google',
       'Punto lila' : 'Safe point', 
       'Hospital' : 'Hospital', 
-      'Centro' :'Center'
+      'Centro' :'Center',
+      'Otro':'Other'
     },
     'es_ES': {
       'Registrarse': 'Registrarse',
@@ -187,7 +188,8 @@ class TranslationService extends Translations {
       'Iniciar sesión con Google':'Iniciar sesión con Google',
       'Punto lila' : 'Punto lila', 
       'Hospital' : 'Hospital', 
-      'Centro' :'Centro'
+      'Centro' :'Centro',
+      'Otro':'Otro'
     },
     'ca_ES': {
       'Registrarse': 'Registrar-se',
@@ -280,7 +282,8 @@ class TranslationService extends Translations {
       'Seleccionar Fecha':'Seleccionar Data',
       'Usuario deshabilitado':'Usuari deshabilitat',
       'Usuario o contraseña incorrectos':'Usuari o contrasenya incorrecte',
-      'Iniciar sesión con Google':'Iniciar sessió amb Google'
+      'Iniciar sesión con Google':'Iniciar sessió amb Google',
+      'Otro':'Altre'
     },
   };
 }
