@@ -270,7 +270,7 @@ print("esta es la categoria al crear: $categoryCode");
     'Punto lila': 'P',
     'Hospital': 'H',
     'Centro': 'C',
-    'Otro': 'O',
+    'Otros': 'O',
   };
   // Función para traducir la categoría seleccionada al código
   String getCategoryCode(String category) {

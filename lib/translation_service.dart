@@ -82,7 +82,11 @@ class TranslationService extends Translations {
       'Puntos cercanos a ti':'Points near you',
       'Nueva ubicación':'New ubication',
       'Dirección (calle, número de portería, localidad)':'Address (street, gate number, town)',
-      'Crear ubicación':'Create location'
+      'Crear ubicación':'Create location',
+      'Punto lila' : 'Safe point', 
+      'Hospital' : 'Hospital', 
+      'Centro' :'Center', 
+      'Otros' : 'Others'
     },
     'es_ES': {
       'Registrarse': 'Registrarse',
@@ -163,7 +167,11 @@ class TranslationService extends Translations {
       'Puntos cercanos a ti':'Puntos cercanos a ti',
       'Nueva ubicación':'Nueva ubicación',
       'Dirección (calle, número de portería, localidad)':'Dirección (calle, número de portería, localidad)',
-      'Crear ubicación':'Crear ubicación'
+      'Crear ubicación':'Crear ubicación',
+      'Punto lila' : 'Punto lila', 
+      'Hospital' : 'Hospital', 
+      'Centro' :'Centro', 
+      'Otros' : 'Otros'
     },
     'ca_ES': {
       'Registrarse': 'Registrar-se',
@@ -244,7 +252,11 @@ class TranslationService extends Translations {
       'Puntos cercanos a ti':'Punts propers a tú',
       'Nueva ubicación':'Nova ubicació',
       'Dirección (calle, número de portería, localidad)':'Adreça (carrer, número de porteria, localitat)',
-      'Crear ubicación':'Crear ubicació'      
+      'Crear ubicación':'Crear ubicació',
+      'Punto lila' : 'Punt lila', 
+      'Hospital' : 'Hospital', 
+      'Centro' :'Centre', 
+      'Otros' : 'Altres', 
     },
   };
 }

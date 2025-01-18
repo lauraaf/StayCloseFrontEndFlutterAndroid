@@ -247,7 +247,7 @@ void _filterLocationsByType(String type) {
                 runSpacing: 10.0, // Espacio entre las filas si los botones se dividen
                 alignment: WrapAlignment.center, // Alinea los botones al centro
                 
-                children: ['Punto lila', 'Hospital', 'Centro', 'Otro', 'Todos']
+                children: ['Punto lila' .tr, 'Hospital' .tr, 'Centro' .tr, 'Otros' .tr, 'Todos' .tr]
                     .map((type) {
                   return ElevatedButton(
                     onPressed: () {
@@ -360,7 +360,14 @@ void _filterLocationsByType(String type) {
                           SizedBox(height: 5),
                           Text('· Dirección: ${selectedUbi.address}'.tr),
                           SizedBox(height: 5),
-                          Text('· Tipo: ${selectedUbi.tipo}'.tr),
+                          if (selectedUbi.tipo=='P')
+                          Text('· Tipo: Punto lila'.tr),
+                          if (selectedUbi.tipo=='H')
+                          Text('· Tipo: Hospital'.tr),
+                          if (selectedUbi.tipo=='C')
+                          Text('· Tipo: Centro'.tr),
+                          if (selectedUbi.tipo=='O')
+                          Text('· Tipo: Otro'.tr),
                           SizedBox(height: 5),
                           Text('· Comentario: ${selectedUbi.comentari}'.tr),
                         ],
