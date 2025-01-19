@@ -113,23 +113,33 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     }
   }
 
+
+
   Future<void> _sendLocation() async {
     try {
-      // Obtener la ubicación actual
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Get.snackbar('Error', 'Location permissions are denied');
+          return;
+        }
+      }
 
-      // Crear el enlace de Google Maps
-      String locationLink =
-          'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
+      if (permission == LocationPermission.deniedForever) {
+        Get.snackbar('Error', 'Location permissions are permanently denied, we cannot request permissions.');
+        return;
+      }
 
-      // Enviar el mensaje con el texto "¡Estoy Aquí!" y el enlace de ubicación
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+      String locationLink = 'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
+
       await MessageService.sendMessage(
         chatId: widget.chatId,
         senderUsername: Get.find<UserController>().currentUserName.value,
         receiverUsername: widget.receiverUsername,
-        content:
-            '¡Estoy Aquí! <a href="$locationLink">¡Estoy Aquí!</a>', // Mensaje con el enlace
+        content: '¡Estoy Aquí! <a href="$locationLink">¡Estoy Aquí!</a>',
       );
 
       print('Ubicación enviada: $locationLink');
@@ -138,6 +148,9 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
       Get.snackbar('Error', 'No se pudo obtener la ubicación');
     }
   }
+
+
+
 
   Future<void> _sendHomeStatus() async {
     try {

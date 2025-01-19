@@ -43,82 +43,93 @@ class PostCard extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      color: const Color(0xFF89AFAF), // Fondo verde claro
-      elevation: 5, // Sombra suave
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  post.author, // Primer el nombre del usuario
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+ @override
+Widget build(BuildContext context) {
+  return Card(
+    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8), // Reduir el marge lateral
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+    color: const Color(0xFF89AFAF), // Fondo verd clar
+    elevation: 5, // Sombra suau
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                post.author, // Primer el nom de l'usuari
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: _getPostTypeColor(post.postType),
+                    width: 2,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: _getPostTypeColor(post.postType),
-                      width: 2,
-                    ),
-                  ),
-                  child: Text(
-                    getCategoryDescription(post.postType).tr, // Traduir i mostrar el tipus de post
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: _getPostTypeColor(post.postType),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  post.content, // Contenido debajo del tipo de post
-                  style: const TextStyle(
+                child: Text(
+                  getCategoryDescription(post.postType).tr, // Traduir i mostrar el tipus de post
+                  style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Imagen al final
-          if (post.image != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 200, right: 200), // Margen alrededor de la imagen
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8), // Esquinas redondeadas
-                child: Image.network(
-                  post.image!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 300,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.broken_image,
-                    size: 100,
-                    color: Color.fromARGB(194, 162, 204, 204),
+                    fontWeight: FontWeight.bold,
+                    color: _getPostTypeColor(post.postType),
                   ),
                 ),
               ),
+              const SizedBox(height: 8),
+              Text(
+                post.content, // Contingut sota el tipus de post
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Afegir una imatge de placeholder
+        if (post.image != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 16, right: 16), // Marges al voltant de la imatge
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8), // Cantonades arrodonides
+              child: Image.network(
+                post.image!,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: 300,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.broken_image,
+                  size: 100,
+                  color: Color.fromARGB(194, 162, 204, 204),
+                ),
+              ),
             ),
-        ],
-      ),
-    );
-  }
+          ),
+      ],
+    ),
+  );
+}
 }

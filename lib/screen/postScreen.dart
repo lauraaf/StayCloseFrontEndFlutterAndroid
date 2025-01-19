@@ -128,90 +128,89 @@ class _PostsScreenState extends State<PostsScreen> {
           );
         }),
       ),
-      body: Center(
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.6,
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  'Todos',
-                  'Película',
-                  'Serie',
-                  'Libro',
-                  'Podcast',
-                  'Música',
-                  'Otro'
-                ].map((type) {
-                  // Obtén el valor de si el tema está oscuro o claro
-                  final isDarkMode =
-                      Theme.of(context).brightness == Brightness.dark;
+     body: Center(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9, // Augmentar l'amplada del contenedor
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Wrap(
+              alignment: WrapAlignment.center, // Això centra els botons
+              spacing: 8.0, // Espai horitzontal entre els botons
+              runSpacing: 8.0, // Espai vertical entre les línies de botons
+              children: [
+                'Todos',
+                'Película',
+                'Serie',
+                'Libro',
+                'Podcast',
+                'Música',
+                'Otro'
+              ].map((type) {
+                final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+                final buttonColor = isDarkMode ? Color(0xFF555A6F) : Color(0xFF89AFAF);
 
-                  // Define el color según el modo
-                  final buttonColor = isDarkMode
-                      ? Color(0xFF555A6F) // Color para el modo oscuro
-                      : Color(0xFF89AFAF); // Color para el modo claro
-
-                  return ElevatedButton(
-                    onPressed: () {
-                      _filterPostsByType(type);
+                return ElevatedButton(
+                  onPressed: () {
+                    _filterPostsByType(type);
+                  },
+                  child: Text(
+                    type.tr,
+                    style: TextStyle(fontSize: 12), // Font més petita
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: buttonColor,
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(color: Colors.white),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Més compacte
+                    minimumSize: Size(55, 35), // Defineix una mida mínima per al botó
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16),
+            Obx(() {
+              if (postController.isLoading.value) {
+                return Center(child: CircularProgressIndicator());
+              } else if (selectedType != 'Todos' && postController.postsByType.isEmpty) {
+                return Center(
+                  child: Text(
+                    "No hay posts disponibles para esta categoría".tr,
+                    style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF)),
+                  ),
+                );
+              } else if (selectedType == 'Todos' && postsListController.postList.isEmpty) {
+                return Center(
+                  child: Text(
+                    "No hay posts disponibles".tr,
+                    style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF)),
+                  ),
+                );
+              } else {
+                var postsToDisplay = selectedType == 'Todos' ? postsListController.postList : postController.postsByType;
+                return Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: postsToDisplay.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == postsToDisplay.length) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      final post = postsToDisplay[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 0.1, horizontal: 0.1), // Reduir el padding lateral
+                        child: PostCard(post: post),
+                      );
                     },
-                    child: Text(type.tr),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          buttonColor, // Cambia el color de fondo según el modo
-                      foregroundColor: Colors.white,
-                      textStyle: const TextStyle(color: Colors.white),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16),
-              Obx(() {
-                if (postController.isLoading.value) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (selectedType != 'Todos' &&
-                    postController.postsByType.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No hay posts disponibles para esta categoría".tr,
-                      style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF)),
-                    ),
-                  );
-                } else if (selectedType == 'Todos' &&
-                    postsListController.postList.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No hay posts disponibles".tr,
-                      style: TextStyle(fontSize: 16, color: Color(0xFF89AFAF)),
-                    ),
-                  );
-                } else {
-                  var postsToDisplay = selectedType == 'Todos' ? postsListController.postList : postController.postsByType;
-                  return Expanded(
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: postsToDisplay.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == postsToDisplay.length) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        final post = postsToDisplay[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: PostCard(post: post),
-                        );
-                      },
-                    ),
-                  );
-                }
-              }),
-            ],
-          ),
+                  ),
+                );
+              }
+            }),
+          ],
         ),
       ),
+    ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showAddPostDialog(context);
@@ -252,7 +251,7 @@ class _PostsScreenState extends State<PostsScreen> {
                 } else {
                   final myPosts = snapshot.data ?? [];
                   return Container(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0), //Cambiar widget postCArd
                     width: MediaQuery.of(context).size.width * 0.6,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
