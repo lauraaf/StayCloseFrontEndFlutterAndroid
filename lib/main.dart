@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget {
         const Locale('es', 'ES'),
         const Locale('ca', 'ES'),
       ],
-      initialRoute: '/login',
+      initialRoute: '/perfil',
       getPages: [
         // Ruta de inicio de sesión
         GetPage(
