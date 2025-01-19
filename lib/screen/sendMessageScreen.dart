@@ -53,7 +53,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
 
   Future<void> _connectToSocket() async {
     _socket = IO.io(
-      'http://127.0.0.1:3000',
+      'http://10.0.2.2:3000',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
@@ -137,7 +137,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
         // Obtener coordenadas de la dirección de casa
         Map<String, double> homeCoordinates =
             await _ubiController.getCoordinatesFromAddress(homeAddress);
-
+        print('Aquestes son les meves coordenadoes de casa: $homeCoordinates');
         // Enviar mensaje "Me dirijo a casa"
         await MessageService.sendMessage(
           chatId: widget.chatId,
@@ -153,6 +153,8 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             distanceFilter: 10,
           ),
         ).listen((Position position) async {
+          print('Ubicación actual: Latitud: ${position.latitude}, Longitud: ${position.longitude}');
+          
           double distanceInMeters = Geolocator.distanceBetween(
             position.latitude,
             position.longitude,
@@ -160,8 +162,10 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             homeCoordinates['longitude']!,
           );
 
+          print('Distancia a casa: $distanceInMeters metros');
+
           if (distanceInMeters < 100) {
-            // Enviar mensaje "Ya estoy en casa" cuando se detecta que el usuario ha llegado a casa
+            print('¡Ya estoy en casa! Enviando mensaje...');
             await MessageService.sendMessage(
               chatId: widget.chatId,
               senderUsername: currentUsername,

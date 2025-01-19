@@ -6,8 +6,10 @@ import 'package:flutter_application_1/models/post.dart';
 import 'package:flutter_application_1/services/postServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:typed_data';
-import 'package:image_picker_web/image_picker_web.dart';
+//import 'package:image_picker_web/image_picker_web.dart';
 import 'package:flutter_application_1/controllers/postsListController.dart'; // Asegúrate de este import
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart'; // Para Android/iOS
 
 class PostController extends GetxController {
   final PostService postService = Get.put(PostService());
@@ -35,10 +37,23 @@ class PostController extends GetxController {
     ownerController.text = username; // Rellenar el campo de autor
   }
 
-  // Seleccionar imagen desde el dispositivo
+  // Seleccionar imagen desde el dispositivo o navegador
   Future<void> pickImage() async {
     try {
-      Uint8List? imageBytes = await ImagePickerWeb.getImageAsBytes();
+      Uint8List? imageBytes;
+      
+      if (kIsWeb) {
+        // Código para la web
+        //imageBytes = await ImagePickerWeb.getImageAsBytes();
+      } else {
+        // Código para móvil
+        final ImagePicker picker = ImagePicker();
+        final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+        if (pickedFile != null) {
+          imageBytes = await pickedFile.readAsBytes();
+        }
+      }
+
       if (imageBytes != null) {
         selectedImage = imageBytes;
         uploadedImageUrl.value = ''; // Reinicia la URL de Cloudinary
@@ -50,7 +65,6 @@ class PostController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
     }
   }
-
   // Subir imagen a Cloudinary
   Future<void> uploadImageToCloudinary() async {
     if (selectedImage == null) {
