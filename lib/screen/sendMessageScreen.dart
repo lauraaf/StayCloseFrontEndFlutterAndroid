@@ -142,19 +142,13 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
         content: '¡Estoy Aquí! <a href="$locationLink">¡Estoy Aquí!</a>',
       );
 
-      // Llança l'URL
-      if (await canLaunch(locationLink)) {
-        await launch(locationLink);
-      } else {
-        throw 'No es pot obrir l\'enllaç: $locationLink';
-      }
-
       print('Ubicación enviada: $locationLink');
     } catch (e) {
       print('Error al obtener la ubicación: $e');
       Get.snackbar('Error', 'No se pudo obtener la ubicación');
     }
   }
+
 
 
 
