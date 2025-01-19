@@ -286,8 +286,8 @@ void _filterLocationsByType(String type) {
                 ],
               ),
               child: Wrap(
-                spacing: 100.0, // Espacio entre los botones
-                runSpacing: 10.0, // Espacio entre las filas si los botones se dividen
+                spacing: 5.0, // Espacio entre los botones
+                runSpacing: 7.0, // Espacio entre las filas si los botones se dividen
                 alignment: WrapAlignment.center, // Alinea los botones al centro
                 
                 children: ['Punto lila' .tr, 'Hospital' .tr, 'Centro' .tr, 'Otros' .tr, 'Todos' .tr]
@@ -298,8 +298,11 @@ void _filterLocationsByType(String type) {
                       _filterLocationsByType(type);
                       
                     },
-                    child: Text(type.tr),
+                    child: Text(
+                      type.tr,
+                      style: const TextStyle(fontSize: 13)),
                     style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
                       backgroundColor: selectedType == type
                           ? const Color(0xFF89AFAF)
                           : const Color.fromARGB(255, 178, 178, 178),
@@ -313,7 +316,7 @@ void _filterLocationsByType(String type) {
           ),
             // Elementos adicionales, como el título y las ubicaciones cercanas
             Positioned(
-              top: 8, 
+              top: 90, 
               right: 27, 
               child: Container(
                 width: 290, 
@@ -336,7 +339,7 @@ void _filterLocationsByType(String type) {
               ),
             ),
             Positioned(
-              top: 58,
+              top: 140,
               right: 10,
               child: Container(
                 width: 320, 
