@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart'; // Para Android/iOS
 class UserController extends GetxController {
   final UserService userService = Get.put(UserService());
   var currentUserName = ''.obs;
+  var users = <UserModel>[].obs;
 
   // Controladores de texto para la UI
   final TextEditingController usernameController = TextEditingController();
@@ -43,6 +44,28 @@ class UserController extends GetxController {
     } catch (e) {
       Get.snackbar('Error', 'No se pudo obtener el usuario');
       print('Error al obtener el usuario: $e');
+    }
+  }
+  
+  // Método para cargar todos los usuarios
+  Future<void> fetchUsers() async {
+    try {
+      isLoading.value = true;
+
+      // Llamar al servicio para obtener los usuarios
+      final fetchedUsers = await userService
+          .getUsers(); // Asegúrate de que esto devuelva una lista válida
+      if (fetchedUsers.isNotEmpty) {
+        users.value = fetchedUsers; // Actualizar la lista de usuarios
+      } else {
+        print("No se encontraron usuarios.");
+        users.clear(); // Limpia la lista si no hay usuarios
+      }
+    } catch (e) {
+      print("Error al obtener usuarios: $e");
+      Get.snackbar("Error", "No se pudieron cargar los usuarios.");
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -169,7 +192,7 @@ class UserController extends GetxController {
     }
   }
 
-  //Buscar usuario por username
+
   // Buscar usuario por username
   Future<void> searchUser(String username) async {
     try {
