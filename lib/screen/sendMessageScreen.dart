@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import '../services/messageService.dart';
 import '../services/userServices.dart'; // Importar UserService
 import '../controllers/userController.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:geolocator/geolocator.dart'; // Importar Geolocator
 import 'package:url_launcher/url_launcher.dart'; // Importar URL Launcher
@@ -62,15 +64,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
 
     _socket.connect();
     _socket.emit('joinChat', widget.chatId);
-    /*
 
-    _socket.on('newMessage', (data) {
-      setState(() {
-        _messages.add(data);
-      });
-      
-    });
-    */
     _socket.on('newMessage', (data) {
       final currentUser = Get.find<UserController>().currentUserName.value;
       // Verificar que el mensaje no esté duplicado
@@ -113,8 +107,6 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     }
   }
 
-
-
   Future<void> _sendLocation() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
@@ -127,13 +119,16 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        Get.snackbar('Error', 'Location permissions are permanently denied, we cannot request permissions.');
+        Get.snackbar('Error',
+            'Location permissions are permanently denied, we cannot request permissions.');
         return;
       }
 
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
 
-      String locationLink = 'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
+      String locationLink =
+          'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
 
       await MessageService.sendMessage(
         chatId: widget.chatId,
@@ -148,9 +143,6 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
       Get.snackbar('Error', 'No se pudo obtener la ubicación');
     }
   }
-
-
-
 
   Future<void> _sendHomeStatus() async {
     try {
@@ -268,42 +260,81 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
         children: [
           Expanded(
             child: ListView.builder(
-              controller: _scrollController, // Asigna el ScrollController aquí
+              controller: _scrollController,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
                 final isSender = message['sender'] ==
                     Get.find<UserController>().currentUserName.value;
-                return Align(
-                  alignment:
-                      isSender ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.all(8.0),
-                    padding: const EdgeInsets.all(12.0),
-                    decoration: BoxDecoration(
-                      color:
-                          isSender ? Color(0xFF89AFAF) : Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: message['content'].contains('<a href="')
-                        ? GestureDetector(
-                            onTap: () => _openMap(message['content'].substring(
-                                message['content'].indexOf('"') + 1,
-                                message['content'].lastIndexOf('"'))),
-                            child: Text(
-                              '¡Estoy Aquí!',
-                              style: TextStyle(
-                                color: Colors.blue,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            message['content'],
-                            style: TextStyle(color: Colors.black87),
+
+                // Renderizar contenido con mapa si es una ubicación
+                if (message['content'].startsWith('geo:')) {
+                  final coordinates = message['content']
+                      .substring(4)
+                      .split(',')
+                      .map(double.parse)
+                      .toList();
+                  final latitude = coordinates[0];
+                  final longitude = coordinates[1];
+
+                  return Align(
+                    alignment:
+                        isSender ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(12.0),
+                      decoration: BoxDecoration(
+                        color:
+                            isSender ? Color(0xFF89AFAF) : Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: SizedBox(
+                        height: 200,
+                        width: 300,
+                        child: FlutterMap(
+                          options: MapOptions(
+                            center: LatLng(latitude, longitude),
+                            zoom: 13,
                           ),
-                  ),
-                );
+                          children: [
+                            TileLayer(
+                              urlTemplate:
+                                  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              subdomains: ['a', 'b', 'c'],
+                            ),
+                            MarkerLayer(
+                              markers: [
+                                Marker(
+                                  point: LatLng(latitude, longitude),
+                                  builder: (ctx) => Icon(Icons.location_pin,
+                                      color: Colors.red, size: 30),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return Align(
+                    alignment:
+                        isSender ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(12.0),
+                      decoration: BoxDecoration(
+                        color:
+                            isSender ? Color(0xFF89AFAF) : Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Text(
+                        message['content'],
+                        style: TextStyle(color: Colors.black87),
+                      ),
+                    ),
+                  );
+                }
               },
             ),
           ),
