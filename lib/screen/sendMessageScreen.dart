@@ -53,7 +53,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
 
   Future<void> _connectToSocket() async {
     _socket = IO.io(
-      'http://10.0.2.2:3000',
+      'http://147.83.7.155:3000',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()

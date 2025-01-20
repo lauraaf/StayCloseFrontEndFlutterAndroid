@@ -3,8 +3,8 @@ import 'package:dio/dio.dart';
 
 class UbiService {
   //final String baseUrl = "http://127.0.0.1:3000"; // URL de tu backend web
-  //final String baseUrl = "http://147.83.7.155:3000"; // URL del backend de producción
-  final String baseUrl = "http://10.0.2.2:3000"; // URL del backend para Android
+  final String baseUrl = "http://147.83.7.155:3000"; // URL del backend de producción
+  //final String baseUrl = "http://10.0.2.2:3000"; // URL del backend para Android
   final Dio dio = Dio(); // Instancia de Dio para hacer las peticiones HTTP
 
   var statusCode;
